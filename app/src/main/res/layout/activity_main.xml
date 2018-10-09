@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.MainActivity">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical" >
+
+        <FrameLayout
+            android:id="@+id/frame"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#e9e9e9" />
+
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="match_parent"
+            android:layout_height="49dp"
+            android:orientation="horizontal" >
+
+            <RadioButton
+                android:id="@+id/rb_team"
+                style="@style/main_tab_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableTop="@drawable/radiobutton_selector1"
+                android:text="@string/team"
+                android:textColor="@drawable/rbtn_text_color" />
+
+            <RadioButton
+                android:id="@+id/rb_find"
+                style="@style/main_tab_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableTop="@drawable/radiobutton_selector2"
+                android:text="@string/find"
+                android:textColor="@drawable/rbtn_text_color" />
+
+            <RadioButton
+                android:id="@+id/rb_msg"
+                style="@style/main_tab_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableTop="@drawable/radiobutton_selector3"
+                android:text="@string/msg"
+                android:textColor="@drawable/rbtn_text_color" />
+
+            <RadioButton
+                android:id="@+id/rb_mine"
+                style="@style/main_tab_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableTop="@drawable/radiobutton_selector4"
+                android:text="@string/mine"
+                android:textColor="@drawable/rbtn_text_color" />
+        </RadioGroup>
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>

@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">X-plan</string>
+    <string name="team">组局</string>
+    <string name="find">发现</string>
+    <string name="msg">消息</string>
+    <string name="mine">我的</string>
+    <string name="logo_msg">一起来更好玩</string>
+    <string name="login">登录</string>
+    <string name="register">注册</string>
+</resources>
