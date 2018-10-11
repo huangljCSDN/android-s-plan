@@ -36,4 +36,7 @@
     //---------------------------
     <color name="color_9DA4B3">#9DA4B3</color>
     <color name="color_FF396E">#FF396E</color>
+    <color name="c_dddddd">#dddddd</color>
+    <color name="c_333333">#333333</color>
+    <color name="transparent">#00000000</color>
 </resources>

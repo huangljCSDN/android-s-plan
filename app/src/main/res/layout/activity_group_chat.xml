@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activity.GroupChatActivity">
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:src="@mipmap/ic_launcher"/>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:id="@+id/id_listview"
+        android:background="#ebebeb"
+        android:divider="@null"
+        android:dividerHeight="10dp"
+        ></ListView>
+
+    <EditText
+        android:id="@+id/et_edit"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@null"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/c_dddddd"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:id="@+id/fl_sound"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_sound" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/fl_camera"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/camera" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/fl_pic"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_pic" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/fl_emoji"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_emoji" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        >
+        <com.markLove.xplan.recorder.view.AudioRecorderButton
+            android:id="@+id/id_recorder_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"
+            android:gravity="center"
+            android:layout_marginTop="7dp"
+            android:layout_marginBottom="7dp"
+            android:padding="5dp"
+            android:text="@string/str_recorder_normal"
+            android:textColor="#727272"
+            android:background="@drawable/btn_recorder_normal"
+            android:minHeight="0dp"
+            >
+
+        </com.markLove.xplan.recorder.view.AudioRecorderButton>
+
+
+    </LinearLayout>
+
+</LinearLayout>
