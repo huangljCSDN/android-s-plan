@@ -34,6 +34,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
                 startActivity(intent);
                 break;
             case R.id.btn_register:
+                Intent intent2 = new Intent(this,MainActivity.class);
                 break;
         }
     }
