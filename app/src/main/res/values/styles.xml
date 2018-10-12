@@ -33,14 +33,14 @@
     <style name="DividerHorizontal">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1px</item>
-        <item name="android:background">@color/c_dddddd</item>
+        <item name="android:background">@color/color_dddddd</item>
     </style>
 
     <!--分隔线 竖向-->
     <style name="DividerVertical">
         <item name="android:layout_width">1px</item>
         <item name="android:layout_height">match_parent</item>
-        <item name="android:background">@color/c_dddddd</item>
+        <item name="android:background">@color/color_dddddd</item>
     </style>
 
     <!-- 填充屏幕宽度的Dialog -->
@@ -78,4 +78,13 @@
         <item name="android:backgroundDimEnabled">true</item>
     </style>
 
+    <style name="Report_button">
+        <item name="android:layout_width">263dp</item>
+        <item name="android:layout_height">35dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:textColor">@color/color_333333</item>
+        <item name="android:background">@drawable/report_button_selector</item>
+    </style>
 </resources>

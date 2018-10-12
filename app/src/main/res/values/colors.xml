@@ -20,10 +20,7 @@
     <color name="color_refund">#DF4444</color>
     <color name="color_white">#ffffff</color>
     <color name="color_white2">#F5F5F5</color>
-    <color name="color_333">#333333</color>
     <color name="color_ddd">#DDDDDD</color>
-    <color name="color_666">#666666</color>
-    <color name="color_999">#999999</color>
     <color name="color_eee">#eeeeee</color>
     <color name="register_titleLine">#C5C5C5</color>
     <color name="color_bbb">#bbbbbb</color>
@@ -34,9 +31,14 @@
     <color name="color_red2">#F85159</color>
 
     //---------------------------
+    <color name="transparent">#00000000</color>
     <color name="color_9DA4B3">#9DA4B3</color>
     <color name="color_FF396E">#FF396E</color>
-    <color name="c_dddddd">#dddddd</color>
-    <color name="c_333333">#333333</color>
-    <color name="transparent">#00000000</color>
+    <color name="color_dddddd">#dddddd</color>
+    <color name="color_333333">#333333</color>
+    <color name="color_666666">#666666</color>
+    <color name="color_999999">#999999</color>
+    <color name="color_f1f1f1">#f1f1f1</color>
+    <color name="color_a7a7a7">#a7a7a7</color>
+
 </resources>

@@ -12,7 +12,7 @@
         android:background="@drawable/function_selector"
         android:gravity="center"
         android:text="@string/dialog_choose_pic_gallery"
-        android:textColor="@color/c_333333" />
+        android:textColor="@color/color_333333" />
 
     <View style="@style/DividerHorizontal" />
 
@@ -23,7 +23,7 @@
         android:background="@drawable/function_selector"
         android:gravity="center"
         android:text="@string/dialog_choose_pic_take_photo"
-        android:textColor="@color/c_333333" />
+        android:textColor="@color/color_333333" />
 
     <View style="@style/DividerHorizontal" />
 

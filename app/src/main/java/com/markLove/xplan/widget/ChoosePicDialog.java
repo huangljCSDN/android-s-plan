@@ -13,8 +13,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * 选择相片的dialog
- * huanglingjun 2017/11/9.
+ * 作者：created by huanglingjun on 2018/10/12
+ * 描述：选择相片
  */
 public class ChoosePicDialog extends DialogFragment implements View.OnClickListener {
     private OnMenuClickListener onMenuClickListener;

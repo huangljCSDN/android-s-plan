@@ -10,8 +10,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 
-import com.markLove.xplan.R;
-
 
 /**
  * 自定义按钮 实现录音等功能
@@ -24,9 +22,10 @@ public class AudioRecorderButton extends Button implements AudioManager.AudioSta
     //手指滑动 距离
     private static final int DISTANCE_Y_CANCEL = 50;
     //状态
-    private static final int STATE_NORMAL = 1;
-    private static final int STATE_RECORDING = 2;
-    private static final int STATE_WANT_TO_CANCEL = 3;
+    public static final int STATE_NORMAL = 1;
+    public static final int STATE_RECORDING = 2;
+    public static final int STATE_WANT_TO_CANCEL = 3;
+    public static final int STATE_TO_SHORT = 4;
     //当前状态
     private int mCurState = STATE_NORMAL;
     //已经开始录音
@@ -45,8 +44,8 @@ public class AudioRecorderButton extends Button implements AudioManager.AudioSta
 
     public AudioRecorderButton(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mDialogManager = new DialogManager(getContext());
-        //偷个懒，并没有判断 是否存在， 是否可读。
+//        mDialogManager = new DialogManager(getContext());
+        //偷个懒，并没有判断 是否存在， 是否可读。、
 
         String dir = Environment.getExternalStorageDirectory() + "/recorder_audios";
 
@@ -66,16 +65,17 @@ public class AudioRecorderButton extends Button implements AudioManager.AudioSta
     /**
      * 录音完成后的回调
      */
-    public interface AudioFinishRecorderListener{
+    public interface AudioFinishRecorderListener {
         //时长  和 文件
         void onFinish(float seconds, String filePath);
     }
 
     private AudioFinishRecorderListener mListener;
 
-    public void setAudioFinishRecorderListener (AudioFinishRecorderListener listener){
+    public void setAudioFinishRecorderListener(AudioFinishRecorderListener listener) {
         mListener = listener;
     }
+
     //获取音量大小的Runnable
     private Runnable mGetVoiceLevelRunnable = new Runnable() {
         @Override
@@ -100,19 +100,21 @@ public class AudioRecorderButton extends Button implements AudioManager.AudioSta
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case MSG_AUDIO_PREPARED :
+                case MSG_AUDIO_PREPARED:
                     //TODO 真正现实应该在audio end prepared以后
-                    mDialogManager.showRecordingDialog();
+//                    mDialogManager.showRecordingDialog();
                     isRecording = true;
 
                     new Thread(mGetVoiceLevelRunnable).start();
                     break;
-                case MSG_VOICE_CHANGED :
-                    mDialogManager.updateVoiceLevel(mAudioManager.getVoiceLevel(7));
-
+                case MSG_VOICE_CHANGED:
+                    if (onStateChangListener != null) {
+                        onStateChangListener.onTimeChang(mTime);
+                    }
+//                    mDialogManager.updateVoiceLevel(mAudioManager.getVoiceLevel(7));
                     break;
-                case MSG_DIALOG_DIMISS :
-                    mDialogManager.dimissDialog();
+                case MSG_DIALOG_DIMISS:
+//                    mDialogManager.dimissDialog();
                     break;
             }
         }
@@ -140,14 +142,14 @@ public class AudioRecorderButton extends Button implements AudioManager.AudioSta
                 if (isRecording) {
 
 
-                //根据想x,y的坐标，判断是否想要取消
-                if (wantToCancel(x, y)) {
+                    //根据想x,y的坐标，判断是否想要取消
+                    if (wantToCancel(x, y)) {
 
-                    changeState(STATE_WANT_TO_CANCEL);
-                } else {
+                        changeState(STATE_WANT_TO_CANCEL);
+                    } else {
 
-                    changeState(STATE_RECORDING);
-                }
+                        changeState(STATE_RECORDING);
+                    }
                 }
                 break;
             case MotionEvent.ACTION_UP:
@@ -158,27 +160,30 @@ public class AudioRecorderButton extends Button implements AudioManager.AudioSta
                 }
                 //触发了onlongclick 没准备好，但是已经prepared 已经start
                 //所以消除文件夹
-                if(!isRecording||mTime<0.6f){
-                    mDialogManager.tooShort();
+                if (!isRecording || mTime < 1f) {
+//                    mDialogManager.tooShort();
                     mAudioManager.cancel();
                     mHandler.sendEmptyMessageDelayed(MSG_DIALOG_DIMISS, 1300);
-                }else if(mCurState==STATE_RECORDING){//正常录制结束
+                    if (onStateChangListener != null){
+                        onStateChangListener.onStateChang(STATE_TO_SHORT);
+                    }
+                } else if (mCurState == STATE_RECORDING) {//正常录制结束
 
-                    mDialogManager.dimissDialog();
+//                    mDialogManager.dimissDialog();
                     mAudioManager.release();
                     if (mListener != null) {
-                        mListener.onFinish(mTime,mAudioManager.getCurrentFilePath());
+                        mListener.onFinish(mTime, mAudioManager.getCurrentFilePath());
+                    }
+                    if (onStateChangListener != null){
+                        onStateChangListener.onStateChang(mCurState);
                     }
 
-                }else if (mCurState == STATE_RECORDING) {
-
-                    mDialogManager.dimissDialog();
-                    //release
-                    //callbacktoAct
                 } else if (mCurState == STATE_WANT_TO_CANCEL) {
-                    mDialogManager.dimissDialog();
+//                    mDialogManager.dimissDialog();
                     mAudioManager.cancel();
-                    //cancel
+                    if (onStateChangListener != null){
+                        onStateChangListener.onStateChang(mCurState);
+                    }
                 }
 
                 reset();
@@ -218,25 +223,42 @@ public class AudioRecorderButton extends Button implements AudioManager.AudioSta
             mCurState = state;
             switch (state) {
                 case STATE_NORMAL:
-                    setBackgroundResource(R.drawable.btn_recorder_normal);
-                    setText(R.string.str_recorder_normal);
+//                    setBackgroundResource(R.drawable.btn_recorder_normal);
+//                    setText(R.string.str_recorder_normal);
+
                     break;
                 case STATE_RECORDING:
-                    setBackgroundResource(R.drawable.btn_recording);
-                    setText(R.string.str_recorder_recording);
+//                    setBackgroundResource(R.drawable.btn_recording);
+//                    setText(R.string.str_recorder_recording);
 
-                    if (isRecording) {
-                        mDialogManager.recording();
-                    }
+//                    if (isRecording) {
+//                        mDialogManager.recording();
+//                    }
                     break;
                 case STATE_WANT_TO_CANCEL:
-                    setBackgroundResource(R.drawable.btn_recording);
-                    setText(R.string.str_recorder_want_cancel);
-                    mDialogManager.wantToCancel();
+//                    setBackgroundResource(R.drawable.btn_recording);
+//                    setText(R.string.str_recorder_want_cancel);
+//                    mDialogManager.wantToCancel();
                     break;
+            }
+            if (onStateChangListener != null){
+                onStateChangListener.onStateChang(state);
             }
         }
     }
 
+    /**
+     * 录音状态改变回调
+     */
+    public interface OnRecordingStateChangListener {
+        void onStateChang(int state);
 
+        void onTimeChang(float time);
+    }
+
+    public OnRecordingStateChangListener onStateChangListener;
+
+    public void setOnRecordindStateChangListener(OnRecordingStateChangListener onRecordindStateChangListener) {
+        this.onStateChangListener = onRecordindStateChangListener;
+    }
 }

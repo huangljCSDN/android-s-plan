@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@drawable/bg_shop_chat_room"
+    android:orientation="vertical"
     tools:context=".activity.GroupChatActivity">
 
     <RelativeLayout
@@ -47,36 +47,45 @@
         android:id="@+id/tv_shop_name"
         android:layout_width="wrap_content"
         android:layout_height="41dp"
-        android:textColor="@color/color_white"
-        android:text="重庆老火锅"
-        android:gravity="center"
         android:layout_marginLeft="23dp"
-        android:textSize="18sp"/>
+        android:gravity="center"
+        android:textColor="@color/color_white"
+        android:textSize="18sp"
+        tools:text="重庆老火锅" />
 
     <TextView
         android:id="@+id/tv_person_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="23dp"
+        android:background="@drawable/bg_all_person"
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
-        android:layout_marginLeft="23dp"
-        android:text="13122141242421"
         android:textColor="@color/color_white"
-        android:background="@drawable/bg_all_person"
-        android:textSize="11sp"/>
+        android:textSize="11sp"
+        tools:text="13122141242421" />
 
     <LinearLayout
-        android:id="@+id/ll_person_count"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="23dp"
         android:layout_marginLeft="23dp"
+        android:layout_marginRight="23dp"
         android:layout_marginTop="16dp"
         android:orientation="horizontal">
-        <ImageView
+
+        <LinearLayout
+            android:id="@+id/ll_person_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_all_person"/>
+            android:orientation="horizontal"></LinearLayout>
+
+        <ImageView
+            android:id="@+id/iv_more"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_all_person" />
     </LinearLayout>
+
     <ImageView
         android:id="@+id/image"
         android:layout_width="wrap_content"
@@ -89,20 +98,27 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="#ebebeb"
+        android:background="@color/transparent"
         android:divider="@null"
+
         android:dividerHeight="10dp"></ListView>
 
     <EditText
-        android:id="@+id/et_edit"
+        android:id="@+id/et_input_msg"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:background="@null" />
+        android:background="@color/color_white"
+        android:hint="@string/hint_input_msg"
+        android:paddingLeft="23dp"
+        android:paddingRight="23dp"
+        android:textSize="14sp"
+        android:textColor="@color/color_333333"
+        android:textColorHint="@color/color_a7a7a7"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:background="@color/color_dddddd"
+        android:background="@color/color_white"
         android:orientation="horizontal">
 
         <FrameLayout
@@ -158,30 +174,45 @@
         </FrameLayout>
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/ll_record_sound"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:gravity="center"
+        android:layout_height="194dp"
+        android:visibility="gone"
         android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_record_tip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:textColor="@color/color_white"
+            android:textSize="10sp"
+            android:layout_centerHorizontal="true"
+            android:text="@string/pressed_say"/>
+
+        <TextView
+            android:id="@+id/tv_record_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:textColor="@color/color_white"
+            android:textSize="10sp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="40dp"
+            tools:text="0.01"/>
 
         <com.markLove.xplan.recorder.view.AudioRecorderButton
             android:id="@+id/id_recorder_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="7dp"
-            android:layout_marginLeft="50dp"
-            android:layout_marginRight="50dp"
-            android:layout_marginTop="7dp"
-            android:background="@drawable/btn_recorder_normal"
-            android:gravity="center"
-            android:minHeight="0dp"
-            android:padding="5dp"
-            android:text="@string/str_recorder_normal"
-            android:textColor="#727272">
+            android:layout_width="68dp"
+            android:layout_height="68dp"
+            android:layout_marginTop="69dp"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/ic_record_sound">
 
         </com.markLove.xplan.recorder.view.AudioRecorderButton>
 
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </LinearLayout>
