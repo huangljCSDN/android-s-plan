@@ -120,4 +120,8 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
     public void showError(String error) {
         Toast.makeText(this, error,Toast.LENGTH_SHORT).show();
     }
+
+    public void toast(String content){
+        Toast.makeText(this,content,Toast.LENGTH_SHORT).show();
+    }
 }

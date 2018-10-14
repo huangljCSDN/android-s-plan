@@ -1,8 +1,18 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'android'
+            keyPassword 'salesman123$$'
+            storePassword 'salesman123$$'
+            storeFile file('sctek_salesman.keystore')
+        }
+    }
+
     compileSdkVersion 27
-    buildToolsVersion '28.0.2'
+    buildToolsVersion '27.0.3'
+
     defaultConfig {
         applicationId "com.markLove.xplan"
         minSdkVersion 23
@@ -11,8 +21,25 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    def STRING = "String"
+    def APP_HOST = "APP_HOST"
+
     buildTypes {
+        // debug 开发环境
+        debug {
+            debuggable true
+            signingConfig signingConfigs.config
+            buildConfigField(STRING, APP_HOST, '"http://appdtdev.opt.snsshop.net"')
+        }
+        // beta 测试环境
+        beta {
+            debuggable true
+            signingConfig signingConfigs.config
+            buildConfigField(STRING, APP_HOST, '"http://appdt.testopt.snsshop.net"')
+        }
+
         release {
+            debuggable false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -34,4 +61,9 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.1.0'
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.4.1'
+    implementation 'com.facebook.fresco:fresco:1.10.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0'
+    implementation 'com.github.bumptech.glide:glide:4.0.0'
+    implementation project(':mediapicker')
+    implementation project(':camera')
 }

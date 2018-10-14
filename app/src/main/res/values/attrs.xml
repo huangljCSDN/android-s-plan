@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--加载进度-->
+    <declare-styleable name="ProgressWheel">
+        <attr name="matProg_progressIndeterminate" format="boolean" />
+        <attr name="matProg_barColor" format="color" />
+        <attr name="matProg_rimColor" format="color" />
+        <attr name="matProg_rimWidth" format="dimension" />
+        <attr name="matProg_spinSpeed" format="float" />
+        <attr name="matProg_barSpinCycleTime" format="integer" />
+        <attr name="matProg_circleRadius" format="dimension" />
+        <attr name="matProg_fillRadius" format="boolean" />
+        <attr name="matProg_barWidth" format="dimension" />
+        <attr name="matProg_linearProgress" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="EmojiPointerView">
+        <!-- 圆点的半径 -->
+        <attr name="radius" format="dimension" />
+        <!-- 圆点之间的距离 -->
+        <attr name="distance" format="dimension" />
+        <!-- 圆点默认的颜色 -->
+        <attr name="defaultColor" format="color" />
+        <!-- 圆点选中的颜色 -->
+        <attr name="selectColor" format="color" />
+        <!--  圆点数量 -->
+        <attr name="count" format="integer" />
+    </declare-styleable>
+
+
+    <declare-styleable name="bubble">
+        <attr name="shadowColor" format="color" />
+        <attr name="padding" format="dimension" />
+        <attr name="strokeWidth" format="float" />
+        <attr name="cornerRadius" format="dimension" />
+        <attr name="halfBaseOfLeg" format="dimension" />
+    </declare-styleable>
+</resources>

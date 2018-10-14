@@ -2,6 +2,8 @@ package com.markLove.xplan.api.util;
 
 import android.content.Context;
 
+import com.markLove.xplan.BuildConfig;
+
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -29,7 +31,7 @@ public class RetrofitUtil {
 
     private RetrofitUtil(){
         retrofit = new Retrofit.Builder()
-                .baseUrl("http://www.kuaidi100.com/")
+                .baseUrl(BuildConfig.APP_HOST)
                 .client(OkHttpUtil.getOkHttpClient())
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
