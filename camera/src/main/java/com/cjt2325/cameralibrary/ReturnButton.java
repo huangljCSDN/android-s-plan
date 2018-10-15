@@ -1,10 +1,13 @@
 package com.cjt2325.cameralibrary;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Rect;
 import android.view.View;
 
 /**
@@ -55,9 +58,14 @@ public class ReturnButton extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        path.moveTo(strokeWidth, strokeWidth/2);
-        path.lineTo(center_X, center_Y - strokeWidth/2);
-        path.lineTo(size - strokeWidth, strokeWidth/2);
-        canvas.drawPath(path, paint);
+//        path.moveTo(strokeWidth, strokeWidth/2);
+//        path.lineTo(center_X, center_Y - strokeWidth/2);
+//        path.lineTo(size - strokeWidth, strokeWidth/2);
+//        canvas.drawPath(path, paint);
+
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.ic_close);
+        Rect mSrcRect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        Rect mDestRect = new Rect(0, 0,bitmap.getWidth(), bitmap.getHeight());
+        canvas.drawBitmap(bitmap,mSrcRect,mDestRect,paint);
     }
 }

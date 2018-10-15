@@ -10,6 +10,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 
+import java.io.File;
+
 
 /**
  * 自定义按钮 实现录音等功能
@@ -47,7 +49,8 @@ public class AudioRecorderButton extends Button implements AudioManager.AudioSta
 //        mDialogManager = new DialogManager(getContext());
         //偷个懒，并没有判断 是否存在， 是否可读。、
 
-        String dir = Environment.getExternalStorageDirectory() + "/recorder_audios";
+//        String dir = Environment.getExternalStorageDirectory() + "/recorder_audios";
+        String dir =  Environment.getExternalStorageDirectory().getPath() + File.separator + "xplan" + File.separator + "recorder_audios";
 
         mAudioManager = new AudioManager(dir);
         mAudioManager.setOnAudioStateListener(this);

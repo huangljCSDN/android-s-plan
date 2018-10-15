@@ -34,6 +34,7 @@ public class TakePhotoActivity extends Activity {
 
         try {
             mTmpFile = createImageFile();
+
         } catch (IOException e) {
             e.printStackTrace();
         }

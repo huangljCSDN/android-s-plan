@@ -7,6 +7,7 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
@@ -19,7 +20,7 @@ import com.markLove.xplan.R;
 public class MorePopWindow extends PopupWindow implements View.OnClickListener{
 
     private Context context;
-    private TextView ll_chat, ll_friend;
+    private LinearLayout ll_report, ll_exit;
 
     private String msg_one,msg_two;
 
@@ -34,14 +35,16 @@ public class MorePopWindow extends PopupWindow implements View.OnClickListener{
     private void initalize() {
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.dialog_more, null);
-        ll_chat = view.findViewById(R.id.ll_chat);
-        ll_friend = view.findViewById(R.id.ll_friend);
+        ll_report = view.findViewById(R.id.ll_report);
+        ll_exit = view.findViewById(R.id.ll_exit);
 
-        ll_chat.setText(msg_one);
-        ll_friend.setText(msg_two);
+        TextView tvReport = view.findViewById(R.id.tv_report);
+        TextView tvExit = view.findViewById(R.id.tv_exit);
+        tvReport.setText(msg_one);
+        tvExit.setText(msg_two);
 
-        ll_chat.setOnClickListener(this);
-        ll_friend.setOnClickListener(this);
+        ll_report.setOnClickListener(this);
+        ll_exit.setOnClickListener(this);
         setContentView(view);
         initWindow();
     }
@@ -83,13 +86,13 @@ public class MorePopWindow extends PopupWindow implements View.OnClickListener{
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.ll_chat:
+            case R.id.ll_report:
                 if (onDialogCallBack != null){
                     onDialogCallBack.onReportCallBack();
                 }
                 dismiss();
                 break;
-            case R.id.ll_friend:
+            case R.id.ll_exit:
                 if (onDialogCallBack != null){
                     onDialogCallBack.onExitCallBack();
                 }

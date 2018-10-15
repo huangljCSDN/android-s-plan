@@ -240,7 +240,7 @@ public class AudioUtils {
     }
 
     public long getCurrentTimeInterval() {
-        return (System.currentTimeMillis() - startTime) / 1000;
+        return (System.currentTimeMillis() - startTime)/1000;
     }
 
 

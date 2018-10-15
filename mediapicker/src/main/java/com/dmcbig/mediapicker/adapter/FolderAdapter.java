@@ -71,7 +71,7 @@ public class FolderAdapter extends BaseAdapter {
                     .load(Uri.parse("file://" + media.path))
                     .into(holder.cover);
         } else {
-            holder.cover.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.default_image));
+            holder.cover.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_unselect));
         }
 
         holder.name.setText(folder.name);

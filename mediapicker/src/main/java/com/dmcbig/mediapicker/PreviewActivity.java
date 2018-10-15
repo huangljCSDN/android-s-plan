@@ -40,6 +40,7 @@ public class PreviewActivity extends FragmentActivity implements View.OnClickLis
     TextView bar_title;
     View top,bottom;
     ArrayList<Media> preRawList, selects;
+    private TextView tvCount;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +51,7 @@ public class PreviewActivity extends FragmentActivity implements View.OnClickLis
         check_layout.setOnClickListener(this);
         bar_title = (TextView) findViewById(R.id.bar_title);
         done = (Button) findViewById(R.id.done);
+        tvCount = findViewById(R.id.tv_count);
         done.setOnClickListener(this);
         top= findViewById(R.id.top);
         bottom= findViewById(R.id.bottom);
@@ -62,7 +64,7 @@ public class PreviewActivity extends FragmentActivity implements View.OnClickLis
 
     void setView(ArrayList<Media> default_list) {
         setDoneView(default_list.size());
-        bar_title.setText(1 + "/" + preRawList.size());
+        tvCount.setText(1 + "/" + preRawList.size());
         ArrayList<Fragment> fragmentArrayList = new ArrayList<>();
         for (Media media : default_list) {
             fragmentArrayList.add(PreviewFragment.newInstance(media, ""));
@@ -73,7 +75,8 @@ public class PreviewActivity extends FragmentActivity implements View.OnClickLis
     }
 
     void setDoneView(int num1) {
-        done.setText(getString(R.string.done) + "(" + num1 + "/" + getIntent().getIntExtra(PickerConfig.MAX_SELECT_COUNT, PickerConfig.DEFAULT_SELECTED_MAX_COUNT) + ")");
+//        done.setText(getString(R.string.send) + "(" + num1 + "/" + getIntent().getIntExtra(PickerConfig.MAX_SELECT_COUNT, PickerConfig.DEFAULT_SELECTED_MAX_COUNT) + ")");
+        done.setText(getString(R.string.send) +num1 );
     }
 
 
@@ -88,10 +91,10 @@ public class PreviewActivity extends FragmentActivity implements View.OnClickLis
             Media media = preRawList.get(viewpager.getCurrentItem());
             int select = isSelect(media, selects);
             if (select < 0) {
-                check_image.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.btn_selected));
+                check_image.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_selected));
                 selects.add(media);
             } else {
-                check_image.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.btn_unselected));
+                check_image.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_unselect));
                 selects.remove(select);
             }
             setDoneView(selects.size());
@@ -171,8 +174,8 @@ public class PreviewActivity extends FragmentActivity implements View.OnClickLis
 
     @Override
     public void onPageSelected(int position) {
-        bar_title.setText((position + 1) + "/" + preRawList.size());
-        check_image.setImageDrawable(isSelect(preRawList.get(position), selects) < 0 ? ContextCompat.getDrawable(this, R.drawable.btn_unselected) : ContextCompat.getDrawable(this, R.drawable.btn_selected));
+        tvCount.setText((position + 1) + "/" + preRawList.size());
+        check_image.setImageDrawable(isSelect(preRawList.get(position), selects) < 0 ? ContextCompat.getDrawable(this, R.drawable.ic_unselect) : ContextCompat.getDrawable(this, R.drawable.ic_selected));
     }
 
     @Override

@@ -96,7 +96,7 @@ public class MediaGridAdapter extends RecyclerView.Adapter<MediaGridAdapter.MyVi
 
         int isSelect = isSelect(media);
         holder.mask_view.setVisibility(isSelect >= 0 ? View.VISIBLE : View.INVISIBLE);
-        holder.check_image.setImageDrawable(isSelect >= 0 ? ContextCompat.getDrawable(context, R.drawable.btn_selected) : ContextCompat.getDrawable(context, R.drawable.btn_unselected));
+        holder.check_image.setImageDrawable(isSelect >= 0 ? ContextCompat.getDrawable(context, R.drawable.ic_selected) : ContextCompat.getDrawable(context, R.drawable.ic_unselect));
 
 
         holder.media_image.setOnClickListener(new View.OnClickListener() {
@@ -111,7 +111,7 @@ public class MediaGridAdapter extends RecyclerView.Adapter<MediaGridAdapter.MyVi
                         Toast.makeText(context, context.getString(R.string.msg_size_limit) + (FileUtils.fileSize(maxSize)), Toast.LENGTH_LONG).show();
                     } else {
                         holder.mask_view.setVisibility(isSelect >= 0 ? View.INVISIBLE : View.VISIBLE);
-                        holder.check_image.setImageDrawable(isSelect >= 0 ? ContextCompat.getDrawable(context, R.drawable.btn_unselected) : ContextCompat.getDrawable(context, R.drawable.btn_selected));
+                        holder.check_image.setImageDrawable(isSelect >= 0 ? ContextCompat.getDrawable(context, R.drawable.ic_unselect) : ContextCompat.getDrawable(context, R.drawable.ic_selected));
                         setSelectMedias(media);
                         mOnItemClickListener.onItemClick(v, media, selectMedias);
                     }

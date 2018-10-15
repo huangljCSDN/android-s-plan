@@ -35,4 +35,8 @@
     <string name="join_person_count">报名人数:</string>
     <string name="competed">已结束</string>
     <string name="enter">报名</string>
+
+    <string name="players">玩伴</string>
+    <string name="play">好玩</string>
+    <string name="find_cp">180cp</string>
 </resources>

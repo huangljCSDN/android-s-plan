@@ -18,9 +18,9 @@
         android:layout_width="18dp"
         android:layout_height="18dp"
         android:layout_gravity="top|right"
-        android:layout_marginRight="5.5dp"
-        android:layout_marginTop="5.5dp"
-        android:src="@drawable/btn_unselected" />
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/ic_unselect" />
     <RelativeLayout
         android:visibility="invisible"
         android:id="@+id/video_info"

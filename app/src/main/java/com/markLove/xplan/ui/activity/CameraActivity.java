@@ -19,10 +19,12 @@ import com.cjt2325.cameralibrary.listener.JCameraListener;
 import com.cjt2325.cameralibrary.util.DeviceUtil;
 import com.cjt2325.cameralibrary.util.FileUtil;
 import com.markLove.xplan.R;
+import com.markLove.xplan.base.mvp.BasePresenter;
+import com.markLove.xplan.base.ui.BaseActivity;
 
 import java.io.File;
 
-public class CameraActivity extends AppCompatActivity {
+public class CameraActivity extends BaseActivity {
     private JCameraView jCameraView;
 
     @Override
@@ -30,12 +32,11 @@ public class CameraActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        setContentView(R.layout.activity_camera);
         jCameraView = (JCameraView) findViewById(R.id.jcameraview);
         //设置视频保存路径
-        jCameraView.setSaveVideoPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "JCamera");
+        jCameraView.setSaveVideoPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "xplan" + File.separator + "camera");
         jCameraView.setFeatures(JCameraView.BUTTON_STATE_BOTH);
-        jCameraView.setTip("JCameraView Tip");
+        jCameraView.setTip("轻触拍照，按住摄影");
         jCameraView.setMediaQuality(JCameraView.MEDIA_QUALITY_MIDDLE);
 
         jCameraView.setErrorLisenter(new ErrorListener() {
@@ -125,5 +126,20 @@ public class CameraActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         jCameraView.onPause();
+    }
+
+    @Override
+    protected int getContentViewId() {
+        return R.layout.activity_camera;
+    }
+
+    @Override
+    protected void init(Bundle savedInstanceState) {
+
+    }
+
+    @Override
+    public BasePresenter onCreatePresenter() {
+        return null;
     }
 }

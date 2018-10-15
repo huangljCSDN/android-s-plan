@@ -47,6 +47,7 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.0.0'
     implementation 'pub.devrel:easypermissions:1.0.0'
     implementation 'com.github.chrisbanes.photoview:library:1.2.4'
+
 }
 
 //bintray {

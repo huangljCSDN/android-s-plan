@@ -41,6 +41,7 @@
             android:layout_weight="1">
 
             <ImageView
+                android:id="@+id/iv_record"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -121,7 +122,7 @@
             android:layout_marginRight="40dp"
             tools:text="0.01"/>
 
-        <com.markLove.xplan.module.recorder.view.AudioRecorderButton
+        <ImageView
             android:id="@+id/id_recorder_button"
             android:layout_width="68dp"
             android:layout_height="68dp"
@@ -129,7 +130,7 @@
             android:layout_centerHorizontal="true"
             android:background="@drawable/ic_record_sound">
 
-        </com.markLove.xplan.module.recorder.view.AudioRecorderButton>
+        </ImageView>
 
 
     </RelativeLayout>

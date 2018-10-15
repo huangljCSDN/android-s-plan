@@ -1,12 +1,17 @@
 package com.cjt2325.cameralibrary;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.view.View;
+
+import com.cjt2325.cameralibrary.R;
 
 /**
  * =====================================
@@ -63,47 +68,58 @@ public class TypeButton extends View{
         super.onDraw(canvas);
         //如果类型为取消，则绘制内部为返回箭头
         if (button_type == TYPE_CANCEL) {
-            mPaint.setAntiAlias(true);
-            mPaint.setColor(0xEEDCDCDC);
-            mPaint.setStyle(Paint.Style.FILL);
-            canvas.drawCircle(center_X, center_Y, button_radius, mPaint);
+//            mPaint.setAntiAlias(true);
+//            mPaint.setColor(0xEEDCDCDC);
+//            mPaint.setStyle(Paint.Style.FILL);
+//            canvas.drawCircle(center_X, center_Y, button_radius, mPaint);
+//
+//            mPaint.setColor(Color.BLACK);
+//            mPaint.setStyle(Paint.Style.STROKE);
+//            mPaint.setStrokeWidth(strokeWidth);
+//
+//            path.moveTo(center_X - index / 7, center_Y + index);
+//            path.lineTo(center_X + index, center_Y + index);
+//
+//            path.arcTo(rectF, 90, -180);
+//            path.lineTo(center_X - index, center_Y - index);
+//            canvas.drawPath(path, mPaint);
+//            mPaint.setStyle(Paint.Style.FILL);
+//            path.reset();
+//            path.moveTo(center_X - index, (float) (center_Y - index * 1.5));
+//            path.lineTo(center_X - index, (float) (center_Y - index / 2.3));
+//            path.lineTo((float) (center_X - index * 1.6), center_Y - index);
+//            path.close();
+//            canvas.drawPath(path, mPaint);
 
-            mPaint.setColor(Color.BLACK);
-            mPaint.setStyle(Paint.Style.STROKE);
-            mPaint.setStrokeWidth(strokeWidth);
-
-            path.moveTo(center_X - index / 7, center_Y + index);
-            path.lineTo(center_X + index, center_Y + index);
-
-            path.arcTo(rectF, 90, -180);
-            path.lineTo(center_X - index, center_Y - index);
-            canvas.drawPath(path, mPaint);
-            mPaint.setStyle(Paint.Style.FILL);
-            path.reset();
-            path.moveTo(center_X - index, (float) (center_Y - index * 1.5));
-            path.lineTo(center_X - index, (float) (center_Y - index / 2.3));
-            path.lineTo((float) (center_X - index * 1.6), center_Y - index);
-            path.close();
-            canvas.drawPath(path, mPaint);
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.ic_canmare_back);
+            Rect mSrcRect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+            Rect mDestRect = new Rect(0, 0,bitmap.getWidth(), bitmap.getHeight());
+            canvas.drawBitmap(bitmap,mSrcRect,mDestRect,mPaint);
 
         }
         //如果类型为确认，则绘制绿色勾
         if (button_type == TYPE_CONFIRM) {
-            mPaint.setAntiAlias(true);
-            mPaint.setColor(0xFFFFFFFF);
-            mPaint.setStyle(Paint.Style.FILL);
-            canvas.drawCircle(center_X, center_Y, button_radius, mPaint);
-            mPaint.setAntiAlias(true);
-            mPaint.setStyle(Paint.Style.STROKE);
-            mPaint.setColor(0xFF00CC00);
-            mPaint.setStrokeWidth(strokeWidth);
+//            mPaint.setAntiAlias(true);
+//            mPaint.setColor(0xFFFFFFFF);
+//            mPaint.setStyle(Paint.Style.FILL);
+//            canvas.drawCircle(center_X, center_Y, button_radius, mPaint);
+//            mPaint.setAntiAlias(true);
+//            mPaint.setStyle(Paint.Style.STROKE);
+//            mPaint.setColor(0xFF00CC00);
+//            mPaint.setStrokeWidth(strokeWidth);
+//
+//            path.moveTo(center_X - button_size / 6f, center_Y);
+//            path.lineTo(center_X - button_size / 21.2f, center_Y + button_size / 7.7f);
+//            path.lineTo(center_X + button_size / 4.0f, center_Y - button_size / 8.5f);
+//            path.lineTo(center_X - button_size / 21.2f, center_Y + button_size / 9.4f);
+//            path.close();
+//            canvas.drawPath(path, mPaint);
 
-            path.moveTo(center_X - button_size / 6f, center_Y);
-            path.lineTo(center_X - button_size / 21.2f, center_Y + button_size / 7.7f);
-            path.lineTo(center_X + button_size / 4.0f, center_Y - button_size / 8.5f);
-            path.lineTo(center_X - button_size / 21.2f, center_Y + button_size / 9.4f);
-            path.close();
-            canvas.drawPath(path, mPaint);
+
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.ic_camare_sure);
+            Rect mSrcRect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+            Rect mDestRect = new Rect(0, 0,bitmap.getWidth(), bitmap.getHeight());
+            canvas.drawBitmap(bitmap,mSrcRect,mDestRect,mPaint);
         }
     }
 }

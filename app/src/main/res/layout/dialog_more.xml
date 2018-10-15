@@ -12,7 +12,7 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/ll_chat"
+            android:id="@+id/ll_report"
             android:layout_width="match_parent"
             android:layout_height="53dp"
             android:gravity="center"
@@ -24,6 +24,7 @@
                 android:src="@drawable/ic_report" />
 
             <TextView
+                android:id="@+id/tv_report"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
@@ -40,7 +41,7 @@
             android:background="@color/color_f1f1f1"/>
 
         <LinearLayout
-            android:id="@+id/ll_friend"
+            android:id="@+id/ll_exit"
             android:layout_width="match_parent"
             android:layout_height="53dp"
             android:gravity="center"
@@ -52,6 +53,7 @@
                 android:src="@drawable/ic_exit" />
 
             <TextView
+                android:id="@+id/tv_exit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"

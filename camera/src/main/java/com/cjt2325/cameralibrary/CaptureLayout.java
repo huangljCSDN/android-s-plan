@@ -6,6 +6,9 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
@@ -246,6 +249,7 @@ public class CaptureLayout extends FrameLayout {
         iv_custom_param_left.gravity = Gravity.CENTER_VERTICAL;
         iv_custom_param_left.setMargins(layout_width / 6, 0, 0, 0);
         iv_custom_left.setLayoutParams(iv_custom_param_left);
+        iv_custom_left.setImageResource(R.drawable.ic_close);
         iv_custom_left.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -274,7 +278,7 @@ public class CaptureLayout extends FrameLayout {
         LayoutParams txt_param = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         txt_param.gravity = Gravity.CENTER_HORIZONTAL;
         txt_param.setMargins(0, 0, 0, 0);
-        txt_tip.setText("轻触拍照，长按摄像");
+        txt_tip.setText("轻触拍照，按住摄影");
         txt_tip.setTextColor(0xFFFFFFFF);
         txt_tip.setGravity(Gravity.CENTER);
         txt_tip.setLayoutParams(txt_param);
@@ -282,9 +286,9 @@ public class CaptureLayout extends FrameLayout {
         this.addView(btn_capture);
         this.addView(btn_cancel);
         this.addView(btn_confirm);
-        this.addView(btn_return);
+//        this.addView(btn_return);
         this.addView(iv_custom_left);
-        this.addView(iv_custom_right);
+//        this.addView(iv_custom_right);
         this.addView(txt_tip);
 
     }
@@ -341,14 +345,14 @@ public class CaptureLayout extends FrameLayout {
     public void setIconSrc(int iconLeft, int iconRight) {
         this.iconLeft = iconLeft;
         this.iconRight = iconRight;
-        if (this.iconLeft != 0) {
-            iv_custom_left.setImageResource(iconLeft);
-            iv_custom_left.setVisibility(VISIBLE);
-            btn_return.setVisibility(GONE);
-        } else {
-            iv_custom_left.setVisibility(GONE);
-            btn_return.setVisibility(VISIBLE);
-        }
+//        if (this.iconLeft != 0) {
+//            iv_custom_left.setImageResource(iconLeft);
+//            iv_custom_left.setVisibility(VISIBLE);
+//            btn_return.setVisibility(GONE);
+//        } else {
+//            iv_custom_left.setVisibility(GONE);
+//            btn_return.setVisibility(VISIBLE);
+//        }
         if (this.iconRight != 0) {
             iv_custom_right.setImageResource(iconRight);
             iv_custom_right.setVisibility(VISIBLE);

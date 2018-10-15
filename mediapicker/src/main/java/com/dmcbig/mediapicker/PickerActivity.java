@@ -154,8 +154,8 @@ public class PickerActivity extends Activity implements DataCallback, View.OnCli
 
     void setButtonText() {
         int max = argsIntent.getIntExtra(PickerConfig.MAX_SELECT_COUNT, PickerConfig.DEFAULT_SELECTED_MAX_COUNT);
-        done.setText(getString(R.string.done) + "(" + gridAdapter.getSelectMedias().size() + "/" + max + ")");
-        preview.setText(getString(R.string.preview) + "(" + gridAdapter.getSelectMedias().size() + ")");
+        done.setText(getString(R.string.send) + gridAdapter.getSelectMedias().size());
+//        preview.setText(getString(R.string.preview) + "(" + gridAdapter.getSelectMedias().size() + ")");
     }
 
     @Override
