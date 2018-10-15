@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/chat_root_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+
+    <CheckBox
+        android:id="@+id/chat_select_view"
+        style="@style/chat_check_box"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_gravity="bottom"
+        android:layout_marginLeft="8dp"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/chat_head_img"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="bottom|left"
+        android:layout_marginLeft="20dp"
+        android:src="@mipmap/agent_user_pho" />
+
+    <ImageView
+        android:id="@+id/chat_img_msg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:background="@mipmap/chat_other_bg"
+        android:gravity="left|center_vertical"
+        android:maxWidth="200dp" />
+
+    <ImageView
+        android:id="@+id/chat_message_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="10dp"
+        android:src="@mipmap/chat_message_fail"
+        android:visibility="gone" />
+</LinearLayout>

@@ -5,7 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
 
-import com.markLove.xplan.base.BaseApplication;
+import com.markLove.xplan.base.App;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -28,7 +28,7 @@ public class FilePathUtils {
     }
 
     public static File getSDCardImagePath() {
-        String path = getSDCardPath() + "/" + BaseApplication.getInstance().getPackageName() + "/image/";
+        String path = getSDCardPath() + "/" + App.getInstance().getPackageName() + "/image/";
         File file = new File(path);
         if (!file.exists()) {
             file.mkdirs();
@@ -37,7 +37,7 @@ public class FilePathUtils {
     }
 
     public static File getSDCardQRCodePath() {
-        String path = getSDCardPath() + "/" + BaseApplication.getInstance().getPackageName() + "/qrcode/";
+        String path = getSDCardPath() + "/" + App.getInstance().getPackageName() + "/qrcode/";
         File file = new File(path);
         if (!file.exists()) {
             file.mkdirs();
@@ -70,7 +70,7 @@ public class FilePathUtils {
      * @return
      */
     public static String getDefaultUnzipFile() {
-        File cacheDir = getCacheDir(BaseApplication.getInstance(), "unZip");
+        File cacheDir = getCacheDir(App.getInstance(), "unZip");
         if (!cacheDir.exists()) {
             cacheDir.mkdirs();
         }
@@ -82,7 +82,7 @@ public class FilePathUtils {
      * 获取SD卡目录下相对应包名程序下的文件保存的图片的路径
      */
     public static String getDefaultFilePath() {
-        File cacheDir = getDiskCacheDir(BaseApplication.getInstance(), "file");
+        File cacheDir = getDiskCacheDir(App.getInstance(), "file");
         if (!cacheDir.exists()) {
             cacheDir.mkdirs();
         }
@@ -93,7 +93,7 @@ public class FilePathUtils {
      * 获取SD卡目录下相对应包名程序下的拍照保存的图片的路径
      */
     public static String getDefaultImageFilePath() {
-        File cacheDir = getDiskCacheDir(BaseApplication.getInstance(), "image");
+        File cacheDir = getDiskCacheDir(App.getInstance(), "image");
         if (!cacheDir.exists()) {
             cacheDir.mkdirs();
         }
@@ -101,7 +101,7 @@ public class FilePathUtils {
     }
 
     public static String getSDCardImageCachePath() {
-        File cacheDir = getDiskCacheDir(BaseApplication.getInstance(), "image");
+        File cacheDir = getDiskCacheDir(App.getInstance(), "image");
         if (!cacheDir.exists()) {
             cacheDir.mkdirs();
         }
@@ -114,7 +114,7 @@ public class FilePathUtils {
      * @return
      */
     public static String getDefaultLogPath() {
-        File cacheDir = getDiskCacheDir(BaseApplication.getInstance(), "log");
+        File cacheDir = getDiskCacheDir(App.getInstance(), "log");
         if (!cacheDir.exists()) {
             cacheDir.mkdirs();
         }
@@ -126,9 +126,9 @@ public class FilePathUtils {
             String cachePath;
             if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
                     && !Environment.isExternalStorageRemovable()) {
-                cachePath = BaseApplication.getInstance().getExternalCacheDir().getPath();
+                cachePath = App.getInstance().getExternalCacheDir().getPath();
             } else {
-                cachePath = BaseApplication.getInstance().getCacheDir().getPath();
+                cachePath = App.getInstance().getCacheDir().getPath();
             }
             deletefile(cachePath);
         } catch (Exception e) {

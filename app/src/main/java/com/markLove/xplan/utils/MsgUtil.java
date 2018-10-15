@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.markLove.xplan.widget.LoadingDialog;
+import com.markLove.xplan.ui.widget.LoadingDialog;
 
 public class MsgUtil {
     public static LoadingDialog baDialog = null;

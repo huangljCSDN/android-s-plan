@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="250dp"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/chat_gift_rv"
+        android:layout_width="match_parent"
+        android:layout_height="205dp"
+        android:background="@android:color/white"
+        android:orientation="vertical" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#A7A7A7" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="44.5dp">
+
+        <ImageView
+            android:id="@+id/chat_send_price_img"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="16dp" />
+
+        <TextView
+            android:id="@+id/chat_send_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/chat_send_price_img"
+            android:drawablePadding="4dp"
+            android:text="0"
+            android:textColor="#ACACAC"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/chat_send_gift"
+            android:layout_width="76.5dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:text="赠送"
+            android:textColor="@color/color_white"
+            android:textSize="12sp" />
+    </RelativeLayout>
+</LinearLayout>

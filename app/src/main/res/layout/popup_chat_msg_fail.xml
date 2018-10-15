@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="8dp"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp">
+
+    <TextView
+        android:id="@+id/popup_again"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@drawable/shape_circular"
+        android:gravity="center"
+        android:text="重新发送"
+        android:textColor="#54CBDC"
+        android:textSize="17sp" />
+
+    <TextView
+        android:id="@+id/popup_cancel"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/shape_circular"
+        android:gravity="center"
+        android:text="取消"
+        android:textColor="#54CBDC"
+        android:textSize="17sp" />
+</LinearLayout>

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_shop_chat_room"
     android:orientation="vertical"
-    tools:context=".activity.GroupChatActivity">
+    tools:context=".ui.activity.GroupChatActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -93,15 +93,13 @@
         android:src="@mipmap/ic_launcher"
         android:visibility="gone" />
 
-    <ListView
-        android:id="@+id/id_listview"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/chat_msg_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@color/transparent"
-        android:divider="@null"
-
-        android:dividerHeight="10dp"></ListView>
+        android:descendantFocusability="beforeDescendants"
+        android:fastScrollEnabled="false"></android.support.v7.widget.RecyclerView>
 
     <include layout="@layout/layout_msg_edit_view"/>
 

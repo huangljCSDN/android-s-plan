@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:oneshot="false"
+	>
+
+	<item android:drawable="@mipmap/load_1" android:duration="200"></item>
+	<item android:drawable="@mipmap/load_2" android:duration="200"></item>
+	<item android:drawable="@mipmap/load_3" android:duration="200"></item>
+	<item android:drawable="@mipmap/load_4" android:duration="200"></item>
+	<item android:drawable="@mipmap/load_5" android:duration="200"></item>
+	<item android:drawable="@mipmap/load_6" android:duration="200"></item>
+	<item android:drawable="@mipmap/load_7" android:duration="200"></item>
+	<item android:drawable="@mipmap/load_8" android:duration="200"></item>
+<!--	<item android:drawable="@mipmap/gps" android:duration="150"></item>
+	<item android:drawable="@mipmap/gpt" android:duration="150"></item>
+	<item android:drawable="@mipmap/gpu" android:duration="150"></item>
+	<item android:drawable="@mipmap/gpv" android:duration="150"></item>-->
+</animation-list>

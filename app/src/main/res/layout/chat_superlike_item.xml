@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/chat_root_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <CheckBox
+        android:id="@+id/chat_select_view"
+        style="@style/chat_check_box"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="8dp"
+        android:visibility="gone" />
+
+    <RelativeLayout
+        android:id="@+id/chat_superlike_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="44dp"
+        android:layout_marginRight="44dp"
+        android:background="@drawable/shape_superlike">
+
+        <ImageView
+            android:id="@+id/chat_superlike_top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:src="@mipmap/chat_superlike_top" />
+
+        <ImageView
+            android:id="@+id/chat_superlike_head"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_alignBottom="@id/chat_superlike_top"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="4dp"
+            android:src="@mipmap/agent_user_pho" />
+
+        <TextView
+            android:id="@+id/chat_superlike_msg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/chat_superlike_top"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:paddingBottom="16dp"
+            android:paddingTop="16dp"
+            android:text="对方想要邀请你成为他的情侣是否愿意"
+            android:textColor="#BC5C1B"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:adjustViewBounds="true"
+            android:src="@mipmap/chat_superlike_bottom" />
+
+        <TextView
+            android:id="@+id/chat_superlike_fail"
+            android:layout_width="match_parent"
+            android:layout_height="28dp"
+            android:layout_alignParentBottom="true"
+            android:layout_below="@id/chat_superlike_msg"
+            android:gravity="center"
+            android:text="重新发送"
+            android:textColor="#31B3EF"
+            android:textSize="16sp"
+            android:visibility="gone" />
+    </RelativeLayout>
+</RelativeLayout>

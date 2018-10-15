@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_shop_chat_room"
     android:orientation="vertical"
-    tools:context=".activity.GroupChatActivity">
+    tools:context=".ui.activity.GroupChatActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"

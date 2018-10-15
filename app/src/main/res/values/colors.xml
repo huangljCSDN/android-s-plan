@@ -29,6 +29,7 @@
     <color name="color_white3">#fefefe</color>
     <color name="color_yellow">#DFB741</color>
     <color name="color_red2">#F85159</color>
+    <color name="white">#ffffff</color>
 
     //---------------------------
     <color name="transparent">#00000000</color>
@@ -41,5 +42,7 @@
     <color name="color_f1f1f1">#f1f1f1</color>
     <color name="color_a7a7a7">#a7a7a7</color>
     <color name="color_ff6ba7">#ff6ba7</color>
+    <color name="color_5ac6d6">#5ac6d6</color>
+    <color name="text">#3C3C3C</color>
 
 </resources>

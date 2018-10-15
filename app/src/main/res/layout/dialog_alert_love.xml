@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/shape_select_photo"
+    android:orientation="vertical"
+    android:layout_marginLeft="20dp"
+    android:layout_marginRight="20dp"
+    >
+    <TextView
+        android:id="@+id/tv_alert_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
+        android:gravity="center"
+        android:text="标题"
+        android:textColor="#555"
+        android:textSize="20dp"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
+        android:visibility="gone"/>
+    <View
+        android:id="@+id/v_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:visibility="gone"
+        android:background="@color/color_999999"/>
+    <TextView
+        android:id="@+id/tv_alert_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="msg"
+        android:textColor="@color/colorAccent"
+        android:textSize="16sp"
+        android:visibility="gone"
+        />
+    <EditText
+        android:id="@+id/et_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:singleLine="true"
+        android:background="@null"
+        android:textColor="@color/text"
+        android:layout_margin="10dp"
+        android:maxLength = "6"
+        android:textColorHint="@color/color_999999"
+        android:textCursorDrawable="@drawable/color_cursor"
+        android:visibility="gone"/>
+
+
+    <include layout="@layout/layout_line"/>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp">
+        <TextView
+            android:id="@+id/tv_alert_left"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:gravity="center"
+            android:text="取消"
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp"
+            android:textColor="@color/color_999999"
+            android:textSize="16sp"
+            android:visibility="gone"/>
+        <View
+            android:id="@+id/v_alert_line"
+            android:layout_width="0.5dp"
+            android:layout_height="match_parent"
+            android:background="@color/color_999999"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:visibility="gone"/>
+        <TextView
+            android:id="@+id/tv_alert_right"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:gravity="center"
+            android:text="确定"
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp"
+            android:textColor="@color/color_5ac6d6"
+            android:textSize="16sp"
+            android:visibility="gone"/>
+    </LinearLayout>
+
+
+</LinearLayout>
