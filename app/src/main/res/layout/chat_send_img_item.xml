@@ -10,8 +10,8 @@
         style="@style/chat_check_box"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
         android:layout_marginLeft="8dp"
         android:visibility="gone" />
 
@@ -21,20 +21,30 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/chat_head_img"
+        <RelativeLayout
+            android:id="@+id/rl_chat_head_img"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
             android:layout_marginRight="16dp"
-            android:src="@mipmap/agent_user_pho" />
+            android:background="@drawable/bg_circle"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/chat_head_img"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@mipmap/agent_user_pho" />
+        </RelativeLayout>
+
 
         <ImageView
             android:id="@+id/chat_img_msg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toLeftOf="@id/chat_head_img"
+            android:layout_marginRight="8dp"
+            android:layout_toLeftOf="@id/rl_chat_head_img"
             android:adjustViewBounds="true"
             android:background="@drawable/bg_me_chat"
             android:gravity="left|center_vertical"

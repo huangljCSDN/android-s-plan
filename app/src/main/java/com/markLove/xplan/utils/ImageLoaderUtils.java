@@ -135,7 +135,7 @@ public class ImageLoaderUtils {
             picUrl = Constants.BASE_IMG_URL + picUrl;
         }
 
-        Glide.with(context).load(picUrl)
+        Glide.with(context).load(R.drawable.icon)
                 .apply(RequestOptions.placeholderOf(R.drawable.icon_loading_default))
                 .apply(RequestOptions.errorOf(R.drawable.icon_loading_default))
                 .apply(RequestOptions.circleCropTransform())

@@ -14,13 +14,22 @@
         android:layout_marginLeft="8dp"
         android:visibility="gone" />
 
-    <ImageView
-        android:id="@+id/chat_head_img"
+    <RelativeLayout
+        android:id="@+id/rl_chat_head_img"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:layout_gravity="bottom|left"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
         android:layout_marginLeft="16dp"
-        android:src="@mipmap/agent_user_pho" />
+        android:background="@drawable/bg_circle"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/chat_head_img"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@mipmap/agent_user_pho" />
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/chat_txt_msg"
@@ -31,6 +40,7 @@
         android:maxWidth="200dp"
         android:textSize="13sp"
         android:paddingRight="5dp"
+        android:layout_marginLeft="8dp"
         android:textColor="#626262" />
 
     <ImageView

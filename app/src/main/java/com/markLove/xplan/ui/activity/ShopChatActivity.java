@@ -15,6 +15,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -87,6 +88,7 @@ public class ShopChatActivity extends BaseActivity implements View.OnClickListen
     boolean isLikeAndUser = false;
     boolean isBlackUser = false;
     boolean keyboardIsShown = false;
+    int usableHeightPrevious = 0;
 
     @Override
     protected int getContentViewId() {
@@ -105,6 +107,8 @@ public class ShopChatActivity extends BaseActivity implements View.OnClickListen
         mTvAllPersonCount = findViewById(R.id.tv_person_count);
         mLlPersons = findViewById(R.id.ll_person_count);
         mFlMore = findViewById(R.id.fl_more);
+
+
         findViewById(R.id.fl_more).setOnClickListener(this);
         mTvShopName.setText("重庆火锅");
         mTvAllPersonCount.setText("21314124人");
@@ -118,6 +122,27 @@ public class ShopChatActivity extends BaseActivity implements View.OnClickListen
                 judeBlackList(message);
             }
         });
+
+        rlChatMsgList.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+                outRect.left = 0;
+                outRect.right = 0;
+                outRect.bottom = DensityUtils.dip2px(ShopChatActivity.this, 10f);
+                outRect.top = DensityUtils.dip2px(ShopChatActivity.this, 10f);
+            }
+        });
+
+        rlChatMsgList.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                chatMessageAdapter.dismissItemPopup();
+                closeSoftKeyBoard();
+                chatView.hideView();
+                return false;
+            }
+        });
+        initSoftKeyboard();
         initData();
     }
 
@@ -127,137 +152,6 @@ public class ShopChatActivity extends BaseActivity implements View.OnClickListen
             case R.id.fl_more:
                 showMoreDialog();
                 break;
-        }
-    }
-
-    /**
-     * 显示更多弹窗
-     */
-    private void showMoreDialog() {
-        MorePopWindow morePopWindow = new MorePopWindow(this, getString(R.string.report_chat_room)
-                , getString(R.string.exit_chat_room));
-        morePopWindow.showAtBottom(mFlMore);
-        morePopWindow.setOnDialogCallBack(new MorePopWindow.OnDialogCallBack() {
-            @Override
-            public void onReportCallBack() {
-                showReportDialog();
-            }
-
-            @Override
-            public void onExitCallBack() {
-                finish();
-            }
-        });
-    }
-
-    /**
-     * 显示举报框
-     */
-    private void showReportDialog() {
-        ReportDialog reportDialog = new ReportDialog(this);
-        reportDialog.setOnDialogCallBack(new ReportDialog.OnDialogCallBack() {
-            @Override
-            public void onCallBack(String content) {
-                toast(content);
-            }
-        });
-
-        reportDialog.show();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (data != null) {
-            Log.i("huang", "requestCode=" + requestCode + "   resultCode=" + resultCode);
-            if (requestCode == Constants.REQUEST_CODE_CAMERA) {
-                final String path = data.getStringExtra("path");
-                Log.i("huang", "path=" + path);
-//                Uri mediaUri = Uri.parse("file://" + path);
-//                Glide.with(this)
-//                        .load(mediaUri)
-//                        .into(imageView);
-//                imageView.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        playVideo(path);
-//                    }
-//                });
-                onImageReturn(null, path, true);
-            }
-            if (requestCode == Constants.REQUEST_CODE_PICKER) {
-                select = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
-                Boolean isOrigin = data.getBooleanExtra(PickerConfig.IS_ORIGIN, false);
-                for (final Media media : select) {
-                    Log.i("media", media.toString());
-                    onImageReturn(null, media.path, isOrigin);
-                }
-            }
-            if (resultCode == 102) {
-                Log.i("CJT", "video");
-                String path = data.getStringExtra("path");
-            }
-            if (resultCode == 103) {
-                Toast.makeText(this, "请检查相机权限~", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    @TargetApi(23)
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == Constants.REQUEST_CODE_PERMISSION_ONE) {
-            int size = 0;
-            if (grantResults.length >= 1) {
-                int writeResult = grantResults[0];
-                //读写内存权限
-                boolean writeGranted = writeResult == PackageManager.PERMISSION_GRANTED;//读写内存权限
-                if (!writeGranted) {
-                    size++;
-                }
-                //录音权限
-                int recordPermissionResult = grantResults[1];
-                boolean recordPermissionGranted = recordPermissionResult == PackageManager.PERMISSION_GRANTED;
-                if (!recordPermissionGranted) {
-                    size++;
-                }
-                //相机权限
-                int cameraPermissionResult = grantResults[2];
-                boolean cameraPermissionGranted = cameraPermissionResult == PackageManager.PERMISSION_GRANTED;
-                if (!cameraPermissionGranted) {
-                    size++;
-                }
-                if (size == 0) {
-                    startActivityForResult(new Intent(ShopChatActivity.this, CameraActivity.class), Constants.REQUEST_CODE_CAMERA);
-                } else {
-                    Toast.makeText(this, "请到设置-权限管理中开启", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
-
-        if (requestCode == Constants.REQUEST_CODE_PERMISSION_TWO) {
-            int size2 = 0;
-            if (grantResults.length >= 1) {
-                int writeResult = grantResults[0];
-                //读写内存权限
-                boolean writeGranted = writeResult == PackageManager.PERMISSION_GRANTED;//读写内存权限
-                if (!writeGranted) {
-                    size2++;
-                }
-                //录音权限
-                int recordPermissionResult = grantResults[1];
-                boolean recordPermissionGranted = recordPermissionResult == PackageManager.PERMISSION_GRANTED;
-                if (!recordPermissionGranted) {
-                    size2++;
-                }
-                if (size2 == 0) {
-//                    showRlRecord();
-                    chatView.showRlRecord();
-                } else {
-                    Toast.makeText(this, "请到设置-权限管理中开启", Toast.LENGTH_SHORT).show();
-                }
-            }
         }
     }
 
@@ -298,15 +192,8 @@ public class ShopChatActivity extends BaseActivity implements View.OnClickListen
         rlChatMsgList.setAdapter(chatMessageAdapter);
 
         chatMessageAdapter.registerAdapterDataObserver(adapterDataObserver);
-        rlChatMsgList.addItemDecoration(new RecyclerView.ItemDecoration() {
-            @Override
-            public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-                outRect.left = 0;
-                outRect.right = 0;
-                outRect.bottom = DensityUtils.dip2px(ShopChatActivity.this, 10f);
-                outRect.top = DensityUtils.dip2px(ShopChatActivity.this, 10f);
-            }
-        });
+
+
         chatPresenter = new ChatPresenterImpl();
         chatPresenter.setView(this);
 //        tvChatSendPrice.setText(gold + "");
@@ -348,47 +235,6 @@ public class ShopChatActivity extends BaseActivity implements View.OnClickListen
             });
         }
     };
-
-    int usableHeightPrevious = 0;
-
-    //设置软键盘弹起和关闭的监听
-    private void initSoftKeyboard() {
-        getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                int usableHeightNow = computeUsableHeight();
-                if (usableHeightNow != usableHeightPrevious) {
-                    int usableHeightSansKeyboard = getWindow().getDecorView().getHeight();
-                    int heightDifference = usableHeightSansKeyboard - usableHeightNow;
-                    if (heightDifference > (usableHeightSansKeyboard / 4)) {
-                        keyboardIsShown = true;
-                        chatView.hideView();
-                    } else {
-                        // 键盘收起
-                        keyboardIsShown = false;
-                    }
-                    getWindow().getDecorView().requestLayout();
-                    usableHeightPrevious = usableHeightNow;
-                }
-            }
-        });
-    }
-
-    private int computeUsableHeight() {
-        Rect r = new Rect();
-        getWindow().getDecorView().getWindowVisibleDisplayFrame(r);
-        return (r.bottom - r.top);
-    }
-
-    private void closeSoftKeyBoard() {
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm.isActive() && getCurrentFocus() != null) {
-            if (getCurrentFocus().getWindowToken() != null) {
-                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-            }
-        }
-    }
-
 
     ChatMessageAdapter.FailMessageResend failMessageResend = new ChatMessageAdapter.FailMessageResend() {
         @Override
@@ -681,11 +527,26 @@ public class ShopChatActivity extends BaseActivity implements View.OnClickListen
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+//        ChatClient.getInstance().isNotification = false;
+//        ChatClient.getInstance().currentlyID = to_user_id;
+        Log.v("MAIN", "onStart");
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         if (null != chatPresenter) {
             chatPresenter.onResume();
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+//        ChatClient.getInstance().isNotification = true;
+        Log.v("MAIN", "onStop");
     }
 
     @Override
@@ -757,20 +618,6 @@ public class ShopChatActivity extends BaseActivity implements View.OnClickListen
         super.onDestroy();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-//        ChatClient.getInstance().isNotification = false;
-//        ChatClient.getInstance().currentlyID = to_user_id;
-        Log.v("MAIN", "onStart");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-//        ChatClient.getInstance().isNotification = true;
-        Log.v("MAIN", "onStop");
-    }
 
     private void addPersonHeadPhoto() {
         for (int i = 0; i < 10; i++) {
@@ -784,6 +631,175 @@ public class ShopChatActivity extends BaseActivity implements View.OnClickListen
             Glide.with(this).load(R.drawable.icon).apply(mRequestOptions).into(imageHead);
 
             mLlPersons.addView(view);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data != null) {
+            Log.i("huang", "requestCode=" + requestCode + "   resultCode=" + resultCode);
+            if (requestCode == Constants.REQUEST_CODE_CAMERA) {
+                final String path = data.getStringExtra("path");
+                Log.i("huang", "path=" + path);
+//                Uri mediaUri = Uri.parse("file://" + path);
+//                Glide.with(this)
+//                        .load(mediaUri)
+//                        .into(imageView);
+//                imageView.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        playVideo(path);
+//                    }
+//                });
+                onImageReturn(null, path, true);
+            }
+            if (requestCode == Constants.REQUEST_CODE_PICKER) {
+                select = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
+                Boolean isOrigin = data.getBooleanExtra(PickerConfig.IS_ORIGIN, false);
+                for (final Media media : select) {
+                    Log.i("media", media.toString());
+                    onImageReturn(null, media.path, isOrigin);
+                }
+            }
+            if (resultCode == 102) {
+                Log.i("CJT", "video");
+                String path = data.getStringExtra("path");
+            }
+            if (resultCode == 103) {
+                Toast.makeText(this, "请检查相机权限~", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @TargetApi(23)
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == Constants.REQUEST_CODE_PERMISSION_ONE) {
+            int size = 0;
+            if (grantResults.length >= 1) {
+                int writeResult = grantResults[0];
+                //读写内存权限
+                boolean writeGranted = writeResult == PackageManager.PERMISSION_GRANTED;//读写内存权限
+                if (!writeGranted) {
+                    size++;
+                }
+                //录音权限
+                int recordPermissionResult = grantResults[1];
+                boolean recordPermissionGranted = recordPermissionResult == PackageManager.PERMISSION_GRANTED;
+                if (!recordPermissionGranted) {
+                    size++;
+                }
+                //相机权限
+                int cameraPermissionResult = grantResults[2];
+                boolean cameraPermissionGranted = cameraPermissionResult == PackageManager.PERMISSION_GRANTED;
+                if (!cameraPermissionGranted) {
+                    size++;
+                }
+                if (size == 0) {
+                    startActivityForResult(new Intent(ShopChatActivity.this, CameraActivity.class), Constants.REQUEST_CODE_CAMERA);
+                } else {
+                    Toast.makeText(this, "请到设置-权限管理中开启", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+
+        if (requestCode == Constants.REQUEST_CODE_PERMISSION_TWO) {
+            int size2 = 0;
+            if (grantResults.length >= 1) {
+                int writeResult = grantResults[0];
+                //读写内存权限
+                boolean writeGranted = writeResult == PackageManager.PERMISSION_GRANTED;//读写内存权限
+                if (!writeGranted) {
+                    size2++;
+                }
+                //录音权限
+                int recordPermissionResult = grantResults[1];
+                boolean recordPermissionGranted = recordPermissionResult == PackageManager.PERMISSION_GRANTED;
+                if (!recordPermissionGranted) {
+                    size2++;
+                }
+                if (size2 == 0) {
+//                    showRlRecord();
+                    chatView.showRlRecord();
+                } else {
+                    Toast.makeText(this, "请到设置-权限管理中开启", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
+    /**
+     * 显示更多弹窗
+     */
+    private void showMoreDialog() {
+        MorePopWindow morePopWindow = new MorePopWindow(this, getString(R.string.report_chat_room)
+                , getString(R.string.exit_chat_room));
+        morePopWindow.showAtBottom(mFlMore);
+        morePopWindow.setOnDialogCallBack(new MorePopWindow.OnDialogCallBack() {
+            @Override
+            public void onReportCallBack() {
+                showReportDialog();
+            }
+
+            @Override
+            public void onExitCallBack() {
+                finish();
+            }
+        });
+    }
+
+    /**
+     * 显示举报框
+     */
+    private void showReportDialog() {
+        ReportDialog reportDialog = new ReportDialog(this);
+        reportDialog.setOnDialogCallBack(new ReportDialog.OnDialogCallBack() {
+            @Override
+            public void onCallBack(String content) {
+                toast(content);
+            }
+        });
+
+        reportDialog.show();
+    }
+
+    //设置软键盘弹起和关闭的监听
+    private void initSoftKeyboard() {
+        getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                int usableHeightNow = computeUsableHeight();
+                if (usableHeightNow != usableHeightPrevious) {
+                    int usableHeightSansKeyboard = getWindow().getDecorView().getHeight();
+                    int heightDifference = usableHeightSansKeyboard - usableHeightNow;
+                    if (heightDifference > (usableHeightSansKeyboard / 4)) {
+                        keyboardIsShown = true;
+                        chatView.hideView();
+                    } else {
+                        // 键盘收起
+                        keyboardIsShown = false;
+                    }
+                    getWindow().getDecorView().requestLayout();
+                    usableHeightPrevious = usableHeightNow;
+                }
+            }
+        });
+    }
+
+    private int computeUsableHeight() {
+        Rect r = new Rect();
+        getWindow().getDecorView().getWindowVisibleDisplayFrame(r);
+        return (r.bottom - r.top);
+    }
+
+    private void closeSoftKeyBoard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm.isActive() && getCurrentFocus() != null) {
+            if (getCurrentFocus().getWindowToken() != null) {
+                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+            }
         }
     }
 }

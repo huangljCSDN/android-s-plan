@@ -23,6 +23,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -116,6 +117,7 @@ public class ChatView extends FrameLayout implements View.OnClickListener{
         etChatSnedMsg.clearFocus();
         mAudioRecorderButton = findViewById(R.id.id_recorder_button);
 
+        tvChatSend.setEnabled(false);
         findViewById(R.id.fl_sound).setOnClickListener(this);
         findViewById(R.id.fl_camera).setOnClickListener(this);
         findViewById(R.id.fl_pic).setOnClickListener(this);
@@ -204,17 +206,23 @@ public class ChatView extends FrameLayout implements View.OnClickListener{
 
     public void showRlRecord() {
         hideEmojiView();
-        if (mRlRecord.getVisibility() == View.GONE) {
+        closeSoftKeyBoard();
+        if (!mRlRecord.isShown()) {
             mIvRecord.setImageResource(R.drawable.ic_recored_selected);
             mRlRecord.setVisibility(View.VISIBLE);
+        } else {
+            hideRlRecord();
         }
     }
 
     private void showEmojiView() {
         hideRlRecord();
+        closeSoftKeyBoard();
         if (!emojiView.isShown()) {
             emojiView.setVisibility(View.VISIBLE);
             mIvEmoji.setImageResource(R.drawable.ic_emoji_selected);
+        } else {
+            hideEmojiView();
         }
     }
 
@@ -231,7 +239,6 @@ public class ChatView extends FrameLayout implements View.OnClickListener{
             mIvRecord.setImageResource(R.drawable.ic_sound);
         }
     }
-
 
     MyHandler handler = new MyHandler();
 
@@ -665,5 +672,14 @@ public class ChatView extends FrameLayout implements View.OnClickListener{
 
     public void setOnSendMessageListener(OnSendMessageListener onSendMessageListener) {
         this.onSendMessageListener = onSendMessageListener;
+    }
+
+    private void closeSoftKeyBoard() {
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm.isActive() && getActivity().getCurrentFocus() != null) {
+            if (getActivity().getCurrentFocus().getWindowToken() != null) {
+                imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+            }
+        }
     }
 }
