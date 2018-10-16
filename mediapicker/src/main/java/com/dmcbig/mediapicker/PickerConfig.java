@@ -35,6 +35,10 @@ public class PickerConfig {
      */
     public static final String DEFAULT_SELECTED_LIST = "default_list";
     /**
+     * 是否原图
+     */
+    public static final String IS_ORIGIN = "is_origin";
+    /**
      * 预览集
      */
     public static final String PRE_RAW_LIST = "pre_raw_List";

@@ -11,12 +11,12 @@ import java.io.File;
 public class Constants {
 
     public static final String LOCAL_IMG_PATH = Environment.getExternalStorageDirectory().getAbsolutePath()
-            + File.separator + "com.cunai.tpk"
+            + File.separator + "com.xplan.tpk"
             + File.separator + "img"
             + File.separator;
 
     public static final String LOCAL_VOICE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath()
-            + File.separator + "com.cunai.tpk"
+            + File.separator + "com.xplan.tpk"
             + File.separator + "voice"
             + File.separator;
 
@@ -28,6 +28,11 @@ public class Constants {
     public static final int STATE_ERROR = 2;
     public static final int STATE_EMPTY = 3;
     public static final int STATE_SUCCESS = 4;
+
+    public static final int REQUEST_CODE_PERMISSION_ONE = 100; //权限申请自定义码
+    public static final int REQUEST_CODE_PERMISSION_TWO = 103; //权限申请自定义码
+    public static final int REQUEST_CODE_CAMERA = 101; //相机
+    public static final int REQUEST_CODE_PICKER = 102; //相册
 
 
     /**

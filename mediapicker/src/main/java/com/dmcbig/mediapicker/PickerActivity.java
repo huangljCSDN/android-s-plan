@@ -9,13 +9,14 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.ListPopupWindow;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,8 +30,10 @@ import com.dmcbig.mediapicker.data.MediaLoader;
 import com.dmcbig.mediapicker.data.VideoLoader;
 import com.dmcbig.mediapicker.entity.Folder;
 import com.dmcbig.mediapicker.entity.Media;
+import com.dmcbig.mediapicker.utils.FileUtils;
 import com.dmcbig.mediapicker.utils.ScreenUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -49,6 +52,7 @@ public class PickerActivity extends Activity implements DataCallback, View.OnCli
     MediaGridAdapter gridAdapter;
     ListPopupWindow mFolderPopupWindow;
     private FolderAdapter mFolderAdapter;
+    private CheckBox cbOriginPick;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,6 +65,7 @@ public class PickerActivity extends Activity implements DataCallback, View.OnCli
         done = (Button) findViewById(R.id.done);
         category_btn = (Button) findViewById(R.id.category_btn);
         preview = (Button) findViewById(R.id.preview);
+        cbOriginPick = findViewById(R.id.cb_origin_map);
         done.setOnClickListener(this);
         category_btn.setOnClickListener(this);
         preview.setOnClickListener(this);
@@ -91,7 +96,8 @@ public class PickerActivity extends Activity implements DataCallback, View.OnCli
         recyclerView.setHasFixedSize(true);
         //创建并设置Adapter
         ArrayList<Media> medias = new ArrayList<>();
-        ArrayList<Media> select = argsIntent.getParcelableArrayListExtra(PickerConfig.DEFAULT_SELECTED_LIST);
+//        ArrayList<Media> select = argsIntent.getParcelableArrayListExtra(PickerConfig.DEFAULT_SELECTED_LIST);
+        ArrayList<Media> select = new ArrayList<>();
         int maxSelect = argsIntent.getIntExtra(PickerConfig.MAX_SELECT_COUNT, PickerConfig.DEFAULT_SELECTED_MAX_COUNT);
         long maxSize = argsIntent.getLongExtra(PickerConfig.MAX_SELECT_SIZE, PickerConfig.DEFAULT_SELECTED_MAX_SIZE);
         gridAdapter = new MediaGridAdapter(medias, this, select, maxSelect, maxSize);
@@ -148,6 +154,13 @@ public class PickerActivity extends Activity implements DataCallback, View.OnCli
             @Override
             public void onItemClick(View view, Media data, ArrayList<Media> selectMedias) {
                 setButtonText();
+                caclTotalSize(selectMedias);
+            }
+        });
+        cbOriginPick.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                caclTotalSize(gridAdapter.getSelectMedias());
             }
         });
     }
@@ -180,6 +193,7 @@ public class PickerActivity extends Activity implements DataCallback, View.OnCli
             Intent intent = new Intent(this, PreviewActivity.class);
             intent.putExtra(PickerConfig.MAX_SELECT_COUNT, argsIntent.getIntExtra(PickerConfig.MAX_SELECT_COUNT, PickerConfig.DEFAULT_SELECTED_MAX_COUNT));
             intent.putExtra(PickerConfig.PRE_RAW_LIST, gridAdapter.getSelectMedias());
+            intent.putExtra(PickerConfig.IS_ORIGIN,cbOriginPick.isChecked());
             this.startActivityForResult(intent, 200);
         }
     }
@@ -187,6 +201,7 @@ public class PickerActivity extends Activity implements DataCallback, View.OnCli
     public void done(ArrayList<Media> selects) {
         Intent intent = new Intent();
         intent.putParcelableArrayListExtra(PickerConfig.EXTRA_RESULT, selects);
+        intent.putExtra(PickerConfig.IS_ORIGIN,cbOriginPick.isChecked());
         setResult(PickerConfig.RESULT_CODE, intent);
         finish();
     }
@@ -220,12 +235,40 @@ public class PickerActivity extends Activity implements DataCallback, View.OnCli
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 200) {
             ArrayList<Media> selects = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
+
+            boolean is_origin = data.getBooleanExtra(PickerConfig.IS_ORIGIN,false);
+            cbOriginPick.setChecked(is_origin);
+            caclTotalSize(selects);
+
             if (resultCode == PickerConfig.RESULT_UPDATE_CODE) {
                 gridAdapter.updateSelectAdapter(selects);
                 setButtonText();
             } else if (resultCode == PickerConfig.RESULT_CODE) {
                 done(selects);
             }
+        }
+    }
+
+    /**
+     * 计算原图大小
+     * @param selects
+     */
+    private void caclTotalSize(ArrayList<Media> selects){
+        if (cbOriginPick.isChecked()){
+            long totalSize = 0;
+            if (selects != null){
+                for (Media media :selects){
+                    File file = new File(media.path);
+                    if (file.exists()){
+                        Long size =  FileUtils.getFileSize(file);
+                        totalSize += size;
+                    }
+                }
+                String s_totalSize = FileUtils.getSizeByUnit(totalSize);
+                cbOriginPick.setText(getString(R.string.picker) + "("+s_totalSize+")");
+            }
+        } else {
+            cbOriginPick.setText(getString(R.string.picker));
         }
     }
 }

@@ -10,12 +10,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -24,7 +22,6 @@ import com.dmcbig.mediapicker.entity.Media;
 import com.dmcbig.mediapicker.view.PreviewFragment;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -41,6 +38,8 @@ public class PreviewActivity extends FragmentActivity implements View.OnClickLis
     View top,bottom;
     ArrayList<Media> preRawList, selects;
     private TextView tvCount;
+    private CheckBox cbOriginPick;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,11 +54,14 @@ public class PreviewActivity extends FragmentActivity implements View.OnClickLis
         done.setOnClickListener(this);
         top= findViewById(R.id.top);
         bottom= findViewById(R.id.bottom);
+        cbOriginPick = findViewById(R.id.cb_origin_map);
         viewpager = (ViewPager) findViewById(R.id.viewpager);
         preRawList = getIntent().getParcelableArrayListExtra(PickerConfig.PRE_RAW_LIST);
         selects = new ArrayList<>();
         selects.addAll(preRawList);
         setView(preRawList);
+        boolean isChecked = getIntent().getBooleanExtra(PickerConfig.IS_ORIGIN,false);
+        cbOriginPick.setChecked(isChecked);
     }
 
     void setView(ArrayList<Media> default_list) {
@@ -123,6 +125,7 @@ public class PreviewActivity extends FragmentActivity implements View.OnClickLis
     public void done(ArrayList<Media> list, int code) {
         Intent intent = new Intent();
         intent.putParcelableArrayListExtra(PickerConfig.EXTRA_RESULT, list);
+        intent.putExtra(PickerConfig.IS_ORIGIN,cbOriginPick.isChecked());
         setResult(code, intent);
         finish();
     }

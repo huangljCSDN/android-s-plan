@@ -38,6 +38,7 @@ import com.markLove.xplan.utils.AudioUtils;
 import com.markLove.xplan.utils.DensityUtils;
 import com.markLove.xplan.utils.FileUtils;
 import com.markLove.xplan.utils.ImageLoaderUtils;
+import com.markLove.xplan.utils.LogUtils;
 import com.markLove.xplan.utils.PreferencesUtils;
 import com.markLove.xplan.utils.ScreenUtils;
 
@@ -472,15 +473,19 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHolder>
         @Override
         public void setChatContent(Message msg) {
             MessageBody body = msg.getBody();
+            LogUtils.i("huang","boody ="+ body);
             if (body instanceof FileMessageBody) {
                 final Context context = rootView.getContext();
                 final FileMessageBody imgMessageBody = (FileMessageBody) body;
                 final String imgPath = Constants.LOCAL_IMG_PATH + imgMessageBody.getFileName();
-                final String imgPath1 = context.getExternalFilesDir("img").getAbsolutePath() + File.separator + imgMessageBody.getFileName();
+                final String imgPath1 = context.getExternalFilesDir("imge").getAbsolutePath() + File.separator + imgMessageBody.getFileName();
+                final String imgPath3 = imgMessageBody.getFilePath();
                 if (new File(imgPath1).exists()) {
                     setImageResource(imgPath1);
-                } else if (new File(imgPath).exists()) {
+                } else if (new File(imgPath).exists()) { //压缩图
                     setImageResource(imgPath);
+                } else if (new File(imgPath3).exists()){ //原图
+                    setImageResource(imgPath3);
                 } else {
                     int me_user_id = PreferencesUtils.getInt(context, Constants.ME_USER_ID);
                     int damageImg;

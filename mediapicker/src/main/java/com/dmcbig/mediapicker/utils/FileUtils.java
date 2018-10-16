@@ -8,9 +8,11 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Locale;
@@ -59,7 +61,7 @@ public class FileUtils {
         return getCacheDirectory(context, true);
     }
 
-    public static String getRealPathFromURI(Context context,Uri contentURI) {
+    public static String getRealPathFromURI(Context context, Uri contentURI) {
         String result;
         Cursor cursor = context.getContentResolver().query(contentURI, null, null, null, null);
         if (cursor == null) { // Source is Dropbox or other similar local file path
@@ -144,7 +146,7 @@ public class FileUtils {
 
     private static final long MB = 1024 * 1024;
 
-    public String getSizeByUnit(double size) {
+    public static String getSizeByUnit(double size) {
 
         if (size == 0) {
             return "0K";
@@ -197,5 +199,29 @@ public class FileUtils {
 
     public static String getMimeTypeByFileName(String fileName) {
         return fileName.substring(fileName.lastIndexOf("."), fileName.length());
+    }
+
+    /**
+     * 获取指定文件大小
+     *
+     * @param
+     * @return
+     * @throws Exception
+     */
+    public static long getFileSize(File file){
+        long size = 0;
+        if (file.exists()) {
+            try {
+                FileInputStream fis = null;
+                fis = new FileInputStream(file);
+                size = fis.available();
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        } else {
+//            file.createNewFile();
+            Log.e("获取文件大小", "文件不存在!");
+        }
+        return size;
     }
 }

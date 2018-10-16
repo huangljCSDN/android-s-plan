@@ -7,25 +7,30 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/white"
         android:orientation="horizontal">
         <EditText
             android:id="@+id/et_input_msg"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="40dp"
-            android:background="@color/color_white"
+            android:background="@drawable/bg_report_dialog"
             android:hint="@string/hint_input_msg"
-            android:paddingLeft="23dp"
-            android:paddingRight="23dp"
+            android:paddingRight="15dp"
             android:textSize="14sp"
+            android:layout_marginLeft="15dp"
             android:textColor="@color/color_333333"
             android:textColorHint="@color/color_a7a7a7"/>
 
-        <TextView
+        <ImageView
             android:id="@+id/btn_send"
-            android:layout_width="100dp"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="@string/send"/>
+            android:paddingRight="15dp"
+            android:paddingLeft="15dp"
+            android:textColor="@color/white"
+            android:src="@drawable/bg_send_btn"
+            android:gravity="center"/>
     </LinearLayout>
 
     <LinearLayout

@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_toLeftOf="@id/chat_head_img"
             android:adjustViewBounds="true"
-            android:background="@mipmap/chat_me_bg"
+            android:background="@drawable/bg_me_chat"
             android:gravity="left|center_vertical"
             android:maxWidth="200dp" />
 

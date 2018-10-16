@@ -1,46 +1,29 @@
 package com.markLove.xplan.ui.activity;
 
-import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.SpannableString;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,71 +31,50 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.cjt2325.cameralibrary.util.FileUtil;
-import com.dmcbig.mediapicker.PickerActivity;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
 import com.markLove.xplan.R;
-import com.markLove.xplan.base.App;
 import com.markLove.xplan.base.mvp.BasePresenter;
 import com.markLove.xplan.base.ui.BaseActivity;
-import com.markLove.xplan.bean.Recorder;
+import com.markLove.xplan.bean.ChatUser;
 import com.markLove.xplan.bean.msg.Message;
+import com.markLove.xplan.bean.msg.body.FileMessageBody;
+import com.markLove.xplan.bean.msg.body.TxtMessageBody;
 import com.markLove.xplan.config.Constants;
-import com.markLove.xplan.module.emoji.EmojiOnClickListener;
-import com.markLove.xplan.module.emoji.EmojiUtils;
-import com.markLove.xplan.module.recorder.MediaManager;
-import com.markLove.xplan.module.recorder.view.AudioRecorderButton;
+import com.markLove.xplan.db.DBDao;
+import com.markLove.xplan.module.image.IImageCompressor;
 import com.markLove.xplan.mvp.contract.ChatView;
 import com.markLove.xplan.mvp.presenter.ChatPresenter;
 import com.markLove.xplan.mvp.presenter.impl.ChatPresenterImpl;
 import com.markLove.xplan.ui.adapter.ChatMessageAdapter;
-import com.markLove.xplan.ui.adapter.EmojiPagerAdapter;
-import com.markLove.xplan.ui.widget.EmojiPointerView;
 import com.markLove.xplan.ui.widget.MorePopWindow;
 import com.markLove.xplan.ui.widget.ReportDialog;
 import com.markLove.xplan.utils.AudioUtils;
-import com.markLove.xplan.utils.BigDecimalUtil;
+import com.markLove.xplan.utils.DataUtils;
 import com.markLove.xplan.utils.DensityUtils;
-import com.markLove.xplan.utils.FileUtils;
+import com.markLove.xplan.utils.ImageUtils;
 import com.markLove.xplan.utils.LogUtils;
 import com.markLove.xplan.utils.PreferencesUtils;
 import com.markLove.xplan.utils.ToastUtils;
 
-import java.io.File;
-import java.lang.ref.WeakReference;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
 public class ShopChatActivity extends BaseActivity implements View.OnClickListener, ChatView {
-    private final int REQUEST_CODE_PERMISSION_ONE = 100; //权限申请自定义码
-    private final int REQUEST_CODE_PERMISSION_TWO = 103; //权限申请自定义码
-    private final int REQUEST_CODE_CAMERA = 101; //相机
-    private final int REQUEST_CODE_PICKER = 102; //相册
-    private ImageView imageView;
-    private ListView mListView;
-    private EditText etChatSnedMsg;
-    private RelativeLayout mRlRecord;
-    private TextView mTvRecordTip, mTvRecordTime;
-    private ArrayAdapter<Recorder> mAdapter;
-    private List<Recorder> mDatas = new ArrayList<>();
-    //    private AudioRecorderButton mAudioRecorderButton;
-    private ImageView mAudioRecorderButton;
-    private View mAnimView;
     private ArrayList<Media> select;
-    private TextView mTvSend;
-    private View emojiView;
-    private ViewPager vpChatEmoji;
-    private ImageView mIvEmoji, mIvRecord;
-    private EmojiPointerView llChatEmojiPoint;
-    private TextView tvChatSend;
 
     private TextView mTvShopName, mTvAllPersonCount;
     private LinearLayout mLlPersons;
     private FrameLayout mFlMore;
     private RecyclerView rlChatMsgList;
+    private com.markLove.xplan.ui.widget.ChatView chatView;
 
     ChatPresenter chatPresenter;
     ChatMessageAdapter chatMessageAdapter;
@@ -121,15 +83,10 @@ public class ShopChatActivity extends BaseActivity implements View.OnClickListen
     //    AutoCameraUtils autoCameraUtils;
     int me_user_id;
     int to_user_id;
-    int moveY = 0;
-    boolean isRecordering = false;
     boolean isEnd = false;
     boolean isLikeAndUser = false;
-    boolean toUserIDIsLove = false;
-    boolean meIsLove = false;
     boolean isBlackUser = false;
     boolean keyboardIsShown = false;
-    static final int REQUEST_RECORDERING_CODE = 0x001;
 
     @Override
     protected int getContentViewId() {
@@ -143,72 +100,7 @@ public class ShopChatActivity extends BaseActivity implements View.OnClickListen
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        findViewById(R.id.fl_sound).setOnClickListener(this);
-        findViewById(R.id.fl_camera).setOnClickListener(this);
-        findViewById(R.id.fl_pic).setOnClickListener(this);
-        findViewById(R.id.fl_emoji).setOnClickListener(this);
-        imageView = findViewById(R.id.image);
-
-//        mListView = findViewById(R.id.id_listview);
         rlChatMsgList = findViewById(R.id.chat_msg_list);
-
-
-        llChatEmojiPoint = findViewById(R.id.chat_emoji_point);
-        mRlRecord = findViewById(R.id.ll_record_sound);
-        etChatSnedMsg = findViewById(R.id.et_input_msg);
-        mTvRecordTip = findViewById(R.id.tv_record_tip);
-        mTvRecordTime = findViewById(R.id.tv_record_time);
-        mTvSend = findViewById(R.id.btn_send);
-        emojiView = findViewById(R.id.chat_emoji_pager);
-        vpChatEmoji = findViewById(R.id.chat_emoji_viewpager);
-        mIvRecord = findViewById(R.id.iv_record);
-        mIvEmoji = findViewById(R.id.iv_emoji);
-        tvChatSend = findViewById(R.id.btn_send);
-        etChatSnedMsg.clearFocus();
-        mAudioRecorderButton = findViewById(R.id.id_recorder_button);
-//        mAudioRecorderButton.setAudioFinishRecorderListener(new AudioRecorderButton.AudioFinishRecorderListener() {
-//            @Override
-//            public void onFinish(float seconds, String filePath) {
-//                //每完成一次录音
-//                Recorder recorder = new Recorder(seconds, filePath);
-//                mDatas.add(recorder);
-//                //更新adapter
-//                mAdapter.notifyDataSetChanged();
-//                //设置listview 位置
-////                mListView.setSelection(mDatas.size() - 1);
-//            }
-//        });
-//
-//        mAudioRecorderButton.setOnRecordindStateChangListener(new AudioRecorderButton.OnRecordingStateChangListener() {
-//            @Override
-//            public void onStateChang(int state) {
-//                switch (state){
-//                    case AudioRecorderButton.STATE_NORMAL:
-//                        mTvRecordTip.setText(getString(R.string.pressed_say));
-//                        mTvRecordTime.setVisibility(View.GONE);
-//                        break;
-//                    case AudioRecorderButton.STATE_WANT_TO_CANCEL:
-//                        mTvRecordTip.setText(getString(R.string.loosen_send));
-//                        break;
-//                    case AudioRecorderButton.STATE_RECORDING:
-//                        mTvRecordTime.setVisibility(View.VISIBLE);
-//                        mTvRecordTip.setText(getString(R.string.cancel_send));
-//                        break;
-//                    case AudioRecorderButton.STATE_TO_SHORT:
-//                        mTvRecordTip.setText(getString(R.string.pressed_say));
-//                        mTvRecordTime.setVisibility(View.GONE);
-//                        toast("录制时间过短");
-//                        break;
-//                }
-//            }
-//
-//            @Override
-//            public void onTimeChang(float time) {
-//                mTvRecordTime.setText(BigDecimalUtil.floatToTime(time));
-//            }
-//        });
-        setListViewAdapter();
-
         mTvShopName = findViewById(R.id.tv_shop_name);
         mTvAllPersonCount = findViewById(R.id.tv_person_count);
         mLlPersons = findViewById(R.id.ll_person_count);
@@ -218,293 +110,23 @@ public class ShopChatActivity extends BaseActivity implements View.OnClickListen
         mTvAllPersonCount.setText("21314124人");
         addPersonHeadPhoto();
 
-        initUI();
-    }
-
-    private void showRlRecord() {
-        hideEmojiView();
-        if (mRlRecord.getVisibility() == View.GONE) {
-            mIvRecord.setImageResource(R.drawable.ic_recored_selected);
-            mRlRecord.setVisibility(View.VISIBLE);
-        }
-    }
-
-    private void showEmojiView() {
-        hideRlRecord();
-        if (!emojiView.isShown()) {
-            emojiView.setVisibility(View.VISIBLE);
-            mIvEmoji.setImageResource(R.drawable.ic_emoji_selected);
-        }
-    }
-
-    private void hideEmojiView() {
-        if (emojiView.isShown()) {
-            emojiView.setVisibility(View.GONE);
-            mIvEmoji.setImageResource(R.drawable.ic_emoji);
-        }
-    }
-
-    private void hideRlRecord() {
-        if (mRlRecord.getVisibility() == View.VISIBLE) {
-            mRlRecord.setVisibility(View.GONE);
-            mIvRecord.setImageResource(R.drawable.ic_sound);
-        }
-    }
-
-
-    MyHandler handler = new MyHandler(this);
-
-    static class MyHandler extends Handler {
-        WeakReference<ShopChatActivity> mActivity;
-
-        public MyHandler(ShopChatActivity chatActivity) {
-            mActivity = new WeakReference<ShopChatActivity>(chatActivity);
-        }
-
-        @Override
-        public void handleMessage(android.os.Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case 0:
-                    if (!mActivity.get().isEnd) {
-                        mActivity.get().postRecorderingMessage();
-                        mActivity.get().setRecorderingTime();
-                    }
-                    break;
-            }
-        }
-    }
-
-    /**
-     * 开始录音
-     */
-    public void startRecordering() {
-        mTvRecordTime.setText("");
-        mTvRecordTime.setVisibility(View.VISIBLE);
-        mTvRecordTip.setText(getString(R.string.cancel_send));
-    }
-
-    /**
-     * 停止录音
-     */
-    public void stopRecordering() {
-        isEnd = true;
-        mTvRecordTime.setVisibility(View.GONE);
-        mTvRecordTip.setText(getString(R.string.pressed_say));
-    }
-
-    /**
-     * 取消录音
-     */
-    public void cancelRecordring() {
-        isEnd = true;
-        mTvRecordTime.setText("");
-        mTvRecordTime.setVisibility(View.GONE);
-        mTvRecordTip.setText(getString(R.string.pressed_say));
-    }
-
-    public void postRecorderingMessage() {
-        handler.sendEmptyMessageDelayed(0, 100);
-    }
-
-    public void setVoiceState() {
-        if (isRecordering) {
-            mTvRecordTip.setText(getString(R.string.cancel_send));
-        } else {
-            mTvRecordTip.setText(getString(R.string.loosen_send));
-        }
-    }
-
-    public void setRecorderingTime() {
-        long timeInterval = AudioUtils.getInstance().getCurrentTimeInterval();
-        if (timeInterval >= AudioUtils.COUNTDOWN_VOICE_TIME && timeInterval < AudioUtils.MAX_VOICE_TIME) {
-            //显示倒计时
-//            ivVoiceToastImg.setVisibility(View.GONE);
-//            tvVoiceToastTime.setVisibility(View.VISIBLE);
-//            tvVoiceToastTime.setText((AudioUtils.MAX_VOICE_TIME - timeInterval) + "");
-        } else if (AudioUtils.getInstance().getCurrentTimeInterval() >= AudioUtils.MAX_VOICE_TIME) {
-            isEnd = true;
-        }
-//        ivChatVoiceSpeakLeft.setVisibility(View.VISIBLE);
-//        ivChatVoiceSpeakRight.setVisibility(View.VISIBLE);
-//        tvChatVoiceSpeak.setTextColor(Color.parseColor("#A6A6A6"));
-//        tvChatVoiceSpeak.setText(String.format("%d秒", AudioUtils.getInstance().getCurrentTimeInterval()));
-//        mTvRecordTime.setText(String.format("%d秒", AudioUtils.getInstance().getCurrentTimeInterval()));
-        mTvRecordTime.setText(showTimeCount(AudioUtils.getInstance().getCurrentTimeInterval()*1000));
-        if (isEnd) {
-            if (isRecordering) {
-                AudioUtils.getInstance().stopRecording();
-            } else {
-                AudioUtils.getInstance().cancelRecording();
-            }
-        }
-    }
-
-    public String showTimeCount(long time) {
-        System.out.println("time=" + time);
-        if (time >= 360000000) {
-            return "00:00:00";
-        }
-        String timeCount = "";
-        long hourc = time / 3600000;
-        String hour = "0" + hourc;
-        System.out.println("hour=" + hour);
-        hour = hour.substring(hour.length() - 2, hour.length());
-        System.out.println("hour2=" + hour);
-
-        long minuec = (time - hourc * 3600000) / (60000);
-        String minue = "0" + minuec;
-        System.out.println("minue=" + minue);
-        minue = minue.substring(minue.length() - 2, minue.length());
-        System.out.println("minue2=" + minue);
-
-        long secc = (time - hourc * 3600000 - minuec * 60000) / 1000;
-        String sec = "0" + secc;
-        System.out.println("sec=" + sec);
-        sec = sec.substring(sec.length() - 2, sec.length());
-        System.out.println("sec2=" + sec);
-        timeCount = minue + ":" + sec;
-        System.out.println("timeCount=" + timeCount);
-        return timeCount;
-    }
-
-    //初始化语音
-    private void initVoice() {
-        mAudioRecorderButton.setOnTouchListener(new View.OnTouchListener() {
+        chatView = findViewById(R.id.chatView);
+        chatView.setActivity(this);
+        chatView.setOnSendMessageListener(new com.markLove.xplan.ui.widget.ChatView.OnSendMessageListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                final String recorderingPermission = Manifest.permission.RECORD_AUDIO;
-                final String storagePermission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
-                //6.0以前无论是否有权限都是返回true
-                if (ContextCompat.checkSelfPermission(ShopChatActivity.this, recorderingPermission) != PackageManager.PERMISSION_GRANTED &&
-                        ContextCompat.checkSelfPermission(ShopChatActivity.this, storagePermission) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(ShopChatActivity.this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_RECORDERING_CODE);
-                } else if (ContextCompat.checkSelfPermission(ShopChatActivity.this, recorderingPermission) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(ShopChatActivity.this, new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_RECORDERING_CODE);
-                } else if (ContextCompat.checkSelfPermission(ShopChatActivity.this, storagePermission) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(ShopChatActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_RECORDERING_CODE);
-                } else {
-                    switch (event.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
-                            AudioUtils.getInstance().startRecording(audioRecoderListener);
-                            break;
-                        case MotionEvent.ACTION_MOVE:
-                            moveY = (int) event.getY();
-                            //当滑动的距离超出父容器的距离，则取消发送
-                            if (moveY < 0 && Math.abs(moveY) > v.getTop()) {
-                                isRecordering = false;
-                            } else {
-                                isRecordering = true;
-                            }
-                            setVoiceState();
-                            break;
-                        case MotionEvent.ACTION_UP:
-                            if (!isEnd) {
-                                if (isRecordering) {
-                                    isEnd = true;
-                                    AudioUtils.getInstance().stopRecording();
-                                } else {
-                                    AudioUtils.getInstance().cancelRecording();
-                                }
-                            }
-                            break;
-                        case MotionEvent.ACTION_CANCEL:
-                            if (isRecordering)
-                                isEnd = true;
-                            AudioUtils.getInstance().cancelRecording();
-                            break;
-                        default:
-                            break;
-                    }
-
-                }
-                return true;
+            public void onSendMessage(Message message) {
+                judeBlackList(message);
             }
         });
+        initData();
     }
-
-    AudioUtils.AudioRecoderListener audioRecoderListener = new AudioUtils.AudioRecoderListener() {
-        @Override
-        public void recoderFail() {
-            ToastUtils.showCenter(App.getInstance(), "录音无效，请检查录音权限", 0);
-            stopRecordering();
-        }
-
-        @Override
-        public void recoderStart() {
-            isRecordering = true;
-            //开启一个时间监听,每隔一秒获取一次时间
-            postRecorderingMessage();
-            isEnd = false;
-            startRecordering();
-        }
-
-        @Override
-        public void recoderEnd() {
-            stopRecordering();
-            //结束录音后发送这条消息
-            if (AudioUtils.getInstance().getTimeInterval() < 1000) {
-                ToastUtils.showCenter(ShopChatActivity.this, "录制时间过短", 0);
-                FileUtils.delete(AudioUtils.getInstance().getFilePath());
-                return;
-            }
-            String voicePath = AudioUtils.getInstance().getFilePath();
-            File file = new File(voicePath);
-            if (file.exists() && file.length() > 0) {
-                String voiceName = voicePath.substring(voicePath.lastIndexOf("/") + 1, voicePath.length());
-                final Message voiceMessage = Message.createVoiceMessage(Message.Type.CHAT, me_user_id, to_user_id, voiceName, voicePath);
-                voiceMessage.setStatus(Message.ChatStatus.SENDING);
-                judeBlackList(voiceMessage);
-            } else {
-                ToastUtils.showCenter(ShopChatActivity.this, "录音无效，请检查录音权限", 0);
-                FileUtils.delete(AudioUtils.getInstance().getFilePath());
-            }
-        }
-
-        @Override
-        public void recoderCancel() {
-            cancelRecordring();
-        }
-    };
-
-
-    private void addPersonHeadPhoto() {
-        for (int i = 0; i < 10; i++) {
-            View view = LayoutInflater.from(this).inflate(R.layout.item_min_head, null);
-            ImageView imageHead = view.findViewById(R.id.iv_item_head);
-            //显示圆形的imageview
-            RequestOptions mRequestOptions = RequestOptions.circleCropTransform()
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)//不做磁盘缓存
-                    .skipMemoryCache(true);//不做内存缓存
-
-            Glide.with(this).load(R.drawable.icon).apply(mRequestOptions).into(imageHead);
-
-            mLlPersons.addView(view);
-        }
-    }
-
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.fl_sound:
-                startRecordSound();
-                break;
-            case R.id.fl_camera:
-                hideRlRecord();
-                hideEmojiView();
-                startCameraActivity();
-                break;
-            case R.id.fl_pic:
-                hideRlRecord();
-                hideEmojiView();
-                startPickerActivity();
-                break;
             case R.id.fl_more:
                 showMoreDialog();
                 break;
-            case R.id.fl_emoji:
-                showEmojiView();
         }
     }
 
@@ -543,110 +165,32 @@ public class ShopChatActivity extends BaseActivity implements View.OnClickListen
         reportDialog.show();
     }
 
-    /**
-     * 开始录音
-     */
-    private void startRecordSound() {
-        if (mRlRecord.getVisibility() == View.VISIBLE) {
-            mRlRecord.setVisibility(View.GONE);
-        } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager
-                        .PERMISSION_GRANTED &&
-                        ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-                    showRlRecord();
-                } else {
-                    //不具有获取权限，需要进行权限申请
-                    ActivityCompat.requestPermissions(this, new String[]{
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                            Manifest.permission.RECORD_AUDIO,
-                    }, 103);
-                }
-            } else {
-                showRlRecord();
-            }
-        }
-    }
-
-    /**
-     * 启动相册
-     */
-    private void startPickerActivity() {
-        Intent intent = new Intent(this, PickerActivity.class);
-        intent.putExtra(PickerConfig.SELECT_MODE, PickerConfig.PICKER_IMAGE_VIDEO);//default image and video (Optional)
-        long maxSize = 188743680L;//long long long
-        intent.putExtra(PickerConfig.MAX_SELECT_SIZE, maxSize); //default 180MB (Optional)
-        intent.putExtra(PickerConfig.MAX_SELECT_COUNT, 15);  //default 40 (Optional)
-        intent.putExtra(PickerConfig.DEFAULT_SELECTED_LIST, select); // (Optional)
-        this.startActivityForResult(intent, REQUEST_CODE_PICKER);
-    }
-
-    /**
-     * 启动相机
-     */
-    private void startCameraActivity() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager
-                    .PERMISSION_GRANTED &&
-                    ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager
-                            .PERMISSION_GRANTED &&
-                    ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager
-                            .PERMISSION_GRANTED) {
-                this.startActivityForResult(new Intent(ShopChatActivity.this, CameraActivity.class), REQUEST_CODE_CAMERA);
-            } else {
-                //不具有获取权限，需要进行权限申请
-                ActivityCompat.requestPermissions(ShopChatActivity.this, new String[]{
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.RECORD_AUDIO,
-                        Manifest.permission.CAMERA}, REQUEST_CODE_PERMISSION_ONE);
-            }
-        } else {
-            this.startActivityForResult(new Intent(ShopChatActivity.this, CameraActivity.class), REQUEST_CODE_CAMERA);
-        }
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (data != null) {
             Log.i("huang", "requestCode=" + requestCode + "   resultCode=" + resultCode);
-            if (requestCode == REQUEST_CODE_CAMERA) {
-                Log.i("CJT", "picture");
+            if (requestCode == Constants.REQUEST_CODE_CAMERA) {
                 final String path = data.getStringExtra("path");
                 Log.i("huang", "path=" + path);
-//            imageView.setImageBitmap(BitmapFactory.decodeFile(path));
-
-                Uri mediaUri = Uri.parse("file://" + path);
-
-                Glide.with(this)
-                        .load(mediaUri)
-                        .into(imageView);
-                imageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        playVideo(path);
-                    }
-                });
+//                Uri mediaUri = Uri.parse("file://" + path);
+//                Glide.with(this)
+//                        .load(mediaUri)
+//                        .into(imageView);
+//                imageView.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        playVideo(path);
+//                    }
+//                });
+                onImageReturn(null, path, true);
             }
-            if (requestCode == REQUEST_CODE_PICKER) {
+            if (requestCode == Constants.REQUEST_CODE_PICKER) {
                 select = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
-                Log.i("select", "select.size" + select.size());
+                Boolean isOrigin = data.getBooleanExtra(PickerConfig.IS_ORIGIN, false);
                 for (final Media media : select) {
-                    Log.i("media", media.path);
-                    Log.e("media", "s:" + media.size);
-//                imageView.setImageURI(Uri.parse(media.path));
-
-                    Uri mediaUri = Uri.parse("file://" + media.path);
-
-                    Glide.with(this)
-                            .load(mediaUri)
-                            .into(imageView);
-                    imageView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            playVideo(media.path);
-                        }
-                    });
+                    Log.i("media", media.toString());
+                    onImageReturn(null, media.path, isOrigin);
                 }
             }
             if (resultCode == 102) {
@@ -663,7 +207,7 @@ public class ShopChatActivity extends BaseActivity implements View.OnClickListen
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CODE_PERMISSION_ONE) {
+        if (requestCode == Constants.REQUEST_CODE_PERMISSION_ONE) {
             int size = 0;
             if (grantResults.length >= 1) {
                 int writeResult = grantResults[0];
@@ -685,14 +229,14 @@ public class ShopChatActivity extends BaseActivity implements View.OnClickListen
                     size++;
                 }
                 if (size == 0) {
-                    startActivityForResult(new Intent(ShopChatActivity.this, CameraActivity.class), REQUEST_CODE_CAMERA);
+                    startActivityForResult(new Intent(ShopChatActivity.this, CameraActivity.class), Constants.REQUEST_CODE_CAMERA);
                 } else {
                     Toast.makeText(this, "请到设置-权限管理中开启", Toast.LENGTH_SHORT).show();
                 }
             }
         }
 
-        if (requestCode == REQUEST_CODE_PERMISSION_TWO) {
+        if (requestCode == Constants.REQUEST_CODE_PERMISSION_TWO) {
             int size2 = 0;
             if (grantResults.length >= 1) {
                 int writeResult = grantResults[0];
@@ -708,182 +252,13 @@ public class ShopChatActivity extends BaseActivity implements View.OnClickListen
                     size2++;
                 }
                 if (size2 == 0) {
-                    showRlRecord();
+//                    showRlRecord();
+                    chatView.showRlRecord();
                 } else {
                     Toast.makeText(this, "请到设置-权限管理中开启", Toast.LENGTH_SHORT).show();
                 }
             }
         }
-    }
-
-    Uri getUri(String path) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return FileProvider.getUriForFile(this, this.getPackageName() + ".dmc", new File(path));
-        } else {
-            return Uri.fromFile(new File(path));
-        }
-    }
-
-    /**
-     * 检查是否有可以处理的程序
-     *
-     * @param context
-     * @param intent
-     * @return
-     */
-    private boolean isIntentAvailable(Context context, Intent intent) {
-        List resolves = context.getPackageManager().queryIntentActivities(intent, 0);
-        return resolves.size() > 0;
-    }
-
-    /**
-     * 调取播放视频的工具
-     *
-     * @param path
-     */
-    private void playVideo(String path) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(getUri(path), "video/*");
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        if (isIntentAvailable(ShopChatActivity.this, intent)) {
-            startActivity(intent);
-        } else {
-            Toast.makeText(ShopChatActivity.this, getString(com.dmcbig.mediapicker.R.string.cant_play_video), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-
-    private void setListViewAdapter() {
-//        mAdapter = new RecorderAdapter(this, mDatas);
-//        mListView.setAdapter(mAdapter);
-//
-//        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                //如果第一个动画正在运行， 停止第一个播放其他的
-//                if (mAnimView != null) {
-//                    mAnimView.setBackgroundResource(R.drawable.adj);
-//                    mAnimView = null;
-//                }
-//                //播放动画
-//                mAnimView = view.findViewById(R.id.id_recorder_anim);
-//                mAnimView.setBackgroundResource(R.drawable.play_anim);
-//                AnimationDrawable animation = (AnimationDrawable) mAnimView.getBackground();
-//                animation.start();
-//
-//                //播放音频  完成后改回原来的background
-//                MediaManager.playSound(mDatas.get(position).filePath, new MediaPlayer.OnCompletionListener() {
-//                    @Override
-//                    public void onCompletion(MediaPlayer mp) {
-//                        mAnimView.setBackgroundResource(R.drawable.adj);
-//                    }
-//                });
-//            }
-//        });
-    }
-
-    /**
-     * 根据生命周期 管理播放录音
-     */
-    @Override
-    protected void onPause() {
-        super.onPause();
-        MediaManager.pause();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        MediaManager.resume();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        MediaManager.release();
-    }
-
-
-    protected void initUI() {
-
-//        setTranslucentStatusColor(Color.WHITE);
-        chatPresenter = new ChatPresenterImpl();
-        chatPresenter.setView(this);
-        initSoftKeyboard();
-        initVoice();
-        initEmoji();
-        rlChatMsgList.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                chatMessageAdapter.dismissItemPopup();
-                closeSoftKeyBoard();
-//                llChatVoice.setVisibility(View.GONE);
-//                ivChatVoice.setImageResource(R.mipmap.chat_voice_normal);
-                emojiView.setVisibility(View.GONE);
-//                ivChatEmoij.setImageResource(R.mipmap.chat_emoij_normal);
-//                llChatGift.setVisibility(View.GONE);
-//                ivChatGift.setImageResource(R.mipmap.chat_gift_normal);
-                return false;
-            }
-        });
-        meIsLove = PreferencesUtils.getBoolean(this, Constants.USER_IS_LOVES_INFO_KEY);
-        etChatSnedMsg.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() > 0) {
-                    tvChatSend.setEnabled(true);
-                } else {
-                    tvChatSend.setEnabled(false);
-                }
-                if (s.length() >= 200) {
-                    ToastUtils.show(ShopChatActivity.this, "最多200个字符", 0);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-        initData();
-    }
-
-    //初始化Emoji
-    private void initEmoji() {
-        List<Integer> list = new ArrayList<>();
-        Collections.addAll(list, EmojiUtils.emojiIcons);
-//        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-//        vpChatEmoji.setLayoutManager(linearLayoutManager);
-        EmojiPagerAdapter emojiPagerAdapter = new EmojiPagerAdapter(this, list);
-        emojiPagerAdapter.setEmojiClickListener(emojiClickListener);
-        vpChatEmoji.setAdapter(emojiPagerAdapter);
-        vpChatEmoji.setVisibility(View.VISIBLE);
-        emojiView.setVisibility(View.GONE);
-        llChatEmojiPoint.setCount(emojiPagerAdapter.getCount());
-        llChatEmojiPoint.setSelectPoint(1);
-        llChatEmojiPoint.invalidate();
-        vpChatEmoji.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int i, float v, int i1) {
-
-            }
-
-            @Override
-            public void onPageSelected(int i) {
-                llChatEmojiPoint.setSelectPoint(i + 1);
-                llChatEmojiPoint.invalidate();
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int i) {
-
-            }
-        });
     }
 
     protected void initData() {
@@ -932,8 +307,8 @@ public class ShopChatActivity extends BaseActivity implements View.OnClickListen
                 outRect.top = DensityUtils.dip2px(ShopChatActivity.this, 10f);
             }
         });
-//        chatPresenter = new ChatPresenterImpl();
-//        chatPresenter.setView(this);
+        chatPresenter = new ChatPresenterImpl();
+        chatPresenter.setView(this);
 //        tvChatSendPrice.setText(gold + "");
 //        chatPresenter.getHistory(me_user_id, to_user_id);
 //        getGiftList();
@@ -974,33 +349,6 @@ public class ShopChatActivity extends BaseActivity implements View.OnClickListen
         }
     };
 
-    EmojiOnClickListener emojiClickListener = new EmojiOnClickListener() {
-        @Override
-        public void onEmojiItemClick(int emojiIcon) {
-            if (emojiIcon != R.mipmap.emoji_delect) {
-                int position = -1;
-                for (int i = 0; i < EmojiUtils.emojiIcons.length; i++) {
-                    if (EmojiUtils.emojiIcons[i] == emojiIcon) {
-                        position = i;
-                        break;
-                    }
-                }
-                if (position >= 0 && position < EmojiUtils.emojiIcons.length) {
-                    String str = etChatSnedMsg.getText().toString() + EmojiUtils.emojiValues[position];
-                    SpannableString spannableString = EmojiUtils.parseEmoji(ShopChatActivity.this, str);
-                    etChatSnedMsg.setText(spannableString);
-                    etChatSnedMsg.setSelection(spannableString.length());
-                }
-            } else {
-                int keyCode = KeyEvent.KEYCODE_DEL;
-                KeyEvent keyEventDown = new KeyEvent(KeyEvent.ACTION_DOWN, keyCode);
-                KeyEvent keyEventUp = new KeyEvent(KeyEvent.ACTION_UP, keyCode);
-                etChatSnedMsg.onKeyDown(keyCode, keyEventDown);
-                etChatSnedMsg.onKeyUp(keyCode, keyEventUp);
-            }
-        }
-    };
-
     int usableHeightPrevious = 0;
 
     //设置软键盘弹起和关闭的监听
@@ -1014,16 +362,7 @@ public class ShopChatActivity extends BaseActivity implements View.OnClickListen
                     int heightDifference = usableHeightSansKeyboard - usableHeightNow;
                     if (heightDifference > (usableHeightSansKeyboard / 4)) {
                         keyboardIsShown = true;
-                        // 键盘弹出
-//                        if (emojiView.isShown()) {
-//                            emojiView.setVisibility(View.GONE);
-//                            ivChatEmoij.setImageResource(R.mipmap.chat_emoij_normal);
-//                        }
-//                        
-//                        if (llChatVoice.isShown()) {
-//                            llChatVoice.setVisibility(View.GONE);
-//                            ivChatVoice.setImageResource(R.mipmap.chat_voice_normal);
-//                        }
+                        chatView.hideView();
                     } else {
                         // 键盘收起
                         keyboardIsShown = false;
@@ -1050,6 +389,7 @@ public class ShopChatActivity extends BaseActivity implements View.OnClickListen
         }
     }
 
+
     ChatMessageAdapter.FailMessageResend failMessageResend = new ChatMessageAdapter.FailMessageResend() {
         @Override
         public void failResend(Message msg) {
@@ -1058,6 +398,10 @@ public class ShopChatActivity extends BaseActivity implements View.OnClickListen
         }
     };
 
+    /**
+     * 重新发送消息
+     * @param resendMessage
+     */
     private void resendMessage(final Message resendMessage) {
         View contentView = LayoutInflater.from(this).inflate(R.layout.popup_chat_msg_fail, null);
         final PopupWindow popupWindow = new PopupWindow(contentView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -1106,6 +450,70 @@ public class ShopChatActivity extends BaseActivity implements View.OnClickListen
         popupWindow.update();
     }
 
+    @Override
+    public void showHistoryMessage(final List<Message> historyMessageList) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                chatMessageAdapter.addAll(historyMessageList);
+            }
+        });
+    }
+
+    @Override
+    public void addOneMessage(final Message msg) {
+        if ((msg.getToID() == me_user_id && msg.getFromID() == to_user_id)
+                || (msg.getToID() == to_user_id && msg.getFromID() == me_user_id)) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (null != chatMessageAdapter) {
+                        chatMessageAdapter.addOne(msg);
+                    }
+                }
+            });
+        }
+    }
+
+    @Override
+    public void updataMessage(final String msgID, final int errorCode) {
+        if (Message.ChatStatus.values()[errorCode] == Message.ChatStatus.SUCCESS) {
+            if (null != chatMessageAdapter) {
+                Message message = chatMessageAdapter.getMessageByID(msgID);
+                if (message != null) {
+                    if (message.getFromID() == PreferencesUtils.getInt(this, Constants.ME_USER_ID) && (message.getChatType() == Message.ChatType.IMAGE || message.getChatType() == Message.ChatType.VOICE) && message.getStatus() == Message.ChatStatus.SUCCESS) {
+                        Message.ChatType chatType = message.getChatType() == Message.ChatType.IMAGE ? Message.ChatType.IMAGE_DESC : Message.ChatType.VOICE_DESC;
+                        FileMessageBody fileMessageBody = (FileMessageBody) message.getBody();
+                        sendMessage(Message.createDescriptionMessage(message.getFromID(), message.getToID(), Message.Type.CHAT, chatType, fileMessageBody.getFileName()));
+                    }
+                }
+            }
+        }
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (null != chatMessageAdapter) {
+                    try {
+                        int position = chatMessageAdapter.getItemPositionByMsgID(msgID);
+                        if (position >= 0) {
+                            Message.ChatStatus status = Message.ChatStatus.values()[errorCode];
+                            List<Message.ChatStatus> payloads = new ArrayList<Message.ChatStatus>();
+                            payloads.add(status);
+                            chatMessageAdapter.notifyItemRangeChanged(position, 1, status);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * 判断是否被拉黑
+     *
+     * @param msg
+     */
     private void judeBlackList(final Message msg) {
         if (null != msg) {
             int sendCount = PreferencesUtils.getInt(this, Constants.SEND_MESSAGE_COUNT + to_user_id, 0);
@@ -1113,9 +521,12 @@ public class ShopChatActivity extends BaseActivity implements View.OnClickListen
             PreferencesUtils.putInt(this, Constants.SEND_MESSAGE_COUNT + to_user_id, ++sendCount);
             addOneMessage(msg);
         }
-        StringBuilder sb = new StringBuilder(Constants.POST_JUDGE_BLACK_LIST);
-        sb.append("?ToUserId=" + to_user_id);
-        sb.append("&Token=" + PreferencesUtils.getString(this, Constants.TOKEN_KEY));
+        //暂时不判断拉黑逻辑，直接发送
+        sendMessage(msg);
+
+//        StringBuilder sb = new StringBuilder(Constants.POST_JUDGE_BLACK_LIST);
+//        sb.append("?ToUserId=" + to_user_id);
+//        sb.append("&Token=" + PreferencesUtils.getString(this, Constants.TOKEN_KEY));
 //        OkGoHttpUtils.post(sb.toString(), new OkGoHttpCallBack() {
 //            @Override
 //            public void onSuccess(String s, Call call, Response response) {
@@ -1166,18 +577,213 @@ public class ShopChatActivity extends BaseActivity implements View.OnClickListen
 //        });
     }
 
-    @Override
-    public void showHistoryMessage(List<Message> historyMessageList) {
+    /**
+     * 发送消息
+     *
+     * @param message
+     */
+    private void sendMessage(Message message) {
+        DBDao.getDbDao(this).insertMessage(me_user_id, message);
+        boolean isOpen = PreferencesUtils.getBoolean(this, Constants.CHAT_OPEN_KEY, true);
+        String token = PreferencesUtils.getString(this, Constants.TOKEN_KEY);
+        LogUtils.d("------->token=" + token + ",isOpen=" + isOpen);
+        if (isOpen) {
+//            ChatClient.getInstance().sendMessage(token, message);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    rlChatMsgList.scrollToPosition(chatMessageAdapter.getItemCount());
+                }
+            });
+        } else {
+            if (message.getChatType() == Message.ChatType.LOVE) {
+                PreferencesUtils.putLong(this, Constants.BECOME_COUPLE_TIME_KEY + to_user_id, 0);
+            }
+            ToastUtils.showCenter(this, "该服务正在紧急维护当中，请稍后再试", 0);
+            updataMessage(message.getMsgID(), Message.ChatStatus.FAIL.ordinal());
+        }
+    }
 
+    /**
+     * 图片返回处理
+     *
+     * @param uri
+     * @param filePath
+     * @param isOrigin 是否原图发送
+     */
+    public void onImageReturn(Uri uri, String filePath, boolean isOrigin) {
+//        String filePath = autoCameraUtils.getPath(this, uri);
+        String fileName = filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length());
+        final Message imgMsg = Message.createImageMessage(Message.Type.CHAT, me_user_id, to_user_id, fileName, filePath);
+        imgMsg.setStatus(Message.ChatStatus.SENDING);
+
+        if (isOrigin) {
+            judeBlackList(imgMsg);
+        } else {
+            Observable.create(new ObservableOnSubscribe<Message>() {
+                @Override
+                public void subscribe(final ObservableEmitter<Message> emitter) throws Exception {
+                    final FileMessageBody imgMessageBody = (FileMessageBody) imgMsg.getBody();
+                    final String outPath = Constants.LOCAL_IMG_PATH + imgMessageBody.getFileName();
+                    ImageUtils.compressImageInPath(imgMessageBody.getFilePath(), Constants.LOCAL_IMG_PATH, new IImageCompressor.OnImageCompressListener() {
+                        @Override
+                        public void onCompressStart(String msg) {
+
+                        }
+
+                        @Override
+                        public void onCompressComplete(List<String> destFilePaths) {
+                            if (destFilePaths != null && destFilePaths.size() > 0) {
+                                imgMessageBody.setFilePath(outPath);
+                                emitter.onNext(imgMsg);
+                                emitter.onComplete();
+                            }
+                        }
+
+                        @Override
+                        public void onCompressError(String msg) {
+
+                        }
+                    });
+                }
+            }).subscribeOn(Schedulers.io())
+                    .observeOn(Schedulers.io())
+                    .subscribe(new Observer<Message>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(Message message) {
+                            judeBlackList(message);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    });
+        }
     }
 
     @Override
-    public void addOneMessage(Message msg) {
-
+    public void onBackPressed() {
+        if (keyboardIsShown || chatView.isShow()) {
+            closeSoftKeyBoard();
+            chatView.hideView();
+        } else super.onBackPressed();
     }
 
     @Override
-    public void updataMessage(String msgID, int errorCode) {
+    protected void onResume() {
+        super.onResume();
+        if (null != chatPresenter) {
+            chatPresenter.onResume();
+        }
+    }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        try {
+            if (chatMessageAdapter.getItemCount() > 0) {
+                Message msg = chatMessageAdapter.getItemMsg(chatMessageAdapter.getItemCount() - 1);
+                msg = DBDao.getDbDao(this).queryLastMessage(me_user_id, to_user_id, msg.getMsgID());
+                ChatUser chatUser = new ChatUser();
+                chatUser.setNickName(nickName);
+                chatUser.setUserID(to_user_id);
+                chatUser.setHeadImgUrl(headImgUrl);
+                chatUser.setChatTime(DataUtils.getDateTime(msg.getMsgTime() != 0 ? msg.getMsgTime() : System.currentTimeMillis()));
+                chatUser.setLastMsgId(msg.getMsgID());
+                chatUser.setUnreadCount(0);
+                chatUser.setLastMsgChatType(msg.getChatType());
+                switch (msg.getChatType()) {
+                    case TXT:
+                        TxtMessageBody txtMessageBody = (TxtMessageBody) msg.getBody();
+                        chatUser.setLastMsgContent(txtMessageBody.getMsg());
+                        break;
+                    case IMAGE:
+                        chatUser.setLastMsgContent("[图片]");
+                        break;
+                    case VOICE:
+                        chatUser.setLastMsgContent("[语音]");
+                        break;
+                    case LOVE:
+                        chatUser.setLastMsgContent("[情侣邀请]");
+                        break;
+                    case SUPERLIKE:
+                        chatUser.setLastMsgContent("[超喜欢]");
+                        break;
+                    case GIFT:
+                        chatUser.setLastMsgContent("[礼物]");
+                        break;
+                    case IMAGE_DESC:
+                        chatUser.setLastMsgContent("[图片]");
+                        break;
+                    case VOICE_DESC:
+                        chatUser.setLastMsgContent("[语音]");
+                        break;
+                    default:
+                        chatUser.setLastMsgContent("");
+                        break;
+                }
+                DBDao.getDbDao(this).insertChatUser(me_user_id, chatUser);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (null != chatPresenter) {
+            chatPresenter.onPause();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        chatMessageAdapter.unregisterAdapterDataObserver(adapterDataObserver);
+//        if (null != handler) {
+//            handler.removeCallbacksAndMessages(null);
+//        }
+        if (null != chatPresenter) {
+            chatPresenter.onDestory();
+        }
+        chatView.onDestroy();
+        AudioUtils.getInstance().destory();
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+//        ChatClient.getInstance().isNotification = false;
+//        ChatClient.getInstance().currentlyID = to_user_id;
+        Log.v("MAIN", "onStart");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+//        ChatClient.getInstance().isNotification = true;
+        Log.v("MAIN", "onStop");
+    }
+
+    private void addPersonHeadPhoto() {
+        for (int i = 0; i < 10; i++) {
+            View view = LayoutInflater.from(this).inflate(R.layout.item_min_head, null);
+            ImageView imageHead = view.findViewById(R.id.iv_item_head);
+            //显示圆形的imageview
+            RequestOptions mRequestOptions = RequestOptions.circleCropTransform()
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)//不做磁盘缓存
+                    .skipMemoryCache(true);//不做内存缓存
+
+            Glide.with(this).load(R.drawable.icon).apply(mRequestOptions).into(imageHead);
+
+            mLlPersons.addView(view);
+        }
     }
 }

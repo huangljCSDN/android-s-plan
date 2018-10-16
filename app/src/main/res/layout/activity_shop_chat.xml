@@ -101,6 +101,14 @@
         android:descendantFocusability="beforeDescendants"
         android:fastScrollEnabled="false"></android.support.v7.widget.RecyclerView>
 
-    <include layout="@layout/layout_msg_edit_view"/>
+    <!--<include layout="@layout/layout_msg_edit_view"/>-->
+
+    <com.markLove.xplan.ui.widget.ChatView
+        android:id="@+id/chatView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="80dp">
+
+    </com.markLove.xplan.ui.widget.ChatView>
 
 </LinearLayout>
