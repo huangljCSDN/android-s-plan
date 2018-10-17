@@ -39,4 +39,13 @@
     <string name="players">玩伴</string>
     <string name="play">好玩</string>
     <string name="find_cp">180cp</string>
+    <string name="remove">删除</string>
+    <string name="wait_group_sure">等待局长同意</string>
+    <string name="wait_confirm">您已提交报名申请。等待局长确认</string>
+    <string name="joined">已报名</string>
+    <string name="going">进行中</string>
+    <string name="finished">已结束</string>
+    <string name="invitation">邀请好友</string>
+    <string name="has_requested">已提交报名申请</string>
+    <string name="agree">同意</string>
 </resources>

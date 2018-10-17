@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/chat_root_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <CheckBox
+        android:id="@+id/chat_select_view"
+        style="@style/chat_check_box"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_gravity="bottom"
+        android:layout_marginLeft="8dp"
+        android:visibility="gone" />
+
+    <RelativeLayout
+        android:id="@+id/rl_chat_head_img"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="16dp"
+        android:background="@drawable/bg_circle"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/chat_head_img"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@mipmap/agent_user_pho" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxWidth="100dp"
+        android:paddingLeft="16dp"
+        android:paddingTop="9dp"
+        android:paddingBottom="9dp"
+        android:orientation="horizontal"
+        android:background="@drawable/group_bg_other_chat">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/chat_txt_msg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="111111111"
+                android:layout_toLeftOf="@id/btn_agree"
+                android:layout_alignParentLeft="true"
+                android:textColor="@color/color_333333" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="@string/has_requested"
+                android:layout_marginTop="6dp"
+                android:textColor="@color/color_333333" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_agree"
+            android:layout_width="70dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_enter"
+            android:text="@string/agree"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:textSize="13sp"
+            android:layout_marginLeft="13dp"
+            android:paddingBottom="3dp"/>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/chat_message_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="10dp"
+        android:src="@mipmap/chat_message_fail"
+        android:visibility="gone" />
+</LinearLayout>

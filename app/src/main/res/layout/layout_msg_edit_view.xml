@@ -104,6 +104,7 @@
         android:layout_width="match_parent"
         android:layout_height="194dp"
         android:visibility="gone"
+        android:background="@color/color_0b083d"
         android:orientation="vertical">
 
         <TextView

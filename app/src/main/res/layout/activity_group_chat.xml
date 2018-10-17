@@ -4,196 +4,278 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_shop_chat_room"
+    android:background="#f6f7f9"
     android:orientation="vertical"
     tools:context=".ui.activity.GroupChatActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:gravity="center_vertical">
-
-        <FrameLayout
-            android:id="@+id/fl_back"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:src="@drawable/ic_white_back" />
-        </FrameLayout>
-
-        <TextView
-            android:id="@+id/tv_group_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_centerHorizontal="true"
-            android:textColor="@color/color_white"
-            android:textSize="15sp"
-            tools:text="ceshi ad assa " />
-
-        <FrameLayout
-            android:id="@+id/fl_more"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:src="@drawable/ic_more" />
-        </FrameLayout>
-    </RelativeLayout>
-
-    <LinearLayout
-        android:layout_width="324dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_report_dialog"
-        android:orientation="vertical"
-        android:paddingLeft="11dp"
-        android:paddingRight="11dp"
-        android:layout_marginTop="24dp"
-        android:layout_gravity="center_horizontal">
+        android:background="@drawable/bg_group_chat">
 
         <RelativeLayout
+            android:id="@+id/rl_title_bar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="18dp">
+            android:layout_height="30dp"
+            android:layout_marginTop="25dp"
+            android:gravity="center_vertical">
 
-            <RelativeLayout
-                android:id="@+id/relativeLayout"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:gravity="center">
+            <FrameLayout
+                android:id="@+id/fl_back"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp">
 
                 <ImageView
-                    android:id="@+id/iv_group_head"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    tools:src="@drawable/ic_emoji" />
-            </RelativeLayout>
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/ic_white_back" />
+            </FrameLayout>
 
             <TextView
-                android:id="@+id/textView3"
+                android:id="@+id/tv_group_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="@string/join_person_count"
-                android:layout_marginLeft="14dp"
-                android:layout_toRightOf="@id/relativeLayout" />
-
-            <TextView
-                android:id="@+id/tv_jion_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:text="TextView"
-                android:layout_toRightOf="@id/textView3" />
-
-            <Button
-                android:id="@+id/btn_enter"
-                android:layout_width="79dp"
-                android:layout_height="35dp"
-                android:text="@string/enter"
-                android:layout_marginRight="3dp"
-                android:background="@drawable/enter_button_selector"
+                android:layout_centerHorizontal="true"
+                android:layout_centerInParent="true"
                 android:textColor="@color/color_white"
-                android:layout_alignParentRight="true" />
+                android:textSize="15sp"
+                tools:text="ceshi ad assa " />
+
+            <FrameLayout
+                android:id="@+id/fl_more"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/ic_more" />
+            </FrameLayout>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rl_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tv_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_centerVertical="true"
+                android:gravity="center"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:text="取消"
+                android:textColor="@color/color_333333"
+                android:textSize="14sp" />
         </RelativeLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="324dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_emoji"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=":"
-                android:textSize="12dp"
-                android:layout_marginLeft="6dp"/>
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="91dp"
+            android:background="@drawable/bg_report_dialog"
+            android:orientation="vertical"
+            android:paddingLeft="11dp"
+            android:paddingRight="11dp">
 
-            <TextView
-                android:id="@+id/tv_place"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="12dp"
-                android:textColor="@color/color_a7a7a7"
-                android:layout_marginLeft="10dp"
-                tools:text="@string/enter"/>
-        </LinearLayout>
+                android:layout_marginTop="18dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="7dp">
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_emoji"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=":"
-                android:textSize="12dp"
-                android:layout_marginLeft="6dp"/>
+                <RelativeLayout
+                    android:id="@+id/relativeLayout"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_group_head"
+                    android:padding="2.5dp">
 
-            <TextView
-                android:id="@+id/tv_time"
+                    <ImageView
+                        android:id="@+id/iv_group_head"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginTop="8dp"
+                        tools:src="@drawable/ic_emoji" />
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="14dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_toRightOf="@id/relativeLayout"
+                    android:text="@string/join_person_count" />
+
+                <TextView
+                    android:id="@+id/tv_jion_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_toRightOf="@id/textView3"
+                    android:text="TextView" />
+
+                <Button
+                    android:id="@+id/btn_enter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="3dp"
+                    android:background="@drawable/bg_enter"
+                    android:gravity="center"
+                    android:paddingBottom="2dp"
+                    android:text="@string/enter"
+                    android:textColor="@color/color_white"
+                    android:textSize="16sp"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/tv_invitation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="3dp"
+                    android:drawableTop="@drawable/ic_invitation"
+                    android:text="@string/invitation"
+                    android:textColor="@color/color_333333"
+                    android:visibility="gone"
+                    android:textSize="13sp" />
+
+            </RelativeLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="12dp"
-                android:textColor="@color/color_a7a7a7"
-                android:layout_marginLeft="10dp"
-                tools:text="@string/enter"/>
-        </LinearLayout>
+                android:layout_marginTop="10dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="7dp">
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_emoji"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=":"
-                android:textSize="12dp"
-                android:layout_marginLeft="6dp"/>
+                <ImageView
+                    android:layout_width="13dp"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_place" />
 
-            <TextView
-                android:id="@+id/tv_remark"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:text=":"
+                    android:textSize="12dp" />
+
+                <TextView
+                    android:id="@+id/tv_place"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:textColor="@color/color_a7a7a7"
+                    android:textSize="12dp"
+                    tools:text="@string/enter" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="12dp"
-                android:textColor="@color/color_a7a7a7"
-                android:layout_marginLeft="10dp"
-                tools:text="@string/enter"/>
-        </LinearLayout>
-    </LinearLayout>
+                android:layout_marginTop="7dp">
 
-    <ListView
-        android:id="@+id/id_listview"
+                <ImageView
+                    android:layout_width="13dp"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_time" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:text=":"
+                    android:textSize="12dp" />
+
+                <TextView
+                    android:id="@+id/tv_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:textColor="@color/color_a7a7a7"
+                    android:textSize="12dp"
+                    tools:text="10:21:23" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="7dp"
+                android:layout_marginTop="7dp">
+
+                <ImageView
+                    android:layout_width="13dp"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_remark" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:text=":"
+                    android:textSize="12dp" />
+
+                <TextView
+                    android:id="@+id/tv_remark"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:textColor="@color/color_a7a7a7"
+                    android:textSize="12dp"
+                    tools:text="@string/enter" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/chat_msg_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="#ebebeb"
-        android:divider="@null"
-        android:dividerHeight="10dp"></ListView>
+        android:descendantFocusability="beforeDescendants"
+        android:fastScrollEnabled="false"></android.support.v7.widget.RecyclerView>
 
-    <include layout="@layout/layout_msg_edit_view" />
+    <!--<include layout="@layout/layout_msg_edit_view"/>-->
+
+    <com.markLove.Xplan.ui.widget.ChatView
+        android:id="@+id/chatView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="80dp">
+
+    </com.markLove.Xplan.ui.widget.ChatView>
+
+    <RelativeLayout
+        android:id="@+id/rl_remove"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#F7F7F7"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/iv_remove"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:layout_margin="8dp"
+            android:background="#F7F7F7"
+            android:src="@drawable/icon_store_delete" />
+    </RelativeLayout>
 
 </LinearLayout>

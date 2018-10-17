@@ -14,7 +14,7 @@ android {
     buildToolsVersion '27.0.3'
 
     defaultConfig {
-        applicationId "com.markLove.xplan"
+        applicationId "com.markLove.Xplan"
         minSdkVersion 23
         targetSdkVersion 27
         versionCode 1

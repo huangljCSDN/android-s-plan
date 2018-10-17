@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <animation-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:drawable="@drawable/send_voice3"
+        android:drawable="@drawable/send_voice_05"
         android:duration="200" />
     <item
-        android:drawable="@drawable/send_voice1"
+        android:drawable="@drawable/send_voice_01"
         android:duration="200" />
     <item
-        android:drawable="@drawable/send_voice2"
+        android:drawable="@drawable/send_voice_02"
         android:duration="200" />
     <item
-        android:drawable="@drawable/send_voice3"
+        android:drawable="@drawable/send_voice_03"
+        android:duration="200" />
+    <item
+        android:drawable="@drawable/send_voice_04"
+        android:duration="200" />
+    <item
+        android:drawable="@drawable/send_voice_05"
         android:duration="200" />
 </animation-list>

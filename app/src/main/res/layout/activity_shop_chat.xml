@@ -9,6 +9,7 @@
     tools:context=".ui.activity.GroupChatActivity">
 
     <RelativeLayout
+        android:id="@+id/rl_title_bar"
         android:layout_width="match_parent"
         android:layout_height="30dp"
         android:gravity="center_vertical">
@@ -41,6 +42,26 @@
                 android:layout_gravity="center_vertical"
                 android:src="@drawable/ic_more" />
         </FrameLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_cancel"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:background="@color/white"
+        android:gravity="center_vertical"
+        android:visibility="gone">
+        <TextView
+            android:id="@+id/tv_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:text="取消"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:gravity="center"
+            android:textColor="@color/color_333333"
+            android:textSize="14sp" />
     </RelativeLayout>
 
     <TextView
@@ -86,16 +107,10 @@
             android:src="@drawable/ic_all_person" />
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/ic_launcher"
-        android:visibility="gone" />
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/chat_msg_list"
         android:layout_width="match_parent"
+        android:layout_marginTop="15dp"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:descendantFocusability="beforeDescendants"
@@ -103,12 +118,30 @@
 
     <!--<include layout="@layout/layout_msg_edit_view"/>-->
 
-    <com.markLove.xplan.ui.widget.ChatView
+    <com.markLove.Xplan.ui.widget.ChatView
         android:id="@+id/chatView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="80dp">
 
-    </com.markLove.xplan.ui.widget.ChatView>
+    </com.markLove.Xplan.ui.widget.ChatView>
+
+    <RelativeLayout
+        android:id="@+id/rl_remove"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#F7F7F7"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/iv_remove"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:layout_margin="8dp"
+            android:background="#F7F7F7"
+            android:src="@drawable/icon_store_delete" />
+    </RelativeLayout>
 
 </LinearLayout>

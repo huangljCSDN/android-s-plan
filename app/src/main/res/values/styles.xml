@@ -33,7 +33,7 @@
     <style name="DividerHorizontal">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1px</item>
-        <item name="android:background">@color/color_dddddd</item>
+        <item name="android:background">#eeeeee</item>
     </style>
 
     <!--分隔线 竖向-->

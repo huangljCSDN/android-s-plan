@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/chat_root_view"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <CheckBox
+        android:id="@+id/chat_select_view"
+        style="@style/chat_check_box"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="8dp"
+        android:visibility="gone" />
+
+
+    <RelativeLayout
+        android:id="@+id/chat_img_ll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:id="@+id/rl_chat_head_img"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="16dp"
+            android:background="@drawable/bg_circle"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/chat_head_img"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@mipmap/agent_user_pho" />
+        </RelativeLayout>
+
+
+        <ImageView
+            android:id="@+id/chat_img_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:layout_toLeftOf="@id/rl_chat_head_img"
+            android:adjustViewBounds="true"
+            android:background="@drawable/group_bg_me_chat"
+            android:gravity="left|center_vertical"
+            android:maxWidth="200dp" />
+
+        <ImageView
+            android:id="@+id/chat_message_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:layout_toLeftOf="@id/chat_img_msg"
+            android:src="@mipmap/chat_message_fail"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/reject_status"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/chat_img_ll"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        android:background="#D4D4D4"
+        android:gravity="center"
+        android:padding="2dp"
+        android:text="消息已发送，但被对方拒收"
+        android:textColor="@color/white"
+        android:visibility="gone" />
+</RelativeLayout>

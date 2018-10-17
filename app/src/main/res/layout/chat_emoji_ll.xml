@@ -12,7 +12,7 @@
         android:layout_height="230dp"
         android:orientation="vertical" />
 
-    <com.markLove.xplan.ui.widget.EmojiPointerView
+    <com.markLove.Xplan.ui.widget.EmojiPointerView
         android:id="@+id/chat_emoji_point"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -23,5 +23,5 @@
         app:defaultColor="#8A8A8A"
         app:radius="2dp"
         app:distance="5dp"
-        app:selectColor="#C8C8C8"></com.markLove.xplan.ui.widget.EmojiPointerView>
+        app:selectColor="#C8C8C8"></com.markLove.Xplan.ui.widget.EmojiPointerView>
 </LinearLayout>

@@ -50,7 +50,7 @@
             <ImageView
                 android:id="@+id/chat_voice_player"
                 android:layout_width="wrap_content"
-                android:layout_height="24dp"
+                android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:src="@drawable/received_voice_anim" />
 
