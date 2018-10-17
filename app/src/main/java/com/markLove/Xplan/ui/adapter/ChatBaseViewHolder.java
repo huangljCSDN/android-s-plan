@@ -2,6 +2,7 @@ package com.markLove.Xplan.ui.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 
@@ -19,6 +20,7 @@ public abstract class ChatBaseViewHolder extends RecyclerView.ViewHolder {
     public View contentView;
     public CheckBox selectView;
     public ImageView userHead;
+    public Button btnAgree;
     public View status;
 
     public ChatBaseViewHolder(View itemView) {

@@ -12,17 +12,22 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.cjt2325.cameralibrary.util.FileUtil;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
@@ -32,6 +37,7 @@ import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.ChatUser;
 import com.markLove.Xplan.bean.msg.Message;
 import com.markLove.Xplan.bean.msg.body.FileMessageBody;
+import com.markLove.Xplan.bean.msg.body.MessageBody;
 import com.markLove.Xplan.bean.msg.body.TxtMessageBody;
 import com.markLove.Xplan.config.Constants;
 import com.markLove.Xplan.db.DBDao;
@@ -40,12 +46,14 @@ import com.markLove.Xplan.mvp.contract.ChatView;
 import com.markLove.Xplan.mvp.presenter.ChatPresenter;
 import com.markLove.Xplan.mvp.presenter.impl.ChatPresenterImpl;
 import com.markLove.Xplan.ui.adapter.GroupChatMessageAdapter;
+import com.markLove.Xplan.ui.widget.GlideRoundImage;
 import com.markLove.Xplan.ui.widget.MorePopWindow;
 import com.markLove.Xplan.ui.widget.RemoveMsgDialog;
 import com.markLove.Xplan.ui.widget.ReportDialog;
 import com.markLove.Xplan.ui.widget.ResendMsgDialog;
 import com.markLove.Xplan.ui.widget.SignUpTipDialog;
 import com.markLove.Xplan.utils.AudioUtils;
+import com.markLove.Xplan.utils.ChatUtils;
 import com.markLove.Xplan.utils.DataUtils;
 import com.markLove.Xplan.utils.DensityUtils;
 import com.markLove.Xplan.utils.ImageUtils;
@@ -66,7 +74,7 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * 组局聊天室
  */
-public class GroupChatActivity extends BaseActivity implements View.OnClickListener ,ChatView{
+public class GroupChatActivity extends BaseActivity implements View.OnClickListener, ChatView {
     private ArrayList<Media> select;
     private FrameLayout mFlMore;
     private RecyclerView rlChatMsgList;
@@ -75,9 +83,11 @@ public class GroupChatActivity extends BaseActivity implements View.OnClickListe
     private RelativeLayout mRlRemove;
     private com.markLove.Xplan.ui.widget.ChatView chatView;
 
-    private TextView mTvJoinCount,mTvPlace,mTvTime,mTvRemark;
+    private TextView mTvJoinCount, mTvPlace, mTvTime, mTvRemark;
     private Button mBtnJoin;
     private TextView mTvInvitation; //邀请好友
+    private ImageView mIvGroupHead;
+    private RelativeLayout mRlHeads;
 
     ChatPresenter chatPresenter;
     GroupChatMessageAdapter chatMessageAdapter;
@@ -116,6 +126,8 @@ public class GroupChatActivity extends BaseActivity implements View.OnClickListe
         mTvRemark = findViewById(R.id.tv_remark);
         mBtnJoin = findViewById(R.id.btn_enter);
         mTvInvitation = findViewById(R.id.tv_invitation);
+        mRlHeads = findViewById(R.id.rl_heads);
+        mIvGroupHead = findViewById(R.id.iv_group_head);
 
         findViewById(R.id.fl_more).setOnClickListener(this);
         findViewById(R.id.tv_cancel).setOnClickListener(this);
@@ -153,6 +165,7 @@ public class GroupChatActivity extends BaseActivity implements View.OnClickListe
         });
         initSoftKeyboard();
         initData();
+        addGroupPersongHead();
     }
 
     @Override
@@ -168,12 +181,47 @@ public class GroupChatActivity extends BaseActivity implements View.OnClickListe
                 showRemoveDialog();
                 break;
             case R.id.btn_enter:
-                signUp();
+//                signUp();
+                getTestData();
                 break;
         }
     }
 
+    private void addGroupPersongHead() {
+        for (int i = 0; i < 5; i++) {
+            View view = LayoutInflater.from(this).inflate(R.layout.layout_head_item, null);
+            ImageView imageHead = view.findViewById(R.id.chat_head_img);
+            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+                    RelativeLayout.LayoutParams.WRAP_CONTENT);
+            layoutParams.leftMargin = i * DensityUtils.dip2px(this, 26);
+            view.setLayoutParams(layoutParams);
+
+            //显示圆形的imageview
+            RequestOptions mRequestOptions = RequestOptions.circleCropTransform()
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)//不做磁盘缓存
+                    .skipMemoryCache(true);//不做内存缓存
+            if (i == 4) {
+                Glide.with(this).load(R.drawable.ic_more_head).apply(mRequestOptions).into(imageHead);
+            } else {
+                Glide.with(this).load(R.drawable.icon).apply(mRequestOptions).into(imageHead);
+            }
+
+
+//            mLlPersons.addView(view);
+            mRlHeads.addView(view);
+        }
+    }
+
     protected void initData() {
+        mTvPlace.setText("市民一路");
+        mTvTime.setText("10:11:22");
+        mTvRemark.setText("代号101");
+        //显示圆形的imageview
+        RequestOptions mRequestOptions = RequestOptions.circleCropTransform()
+                .diskCacheStrategy(DiskCacheStrategy.NONE)//不做磁盘缓存
+                .skipMemoryCache(true);//不做内存缓存
+        Glide.with(this).load(R.drawable.icon).apply(mRequestOptions).into(mIvGroupHead);
+
         boolean isLove = PreferencesUtils.getBoolean(this, Constants.USER_IS_LOVES_INFO_KEY);
         if (isLove) {
             int femaleID = PreferencesUtils.getInt(this, Constants.FEMALE_USER_ID, 0);
@@ -223,7 +271,8 @@ public class GroupChatActivity extends BaseActivity implements View.OnClickListe
     /**
      * 报名
      */
-    private void signUp(){
+
+    private void signUp() {
         //已报名
         mBtnJoin.setText(getString(R.string.joined));
         mBtnJoin.setTextColor(getColor(R.color.color_333333));
@@ -237,26 +286,27 @@ public class GroupChatActivity extends BaseActivity implements View.OnClickListe
 
     /**
      * 设置组局状态
+     *
      * @param startTime
      */
-    private void checkTime(long startTime){
-       long currentTime =  System.currentTimeMillis();
-       long goingTime = currentTime - startTime;
+    private void checkTime(long startTime) {
+        long currentTime = System.currentTimeMillis();
+        long goingTime = currentTime - startTime;
 
-       if (goingTime > 0){
-           long hour = goingTime / 3600000;
-           if (hour > 8){
-               mBtnJoin.setText(getString(R.string.finished));
-               mBtnJoin.setTextColor(getColor(R.color.white));
-               mBtnJoin.setBackgroundResource(R.drawable.bg_joined);
-               mBtnJoin.setClickable(false);
-           } else {
-               mBtnJoin.setText(getString(R.string.going));
-               mBtnJoin.setTextColor(getColor(R.color.white));
-               mBtnJoin.setBackgroundResource(R.drawable.bg_joined);
-               mBtnJoin.setClickable(false);
-           }
-       }
+        if (goingTime > 0) {
+            long hour = goingTime / 3600000;
+            if (hour > 8) {
+                mBtnJoin.setText(getString(R.string.finished));
+                mBtnJoin.setTextColor(getColor(R.color.white));
+                mBtnJoin.setBackgroundResource(R.drawable.bg_joined);
+                mBtnJoin.setClickable(false);
+            } else {
+                mBtnJoin.setText(getString(R.string.going));
+                mBtnJoin.setTextColor(getColor(R.color.white));
+                mBtnJoin.setBackgroundResource(R.drawable.bg_joined);
+                mBtnJoin.setClickable(false);
+            }
+        }
     }
 
     private void getChatOpen() {
@@ -303,6 +353,7 @@ public class GroupChatActivity extends BaseActivity implements View.OnClickListe
 
     /**
      * 重新发送消息
+     *
      * @param resendMessage
      */
     private void resendMessage(final Message resendMessage) {
@@ -319,6 +370,7 @@ public class GroupChatActivity extends BaseActivity implements View.OnClickListe
 
     /**
      * 显示历史消息
+     *
      * @param historyMessageList
      */
     @Override
@@ -333,10 +385,12 @@ public class GroupChatActivity extends BaseActivity implements View.OnClickListe
 
     /**
      * 添加一条消息
+     *
      * @param msg
      */
     @Override
     public void addOneMessage(final Message msg) {
+        LogUtils.i("huang","msg"+msg.toString());
         if ((msg.getToID() == me_user_id && msg.getFromID() == to_user_id)
                 || (msg.getToID() == to_user_id && msg.getFromID() == me_user_id)) {
             runOnUiThread(new Runnable() {
@@ -349,6 +403,18 @@ public class GroupChatActivity extends BaseActivity implements View.OnClickListe
             });
         }
     }
+
+    //{packetLength=0, fromID=0, toID=0, msgID='frlT9vdj', type=CHAT, chatType=TXT, status=SENDING, packetOrder=0, packetCount=0,
+    // body={"msg":"11","chatType":"TXT","dateTime":"2018/10/17 22:18:15","type":"CHAT","userName":""}, msgTime=0}
+
+    private Message getTestData(){
+        TxtMessageBody txtMessageBody = new TxtMessageBody(Message.Type.CHAT, Message.ChatType.REQUEST_JOIN, "hahahha");
+        Message txtMessage = new Message(0, 0, ChatUtils.generateShortUuid(), Message.Type.CHAT, Message.ChatType.REQUEST_JOIN, txtMessageBody);
+        txtMessage.setStatus(Message.ChatStatus.SENDING);
+
+        addOneMessage(txtMessage);
+        return txtMessage;
+   }
 
     @Override
     public void updataMessage(final String msgID, final int errorCode) {

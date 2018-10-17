@@ -5,9 +5,11 @@ import android.text.TextUtils;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.request.RequestOptions;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.config.Constants;
+import com.markLove.Xplan.ui.widget.GlideRoundImage;
 
 import java.io.File;
 
@@ -128,17 +130,33 @@ public class ImageLoaderUtils {
      */
     public static void displayCircle(Context context, String picUrl, ImageView imageView) {
         if (TextUtils.isEmpty(picUrl)){
-            imageView.setBackgroundResource(R.drawable.icon_loading_default);
+            imageView.setBackgroundResource(R.drawable.bg_circle);
             return;
         }
         if (!picUrl.startsWith("http")) {
             picUrl = Constants.BASE_IMG_URL + picUrl;
         }
 
-        Glide.with(context).load(R.drawable.icon)
-                .apply(RequestOptions.placeholderOf(R.drawable.icon_loading_default))
-                .apply(RequestOptions.errorOf(R.drawable.icon_loading_default))
+        Glide.with(context).load(picUrl)
+                .apply(RequestOptions.placeholderOf(R.drawable.bg_circle))
+                .apply(RequestOptions.errorOf(R.drawable.bg_circle))
                 .apply(RequestOptions.circleCropTransform())
+                .into(imageView);
+    }
+
+    public static void displayRoundImage(Context context, String picUrl, ImageView imageView) {
+        if (TextUtils.isEmpty(picUrl)){
+            imageView.setBackgroundResource(R.drawable.bg_circle);
+            return;
+        }
+        if (!picUrl.startsWith("http")) {
+            picUrl = Constants.BASE_IMG_URL + picUrl;
+        }
+
+        Glide.with(context).load(picUrl)
+                .apply(RequestOptions.placeholderOf(R.drawable.bg_circle))
+                .apply(RequestOptions.errorOf(R.drawable.bg_circle))
+                .apply(RequestOptions.bitmapTransform(new GlideRoundImage(context)))
                 .into(imageView);
     }
 

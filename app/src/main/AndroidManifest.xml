@@ -11,25 +11,25 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
-        android:name=".base.App"
+        android:name="com.markLove.Xplan.base.App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.activity.LauncherActivity">
+        <activity android:name="com.markLove.Xplan.ui.activity.LauncherActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activity.MainActivity" />
-        <activity android:name=".ui.activity.LoginActivity" />
-        <activity android:name=".ui.activity.RegisterActivity" />
-        <activity android:name=".ui.activity.BaseContractActivity" />
-        <activity android:name=".ui.activity.CameraActivity" />
+        <activity android:name="com.markLove.Xplan.ui.activity.MainActivity" />
+        <activity android:name="com.markLove.Xplan.ui.activity.LoginActivity" />
+        <activity android:name="com.markLove.Xplan.ui.activity.RegisterActivity" />
+        <activity android:name="com.markLove.Xplan.ui.activity.BaseContractActivity" />
+        <activity android:name="com.markLove.Xplan.ui.activity.CameraActivity" />
 
         <!-- Android 7.0 文件共享配置，必须配置 -->
         <provider
@@ -42,9 +42,9 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".ui.activity.GroupChatActivity" />
-        <activity android:name=".ui.activity.SingleChatActivity" />
-        <activity android:name=".ui.activity.ShopChatActivity" />
+        <activity android:name="com.markLove.Xplan.ui.activity.GroupChatActivity" />
+        <activity android:name="com.markLove.Xplan.ui.activity.SingleChatActivity" />
+        <activity android:name="com.markLove.Xplan.ui.activity.ShopChatActivity" />
     </application>
 
 </manifest>

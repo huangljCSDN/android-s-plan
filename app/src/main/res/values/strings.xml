@@ -48,4 +48,5 @@
     <string name="invitation">邀请好友</string>
     <string name="has_requested">已提交报名申请</string>
     <string name="agree">同意</string>
+    <string name="has_agreed">局长同意%S加入</string>
 </resources>

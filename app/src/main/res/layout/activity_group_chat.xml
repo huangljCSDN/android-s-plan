@@ -38,8 +38,8 @@
                 android:id="@+id/tv_group_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
                 android:layout_centerInParent="true"
+                android:layout_centerHorizontal="true"
                 android:textColor="@color/color_white"
                 android:textSize="15sp"
                 tools:text="ceshi ad assa " />
@@ -116,8 +116,7 @@
                     android:id="@+id/textView3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="14dp"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginLeft="8dp"
                     android:layout_toRightOf="@id/relativeLayout"
                     android:text="@string/join_person_count" />
 
@@ -128,6 +127,17 @@
                     android:layout_marginStart="5dp"
                     android:layout_toRightOf="@id/textView3"
                     android:text="TextView" />
+
+                <RelativeLayout
+                    android:id="@+id/rl_heads"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_below="@id/textView3"
+                    android:layout_marginTop="2dp"
+                    android:layout_toRightOf="@id/relativeLayout">
+
+                </RelativeLayout>
 
                 <Button
                     android:id="@+id/btn_enter"
@@ -152,8 +162,8 @@
                     android:drawableTop="@drawable/ic_invitation"
                     android:text="@string/invitation"
                     android:textColor="@color/color_333333"
-                    android:visibility="gone"
-                    android:textSize="13sp" />
+                    android:textSize="13sp"
+                    android:visibility="gone" />
 
             </RelativeLayout>
 
@@ -214,8 +224,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="7dp"
-                android:layout_marginTop="7dp">
+                android:layout_marginTop="7dp"
+                android:layout_marginBottom="7dp">
 
                 <ImageView
                     android:layout_width="13dp"

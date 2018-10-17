@@ -136,6 +136,10 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
                 view = LayoutInflater.from(context).inflate(R.layout.group_chat_received_request_item, viewGroup, false);
                 holder = new ChatRequestJoinViewHolder(view);
                 break;
+            case RECEIVED_REQUEST_NOTIFICATION_TXT:
+                view = LayoutInflater.from(context).inflate(R.layout.chat_agree_item, viewGroup, false);
+                holder = new ChatRequestAgreedViewHolder(view);
+                break;
             default:
                 view = LayoutInflater.from(context).inflate(R.layout.chat_default_item, viewGroup, false);
                 holder = new ChatDefaultViewHolder(view);
@@ -148,26 +152,28 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
     public void onBindViewHolder(final ChatBaseViewHolder viewHolder, final int position) {
         final Message msg = mDatas.get(position);
         viewHolder.setChatContent(msg);
-        viewHolder.selectView.setTag(msg.getMsgID());
-        viewHolder.selectView.setChecked(selectPositionList.contains(msg.getMsgID()));
-        if (select == 1) {
-            viewHolder.selectView.setVisibility(View.VISIBLE);
-            viewHolder.selectView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if (isChecked) {
-                        if (!selectPositionList.contains(viewHolder.selectView.getTag())) {
-                            selectPositionList.add(msg.getMsgID());
-                        }
-                    } else {
-                        if (selectPositionList.contains(viewHolder.selectView.getTag())) {
-                            selectPositionList.remove(msg.getMsgID());
+        if (viewHolder.selectView != null) {
+            viewHolder.selectView.setTag(msg.getMsgID());
+            viewHolder.selectView.setChecked(selectPositionList.contains(msg.getMsgID()));
+            if (select == 1) {
+                viewHolder.selectView.setVisibility(View.VISIBLE);
+                viewHolder.selectView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (isChecked) {
+                            if (!selectPositionList.contains(viewHolder.selectView.getTag())) {
+                                selectPositionList.add(msg.getMsgID());
+                            }
+                        } else {
+                            if (selectPositionList.contains(viewHolder.selectView.getTag())) {
+                                selectPositionList.remove(msg.getMsgID());
+                            }
                         }
                     }
-                }
-            });
-        } else {
-            viewHolder.selectView.setVisibility(View.GONE);
+                });
+            } else {
+                viewHolder.selectView.setVisibility(View.GONE);
+            }
         }
         setUserHead(msg, viewHolder);
         if (null != viewHolder.contentView) {
@@ -181,6 +187,15 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
                 @Override
                 public void onClick(View v) {
 
+                }
+            });
+        }
+
+        if (viewHolder.btnAgree != null && msg.getChatType() == Message.ChatType.REQUEST_JOIN){
+            viewHolder.btnAgree.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    resetButton((Button) view);
                 }
             });
         }
@@ -306,6 +321,10 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
                     return ViewType.SUPERLIKE.ordinal();
                 case GIFT:
                     return ViewType.SEND_GIFT.ordinal();
+                case NOTIFICATION:
+                    return ViewType.RECEIVED_REQUEST_NOTIFICATION_TXT.ordinal();
+                case REQUEST_JOIN:
+                    return ViewType.RECEIVED_REQUEST_JOIN.ordinal();
                 default:
                     return ViewType.DEFAULT.ordinal();
             }
@@ -323,6 +342,10 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
                     return ViewType.SUPERLIKE.ordinal();
                 case GIFT:
                     return ViewType.RECEIVED_GIFT.ordinal();
+                case NOTIFICATION:
+                    return ViewType.RECEIVED_REQUEST_NOTIFICATION_TXT.ordinal();
+                case REQUEST_JOIN:
+                    return ViewType.RECEIVED_REQUEST_JOIN.ordinal();
                 default:
                     return 0;
             }
@@ -415,7 +438,6 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
      */
     static class ChatRequestJoinViewHolder extends ChatBaseViewHolder {
         TextView txtMsg;
-        Button btnAgree;
 
         public ChatRequestJoinViewHolder(View itemView) {
             super(itemView);
@@ -426,13 +448,6 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
             status.setTag(2);
             status.setVisibility(View.GONE);
             contentView = txtMsg;
-
-            btnAgree.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                }
-            });
         }
 
         @Override
@@ -486,6 +501,54 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
 //                    v.setVisibility(View.VISIBLE);
 //                }
 //            }
+        }
+
+        @Override
+        public void setChatContent(final Message msg) {
+            MessageBody body = msg.getBody();
+            if (body instanceof TxtMessageBody) {
+                final String bodyTxt = ((TxtMessageBody) body).getMsg();
+                txtMsg.setText(EmojiUtils.parseEmoji(txtMsg.getContext(), bodyTxt));
+            }
+        }
+    }
+
+    private void resetButton(Button button){
+        button.setText("已同意");
+        button.setTextColor(Color.parseColor("#333333"));
+        button.setBackground(context.getDrawable(R.drawable.bg_joined));
+    }
+
+    /**
+     * 加入聊天室通知消息
+     */
+    static class ChatRequestAgreedViewHolder extends ChatBaseViewHolder {
+        TextView txtMsg;
+
+        public ChatRequestAgreedViewHolder(View itemView) {
+            super(itemView);
+            txtMsg = (TextView) itemView.findViewById(R.id.chat_txt_msg);
+            contentView = txtMsg;
+        }
+
+        @Override
+        public void sending() {
+
+        }
+
+        @Override
+        public void success() {
+
+        }
+
+        @Override
+        public void fail() {
+
+        }
+
+        @Override
+        public void rejected() {
+
         }
 
         @Override
@@ -567,7 +630,7 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
         @Override
         public void setChatContent(Message msg) {
             MessageBody body = msg.getBody();
-            LogUtils.i("huang","boody ="+ body);
+            LogUtils.i("huang", "boody =" + body);
             if (body instanceof FileMessageBody) {
                 final Context context = rootView.getContext();
                 final FileMessageBody imgMessageBody = (FileMessageBody) body;
@@ -578,7 +641,7 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
                     setImageResource(imgPath1);
                 } else if (new File(imgPath).exists()) { //压缩图
                     setImageResource(imgPath);
-                } else if (new File(imgPath3).exists()){ //原图
+                } else if (new File(imgPath3).exists()) { //原图
                     setImageResource(imgPath3);
                 } else {
                     int me_user_id = PreferencesUtils.getInt(context, Constants.ME_USER_ID);
@@ -588,7 +651,7 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
                     } else {
                         damageImg = R.mipmap.receiver_file_damage;
                     }
-                    ImageLoaderUtils.display(context,damageImg,imgMsg,200,200);
+                    ImageLoaderUtils.display(context, damageImg, imgMsg, 200, 200);
                 }
             }
         }
@@ -609,7 +672,7 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
                 height = (int) (inSampleSize * height);
             }
 
-            ImageLoaderUtils.display(context,new File(imgPath),imgMsg,width,height);
+            ImageLoaderUtils.display(context, new File(imgPath), imgMsg, width, height);
         }
     }
 
@@ -939,7 +1002,8 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
         if (message.getChatType() == Message.ChatType.IMAGE || message.getChatType() == Message.ChatType.VOICE
                 || message.getChatType() == Message.ChatType.TXT || message.getChatType() == Message.ChatType.LOVE
                 || message.getChatType() == Message.ChatType.GIFT || message.getChatType() == Message.ChatType.SUPERLIKE
-                || message.getChatType() == Message.ChatType.VIDEO) {
+                || message.getChatType() == Message.ChatType.VIDEO || message.getChatType() == Message.ChatType.NOTIFICATION
+                || message.getChatType() == Message.ChatType.REQUEST_JOIN) {
             boolean hasMessage = false;
             for (int i = mDatas.size() - 1; i >= 0; i--) {
                 Message tempMessage = mDatas.get(i);
@@ -1003,7 +1067,8 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
         LOVE(7),
         SUPERLIKE(8),
         SEND_GIFT(9), RECEIVED_GIFT(10),
-        RECEIVED_REQUEST_JOIN(11);
+        RECEIVED_REQUEST_JOIN(11),
+        RECEIVED_REQUEST_NOTIFICATION_TXT(12);
         int t;
 
         ViewType(int t) {

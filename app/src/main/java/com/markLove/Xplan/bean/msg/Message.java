@@ -178,7 +178,8 @@ public class Message {
      */
     public enum ChatType {
         //8和9代表图片描述和语音描述
-        NULL(0), TXT(1), VOICE(2), VIDEO(3), IMAGE(4), LOVE(5), SUPERLIKE(6), GIFT(7), VOICE_DESC(8), IMAGE_DESC(9), VIDEO_DESC(10), ORDER(11) ,CIRCLE_GIFT(12);
+        NULL(0), TXT(1), VOICE(2), VIDEO(3), IMAGE(4), LOVE(5), SUPERLIKE(6), GIFT(7), VOICE_DESC(8), IMAGE_DESC(9), VIDEO_DESC(10), ORDER(11) ,CIRCLE_GIFT(12),
+        NOTIFICATION(13),REQUEST_JOIN(4);
         public int flag;
 
         ChatType(int chatType) {
@@ -412,4 +413,20 @@ public class Message {
         return desciptionMessage;
     }
 
+    @Override
+    public String toString() {
+        return "Message{" +
+                "packetLength=" + packetLength +
+                ", fromID=" + fromID +
+                ", toID=" + toID +
+                ", msgID='" + msgID + '\'' +
+                ", type=" + type +
+                ", chatType=" + chatType +
+                ", status=" + status +
+                ", packetOrder=" + packetOrder +
+                ", packetCount=" + packetCount +
+                ", body=" + body +
+                ", msgTime=" + msgTime +
+                '}';
+    }
 }
