@@ -22,6 +22,7 @@ public class LauncherActivity extends BaseActivity implements View.OnClickListen
 
     @Override
     protected void init(Bundle savedInstanceState) {
+        fullScreen(this);
 //        getPermissions();
         findViewById(R.id.btn_login).setOnClickListener(this);
         findViewById(R.id.btn_register).setOnClickListener(this);

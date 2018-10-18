@@ -59,6 +59,7 @@ import com.markLove.Xplan.utils.DensityUtils;
 import com.markLove.Xplan.utils.ImageUtils;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
+import com.markLove.Xplan.utils.StatusBarUtil;
 import com.markLove.Xplan.utils.ToastUtils;
 
 import java.util.ArrayList;
@@ -114,6 +115,7 @@ public class GroupChatActivity extends BaseActivity implements View.OnClickListe
 
     @Override
     protected void init(Bundle savedInstanceState) {
+//        StatusBarUtil.setStatusBarColor(this,R.color.colorPrimary);
         rlChatMsgList = findViewById(R.id.chat_msg_list);
         mFlMore = findViewById(R.id.fl_more);
         mRlTitleBar = findViewById(R.id.rl_title_bar);

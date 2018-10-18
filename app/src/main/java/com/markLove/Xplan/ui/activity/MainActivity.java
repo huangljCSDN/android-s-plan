@@ -16,6 +16,7 @@ import com.markLove.Xplan.ui.fragment.MineFragment;
 import com.markLove.Xplan.ui.fragment.MsgFragment;
 import com.markLove.Xplan.ui.fragment.TeamFragment;
 import com.markLove.Xplan.mvp.presenter.MainPresenter;
+import com.markLove.Xplan.utils.StatusBarUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,8 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
 
     @Override
     protected void init(Bundle savedInstanceState) {
+        fullScreen(this);
+        StatusBarUtil.StatusBarLightMode(this);
         radioGroup = findViewById(R.id.radioGroup);
         radioGroup.check(R.id.rb_team);
         fragments = new ArrayList<Fragment>();

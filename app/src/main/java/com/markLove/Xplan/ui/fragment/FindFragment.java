@@ -2,6 +2,7 @@ package com.markLove.Xplan.ui.fragment;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.cjt2325.cameralibrary.util.LogUtil;
@@ -20,7 +21,7 @@ import com.markLove.Xplan.ui.adapter.ShopChatAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FindFragment extends BaseFragment implements CallBackTest{
+public class FindFragment extends BaseFragment implements View.OnClickListener {
 
     private CircleRecyclerView mCircleRecyclerView2;
     private CircleRecyclerView mCircleRecyclerView;
@@ -29,6 +30,9 @@ public class FindFragment extends BaseFragment implements CallBackTest{
     private LinearLayoutManager mLayoutManager;
     private LinearLayoutManager mLayoutManager2;
     private boolean mIsNotLoop;
+    private int currentPositionOne;
+    private int currentPositionTwo;
+    private Button btnAll,btnBoy,btnGirl;
 
     @Override
     public BasePresenter onCreatePresenter() {
@@ -42,6 +46,18 @@ public class FindFragment extends BaseFragment implements CallBackTest{
 
     @Override
     protected void init(View view) {
+        btnAll = view.findViewById(R.id.btn_all);
+        btnBoy = view.findViewById(R.id.btn_boy);
+        btnGirl = view.findViewById(R.id.btn_girl);
+
+        btnAll.setOnClickListener(this);
+        btnBoy.setOnClickListener(this);
+        btnGirl.setOnClickListener(this);
+
+        btnAll.setSelected(true);
+        btnBoy.setSelected(false);
+        btnGirl.setSelected(false);
+
         initCrOne(view);
         initCrTwo(view);
     }
@@ -63,12 +79,7 @@ public class FindFragment extends BaseFragment implements CallBackTest{
                 Toast.makeText(getContext(), "Center Clicked", Toast.LENGTH_SHORT).show();
             }
         });
-//        ((CircularViewMode)mItemViewMode).setOnScrollCenterListener(new CircularViewMode.OnScrollCenterListener() {
-//            @Override
-//            public void onCenterView(View view) {
-//                LogUtil.i("huang","view.getTag() 1 =="+view.getTag());
-//            }
-//        });
+
         ((CircularViewMode) mItemViewMode).setOnScrollCenterListener(onScrollCenterListener1);
         ShopChatAdapter shopChatAdapter = new ShopChatAdapter(getContext(),getData2());
         mCircleRecyclerView.setAdapter(shopChatAdapter);
@@ -76,7 +87,7 @@ public class FindFragment extends BaseFragment implements CallBackTest{
 
     private void initCrTwo(View view){
         mItemViewMode2 = new CircularViewMode();
-        ((CircularViewMode)mItemViewMode2).setxOffset(500);
+        ((CircularViewMode)mItemViewMode2).setxOffset(600);
 
         mCircleRecyclerView2 = (CircleRecyclerView) view.findViewById(R.id.cr_two);
         mLayoutManager2 = new LinearLayoutManager(getContext());
@@ -91,14 +102,7 @@ public class FindFragment extends BaseFragment implements CallBackTest{
                 Toast.makeText(getContext(), "Center Clicked", Toast.LENGTH_SHORT).show();
             }
         });
-//        ((CircularViewMode) mItemViewMode2).setOnScrollCenterListener(new CircularViewMode.OnScrollCenterListener() {
-//            @Override
-//            public void onCenterView(View view) {
-//                LogUtil.i("huang","view.getTag() 2 =="+view.getTag());
-//            }
-//        });
         ((CircularViewMode) mItemViewMode2).setOnScrollCenterListener(onScrollCenterListener2);
-//        ((CircularViewMode) mItemViewMode2).setCallBackTest(this);
         PeoplesAdapter peoplesAdapter = new PeoplesAdapter(getContext(),getData());
 //        peoplesAdapter.setData(getData());
         mCircleRecyclerView2.setAdapter(peoplesAdapter);
@@ -122,15 +126,14 @@ public class FindFragment extends BaseFragment implements CallBackTest{
         return list;
     }
 
-    @Override
-    public void onCenterView(View view) {
-        LogUtil.i("huang","view"+view.getTag());
-    }
-
     CircularViewMode.OnScrollCenterListener onScrollCenterListener1 = new CircularViewMode.OnScrollCenterListener() {
         @Override
         public void onCenterView(View view) {
             LogUtil.i("huang","view.getTag() 1 =="+view.getTag());
+            int currentPosition = (int)view.getTag();
+            if (currentPositionOne != currentPosition){
+                currentPositionOne = currentPosition;
+            }
         }
     };
 
@@ -138,6 +141,32 @@ public class FindFragment extends BaseFragment implements CallBackTest{
         @Override
         public void onCenterView(View view) {
             LogUtil.i("huang","view.getTag() 2 =="+view.getTag());
+            int currentPosition = (int)view.getTag();
+            if (currentPositionTwo != currentPosition){
+                currentPositionTwo = currentPosition;
+            }
         }
     };
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.btn_all:
+                btnAll.setSelected(true);
+                btnGirl.setSelected(false);
+                btnBoy.setSelected(false);
+                break;
+            case R.id.btn_boy:
+                btnBoy.setSelected(true);
+                btnGirl.setSelected(false);
+                btnAll.setSelected(false);
+                break;
+            case R.id.btn_girl:
+                btnGirl.setSelected(true);
+                btnAll.setSelected(false);
+                btnBoy.setSelected(false);
+                break;
+        }
+
+    }
 }

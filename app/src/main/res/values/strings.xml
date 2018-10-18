@@ -50,4 +50,7 @@
     <string name="agree">同意</string>
     <string name="has_agreed">局长同意%S加入</string>
     <string name="tag_is_center">tagIsCenter</string>
+    <string name="boy">男生</string>
+    <string name="girl">女生</string>
+    <string name="all">全部</string>
 </resources>
