@@ -30,6 +30,7 @@
         <activity android:name="com.markLove.Xplan.ui.activity.RegisterActivity" />
         <activity android:name="com.markLove.Xplan.ui.activity.BaseContractActivity" />
         <activity android:name="com.markLove.Xplan.ui.activity.CameraActivity" />
+        <activity android:name="com.markLove.Xplan.ui.activity.ZoomImageActivity" />
 
         <!-- Android 7.0 文件共享配置，必须配置 -->
         <provider

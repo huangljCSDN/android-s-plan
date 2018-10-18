@@ -35,7 +35,7 @@
         android:id="@+id/chat_txt_msg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/group_bg_other_chat"
+        android:background="@drawable/chat_bg_group_left"
         android:gravity="left|center_vertical"
         android:maxWidth="200dp"
         android:textSize="13sp"

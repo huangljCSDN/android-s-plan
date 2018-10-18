@@ -1,12 +1,34 @@
 package com.markLove.Xplan.ui.fragment;
 
+import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
+import android.widget.Toast;
 
+import com.cjt2325.cameralibrary.util.LogUtil;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseFragment;
+import com.markLove.Xplan.bean.PeopleBean;
+import com.markLove.Xplan.bean.ShopItemBean;
+import com.markLove.Xplan.module.CallBackTest;
+import com.markLove.Xplan.module.CircleRecyclerView.CircleRecyclerView;
+import com.markLove.Xplan.module.CircleRecyclerView.CircularViewMode;
+import com.markLove.Xplan.module.CircleRecyclerView.ItemViewMode;
+import com.markLove.Xplan.ui.adapter.PeoplesAdapter;
+import com.markLove.Xplan.ui.adapter.ShopChatAdapter;
 
-public class FindFragment extends BaseFragment {
+import java.util.ArrayList;
+import java.util.List;
+
+public class FindFragment extends BaseFragment implements CallBackTest{
+
+    private CircleRecyclerView mCircleRecyclerView2;
+    private CircleRecyclerView mCircleRecyclerView;
+    private ItemViewMode mItemViewMode;
+    private ItemViewMode mItemViewMode2;
+    private LinearLayoutManager mLayoutManager;
+    private LinearLayoutManager mLayoutManager2;
+    private boolean mIsNotLoop;
 
     @Override
     public BasePresenter onCreatePresenter() {
@@ -20,6 +42,102 @@ public class FindFragment extends BaseFragment {
 
     @Override
     protected void init(View view) {
-
+        initCrOne(view);
+        initCrTwo(view);
     }
+
+    private void initCrOne(View view){
+        mItemViewMode = new CircularViewMode();
+        ((CircularViewMode)mItemViewMode).setxOffset(200);
+
+        mCircleRecyclerView = (CircleRecyclerView) view.findViewById(R.id.cr_one);
+        mLayoutManager = new LinearLayoutManager(getContext());
+        mCircleRecyclerView.setLayoutManager(mLayoutManager);
+        mCircleRecyclerView.setViewMode(mItemViewMode);
+        mCircleRecyclerView.setNeedCenterForce(true);
+        mCircleRecyclerView.setNeedLoop(!mIsNotLoop);
+
+        mCircleRecyclerView.setOnCenterItemClickListener(new CircleRecyclerView.OnCenterItemClickListener() {
+            @Override
+            public void onCenterItemClick(View v) {
+                Toast.makeText(getContext(), "Center Clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
+//        ((CircularViewMode)mItemViewMode).setOnScrollCenterListener(new CircularViewMode.OnScrollCenterListener() {
+//            @Override
+//            public void onCenterView(View view) {
+//                LogUtil.i("huang","view.getTag() 1 =="+view.getTag());
+//            }
+//        });
+        ((CircularViewMode) mItemViewMode).setOnScrollCenterListener(onScrollCenterListener1);
+        ShopChatAdapter shopChatAdapter = new ShopChatAdapter(getContext(),getData2());
+        mCircleRecyclerView.setAdapter(shopChatAdapter);
+    }
+
+    private void initCrTwo(View view){
+        mItemViewMode2 = new CircularViewMode();
+        ((CircularViewMode)mItemViewMode2).setxOffset(500);
+
+        mCircleRecyclerView2 = (CircleRecyclerView) view.findViewById(R.id.cr_two);
+        mLayoutManager2 = new LinearLayoutManager(getContext());
+        mCircleRecyclerView2.setLayoutManager(mLayoutManager2);
+        mCircleRecyclerView2.setViewMode(mItemViewMode2);
+        mCircleRecyclerView2.setNeedCenterForce(true);
+        mCircleRecyclerView2.setNeedLoop(!mIsNotLoop);
+
+        mCircleRecyclerView2.setOnCenterItemClickListener(new CircleRecyclerView.OnCenterItemClickListener() {
+            @Override
+            public void onCenterItemClick(View v) {
+                Toast.makeText(getContext(), "Center Clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
+//        ((CircularViewMode) mItemViewMode2).setOnScrollCenterListener(new CircularViewMode.OnScrollCenterListener() {
+//            @Override
+//            public void onCenterView(View view) {
+//                LogUtil.i("huang","view.getTag() 2 =="+view.getTag());
+//            }
+//        });
+        ((CircularViewMode) mItemViewMode2).setOnScrollCenterListener(onScrollCenterListener2);
+//        ((CircularViewMode) mItemViewMode2).setCallBackTest(this);
+        PeoplesAdapter peoplesAdapter = new PeoplesAdapter(getContext(),getData());
+//        peoplesAdapter.setData(getData());
+        mCircleRecyclerView2.setAdapter(peoplesAdapter);
+    }
+
+    private List<PeopleBean> getData(){
+        List<PeopleBean> list = new ArrayList<>();
+        for (int i=0;i<10;i++){
+            PeopleBean peopleBean = new PeopleBean("张三"+i,10,1,System.currentTimeMillis(),"");
+            list.add(peopleBean);
+        }
+        return list;
+    }
+
+    private List<ShopItemBean> getData2(){
+        List<ShopItemBean> list = new ArrayList<>();
+        for (int i=0;i<10;i++){
+            ShopItemBean shopItemBean = new ShopItemBean(11111,"水煮活鱼","100人推荐",null);
+            list.add(shopItemBean);
+        }
+        return list;
+    }
+
+    @Override
+    public void onCenterView(View view) {
+        LogUtil.i("huang","view"+view.getTag());
+    }
+
+    CircularViewMode.OnScrollCenterListener onScrollCenterListener1 = new CircularViewMode.OnScrollCenterListener() {
+        @Override
+        public void onCenterView(View view) {
+            LogUtil.i("huang","view.getTag() 1 =="+view.getTag());
+        }
+    };
+
+    CircularViewMode.OnScrollCenterListener onScrollCenterListener2 = new CircularViewMode.OnScrollCenterListener() {
+        @Override
+        public void onCenterView(View view) {
+            LogUtil.i("huang","view.getTag() 2 =="+view.getTag());
+        }
+    };
 }

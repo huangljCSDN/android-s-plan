@@ -3,10 +3,12 @@ package com.markLove.Xplan.ui.adapter;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.GestureDetector;
@@ -33,6 +35,7 @@ import com.markLove.Xplan.config.Constants;
 import com.markLove.Xplan.db.DBDao;
 import com.markLove.Xplan.module.emoji.EmojiUtils;
 import com.markLove.Xplan.ui.activity.ShopChatActivity;
+import com.markLove.Xplan.ui.activity.ZoomImageActivity;
 import com.markLove.Xplan.ui.widget.BecomeLovesDialog;
 import com.markLove.Xplan.ui.widget.CoupleGiftPopupWindow;
 import com.markLove.Xplan.utils.AudioUtils;
@@ -495,7 +498,8 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHolder>
                     } else {
                         damageImg = R.mipmap.receiver_file_damage;
                     }
-                    ImageLoaderUtils.display(context,damageImg,imgMsg,200,200);
+//                    ImageLoaderUtils.display(context,damageImg,imgMsg,200,200);
+                    ImageLoaderUtils.displayRoundImage(context,damageImg,imgMsg,200,200);
                 }
             }
         }
@@ -516,7 +520,8 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHolder>
                 height = (int) (inSampleSize * height);
             }
 
-            ImageLoaderUtils.display(context,new File(imgPath),imgMsg,width,height);
+//            ImageLoaderUtils.display(context,new File(imgPath),imgMsg,width,height);
+            ImageLoaderUtils.displayRoundImage(context,new File(imgPath),imgMsg,width,height);
         }
     }
 
@@ -1262,11 +1267,11 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHolder>
     }
 
     private void toZoomImage(String path) {
-//        Intent intent = new Intent(context, ZoomImageActivity.class);
-//        Bundle bundle = new Bundle();
-//        bundle.putString("imgPath", path);
-//        intent.putExtra("data", bundle);
-//        context.startActivity(intent);
+        Intent intent = new Intent(context, ZoomImageActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("imgPath", path);
+        intent.putExtra("data", bundle);
+        context.startActivity(intent);
     }
 
     public void destory() {

@@ -46,7 +46,6 @@
             android:layout_marginRight="8dp"
             android:layout_toLeftOf="@id/rl_chat_head_img"
             android:adjustViewBounds="true"
-            android:background="@drawable/bg_me_chat"
             android:gravity="left|center_vertical"
             android:maxWidth="200dp" />
 

@@ -39,7 +39,7 @@
         android:paddingTop="9dp"
         android:paddingBottom="9dp"
         android:orientation="horizontal"
-        android:background="@drawable/group_bg_other_chat">
+        android:background="@drawable/chat_bg_group_left">
 
         <LinearLayout
             android:layout_width="wrap_content"

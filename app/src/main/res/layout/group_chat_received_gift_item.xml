@@ -26,7 +26,7 @@
         android:id="@+id/chat_gift_content_ll"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/group_bg_other_chat"
+        android:background="@drawable/chat_bg_group_left"
         android:orientation="horizontal">
 
         <TextView

@@ -1,14 +1,20 @@
 package com.markLove.Xplan.base.ui;
 
+import android.annotation.TargetApi;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.mvp.BaseView;
 import com.markLove.Xplan.utils.AppManager;
+import com.markLove.Xplan.utils.StatusBarUtil;
+import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 /**
  * Created by huanglingjun on 2018/5/16.
@@ -16,11 +22,13 @@ import com.markLove.Xplan.utils.AppManager;
 
 public abstract class BaseActivity<P extends BasePresenter> extends AppCompatActivity implements BaseView {
     public P mPresenter;
+    SystemBarTintManager tintManager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
+//        setTranslucentStatus();
         setContentView(getContentViewId());
 
         AppManager.getAppManager().addActivity(this);
@@ -82,6 +90,44 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
                 R.anim.slide_right_out);
     }
 
+    /**
+     * 设置状态栏背景状态
+     */
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public void setTranslucentStatus() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            //透明状态栏
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            //透明导航栏
+//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+        }
+        tintManager = new SystemBarTintManager(this);
+        tintManager.setStatusBarTintEnabled(true);
+        tintManager.setNavigationBarTintEnabled(false);
+    }
+
+    /**
+     * 设置状态栏颜色
+     */
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public void setTranslucentStatusColor(int color) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            tintManager.setStatusBarTintColor(color);
+        }
+        //如果状态栏为白色，则设置状态栏字体为黑色
+        if(color == Color.WHITE){
+            StatusBarUtil.StatusBarLightMode(this);
+        }
+    }
+
+//    /**
+//     * 设置状态栏隐藏
+//     */
+//    public void setTranslucentStatusHide() {
+//        tintManager.setStatusBarTintColor(Color.parseColor("#00000000"));
+//        root.setFitsSystemWindows(false);
+//        root.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+//    }
 
     /**
      * 设置回退动画

@@ -5,7 +5,6 @@ import android.text.TextUtils;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.request.RequestOptions;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.config.Constants;
@@ -97,6 +96,15 @@ public class ImageLoaderUtils {
                 .into(imageView);
     }
 
+    public static void display(Context context, int res, ImageView imageView) {
+
+        Glide.with(context).load(res)
+                .apply(RequestOptions.placeholderOf(R.drawable.icon_loading_default))
+                .apply(RequestOptions.errorOf(R.drawable.icon_loading_default))
+
+                .into(imageView);
+    }
+
 
     /**
      * 图像显示
@@ -144,9 +152,15 @@ public class ImageLoaderUtils {
                 .into(imageView);
     }
 
+    /**
+     *显示圆角图片
+     * @param context
+     * @param picUrl
+     * @param imageView
+     */
     public static void displayRoundImage(Context context, String picUrl, ImageView imageView) {
         if (TextUtils.isEmpty(picUrl)){
-            imageView.setBackgroundResource(R.drawable.bg_circle);
+            imageView.setBackgroundResource(R.drawable.icon_loading_default);
             return;
         }
         if (!picUrl.startsWith("http")) {
@@ -154,9 +168,63 @@ public class ImageLoaderUtils {
         }
 
         Glide.with(context).load(picUrl)
-                .apply(RequestOptions.placeholderOf(R.drawable.bg_circle))
-                .apply(RequestOptions.errorOf(R.drawable.bg_circle))
+                .apply(RequestOptions.placeholderOf(R.drawable.icon_loading_default))
+                .apply(RequestOptions.errorOf(R.drawable.icon_loading_default))
                 .apply(RequestOptions.bitmapTransform(new GlideRoundImage(context)))
+                .into(imageView);
+    }
+
+    /**
+     *显示圆角图片
+     * @param context
+     * @param picUrl
+     * @param imageView
+     */
+    public static void displayRoundImage(Context context, String picUrl, ImageView imageView,int width,int height) {
+        if (TextUtils.isEmpty(picUrl)){
+            imageView.setBackgroundResource(R.drawable.icon_loading_default);
+            return;
+        }
+        if (!picUrl.startsWith("http")) {
+            picUrl = Constants.BASE_IMG_URL + picUrl;
+        }
+
+        Glide.with(context).load(picUrl)
+                .apply(RequestOptions.placeholderOf(R.drawable.icon_loading_default))
+                .apply(RequestOptions.errorOf(R.drawable.icon_loading_default))
+                .apply(RequestOptions.bitmapTransform(new GlideRoundImage(context)))
+                .apply(RequestOptions.overrideOf(width,height))
+                .into(imageView);
+    }
+
+    /**
+     *显示圆角图片
+     * @param context
+     * @param res
+     * @param imageView
+     */
+    public static void displayRoundImage(Context context, int res, ImageView imageView,int width,int height) {
+        Glide.with(context).load(res)
+                .apply(RequestOptions.placeholderOf(R.drawable.icon_loading_default))
+                .apply(RequestOptions.errorOf(R.drawable.icon_loading_default))
+                .apply(RequestOptions.bitmapTransform(new GlideRoundImage(context)))
+                .apply(RequestOptions.overrideOf(width,height))
+                .into(imageView);
+    }
+
+    /**
+     *显示圆角图片
+     * @param context
+     * @param res
+     * @param imageView
+     */
+    public static void displayRoundImage(Context context, File res, ImageView imageView, int width, int height) {
+
+        Glide.with(context).load(res)
+                .apply(RequestOptions.placeholderOf(R.drawable.icon_loading_default))
+                .apply(RequestOptions.errorOf(R.drawable.icon_loading_default))
+                .apply(RequestOptions.bitmapTransform(new GlideRoundImage(context)))
+                .apply(RequestOptions.overrideOf(width,height))
                 .into(imageView);
     }
 
