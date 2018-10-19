@@ -1,5 +1,6 @@
 package com.markLove.Xplan.ui.fragment;
 
+import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
 import android.widget.Button;
@@ -11,10 +12,12 @@ import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseFragment;
 import com.markLove.Xplan.bean.PeopleBean;
 import com.markLove.Xplan.bean.ShopItemBean;
-import com.markLove.Xplan.module.CallBackTest;
 import com.markLove.Xplan.module.CircleRecyclerView.CircleRecyclerView;
 import com.markLove.Xplan.module.CircleRecyclerView.CircularViewMode;
 import com.markLove.Xplan.module.CircleRecyclerView.ItemViewMode;
+import com.markLove.Xplan.ui.activity.GoodPlayActivity;
+import com.markLove.Xplan.ui.activity.LoverActivity;
+import com.markLove.Xplan.ui.activity.PlayersActivity;
 import com.markLove.Xplan.ui.adapter.PeoplesAdapter;
 import com.markLove.Xplan.ui.adapter.ShopChatAdapter;
 
@@ -53,6 +56,9 @@ public class FindFragment extends BaseFragment implements View.OnClickListener {
         btnAll.setOnClickListener(this);
         btnBoy.setOnClickListener(this);
         btnGirl.setOnClickListener(this);
+        view.findViewById(R.id.tv_play).setOnClickListener(this);
+        view.findViewById(R.id.tv_players).setOnClickListener(this);
+        view.findViewById(R.id.tv_find_cp).setOnClickListener(this);
 
         btnAll.setSelected(true);
         btnBoy.setSelected(false);
@@ -64,7 +70,7 @@ public class FindFragment extends BaseFragment implements View.OnClickListener {
 
     private void initCrOne(View view){
         mItemViewMode = new CircularViewMode();
-        ((CircularViewMode)mItemViewMode).setxOffset(200);
+        ((CircularViewMode)mItemViewMode).setxOffset(450);
 
         mCircleRecyclerView = (CircleRecyclerView) view.findViewById(R.id.cr_one);
         mLayoutManager = new LinearLayoutManager(getContext());
@@ -87,8 +93,8 @@ public class FindFragment extends BaseFragment implements View.OnClickListener {
 
     private void initCrTwo(View view){
         mItemViewMode2 = new CircularViewMode();
-        ((CircularViewMode)mItemViewMode2).setxOffset(600);
-
+        ((CircularViewMode)mItemViewMode2).setxOffset(100);
+        ((CircularViewMode)mItemViewMode2).setOffset11(150);
         mCircleRecyclerView2 = (CircleRecyclerView) view.findViewById(R.id.cr_two);
         mLayoutManager2 = new LinearLayoutManager(getContext());
         mCircleRecyclerView2.setLayoutManager(mLayoutManager2);
@@ -166,7 +172,30 @@ public class FindFragment extends BaseFragment implements View.OnClickListener {
                 btnAll.setSelected(false);
                 btnBoy.setSelected(false);
                 break;
+            case R.id.tv_players:
+                startPlayerActivity();
+                break;
+            case R.id.tv_play:
+                startPlayActivity();
+                break;
+            case R.id.tv_find_cp:
+                startLoveActivity();
+                break;
         }
+    }
 
+    private void startPlayActivity(){
+        Intent intent = new Intent(getContext(), GoodPlayActivity.class);
+        startActivity(intent);
+    }
+
+    private void startPlayerActivity(){
+        Intent intent = new Intent(getContext(), PlayersActivity.class);
+        startActivity(intent);
+    }
+
+    private void startLoveActivity(){
+        Intent intent = new Intent(getContext(), LoverActivity.class);
+        startActivity(intent);
     }
 }

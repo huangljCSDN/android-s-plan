@@ -22,6 +22,7 @@
     <string name="cancle">取消</string>
     <string name="sure">确定</string>
     <string name="picker">原图</string>
+    <string name="completed">完成</string>
 
 
 </resources>

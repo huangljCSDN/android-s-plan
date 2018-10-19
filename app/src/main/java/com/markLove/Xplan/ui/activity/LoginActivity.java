@@ -1,14 +1,12 @@
 package com.markLove.Xplan.ui.activity;
 
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.markLove.Xplan.R;
@@ -29,6 +27,10 @@ public class LoginActivity extends BaseContractActivity {
         mWebView = new WebView(getApplicationContext());
         LinearLayout mll = findViewById(R.id.rootView);
         //避免内存泄露，采用动态添加的方式
+
+//        mWebView = findViewById(R.id.webView);
+        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        mWebView.setLayoutParams(layoutParams);
         mll.addView(mWebView);
         initWebSettings();
     }
@@ -80,17 +82,9 @@ public class LoginActivity extends BaseContractActivity {
             }
         });
 
-        testFun();
+
     }
 
-    private void testFun(){
-        findViewById(R.id.tv_test).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showPicDialog();
-            }
-        });
-    }
 
     @Override
     public void onBackPressed() {
@@ -124,7 +118,5 @@ public class LoginActivity extends BaseContractActivity {
 //        } else {
 //            mUploadMessage.onReceiveValue(uri);
 //        }
-        ImageView imageView = findViewById(R.id.iv_test);
-        imageView.setImageBitmap(BitmapFactory.decodeFile(imagePath));
     }
 }
