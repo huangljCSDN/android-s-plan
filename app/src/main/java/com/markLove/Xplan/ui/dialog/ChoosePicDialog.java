@@ -1,4 +1,4 @@
-package com.markLove.Xplan.ui.widget;
+package com.markLove.Xplan.ui.dialog;
 
 import android.app.Dialog;
 import android.app.DialogFragment;

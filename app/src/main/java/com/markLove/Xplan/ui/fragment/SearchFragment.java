@@ -10,11 +10,14 @@ import com.cjt2325.cameralibrary.util.LogUtil;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseFragment;
-import com.markLove.Xplan.bean.PeopleBean;
+import com.markLove.Xplan.bean.MerchantBean;
+import com.markLove.Xplan.bean.UserBean;
 import com.markLove.Xplan.bean.ShopItemBean;
 import com.markLove.Xplan.module.CircleRecyclerView.CircleRecyclerView;
 import com.markLove.Xplan.module.CircleRecyclerView.CircularViewMode;
 import com.markLove.Xplan.module.CircleRecyclerView.ItemViewMode;
+import com.markLove.Xplan.mvp.contract.SearchContract;
+import com.markLove.Xplan.mvp.presenter.SearchPresenter;
 import com.markLove.Xplan.ui.activity.GoodPlayActivity;
 import com.markLove.Xplan.ui.activity.LoverActivity;
 import com.markLove.Xplan.ui.activity.PlayersActivity;
@@ -22,9 +25,11 @@ import com.markLove.Xplan.ui.adapter.PeoplesAdapter;
 import com.markLove.Xplan.ui.adapter.ShopChatAdapter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class FindFragment extends BaseFragment implements View.OnClickListener {
+public class SearchFragment extends BaseFragment<SearchPresenter> implements View.OnClickListener,SearchContract.View {
 
     private CircleRecyclerView mCircleRecyclerView2;
     private CircleRecyclerView mCircleRecyclerView;
@@ -38,8 +43,8 @@ public class FindFragment extends BaseFragment implements View.OnClickListener {
     private Button btnAll,btnBoy,btnGirl;
 
     @Override
-    public BasePresenter onCreatePresenter() {
-        return null;
+    public SearchPresenter onCreatePresenter() {
+        return new SearchPresenter();
     }
 
     @Override
@@ -66,6 +71,27 @@ public class FindFragment extends BaseFragment implements View.OnClickListener {
 
         initCrOne(view);
         initCrTwo(view);
+    }
+
+    private void getMerchantList(){
+        Map<String,String> map = new HashMap<>();
+        map.put("userId","");
+        map.put("page","");
+        map.put("rows","");
+        map.put("Token","");
+        mPresenter.getNearMerchant(map);
+    }
+
+    private void getNearUser(){
+        Map<String,String> map = new HashMap<>();
+        map.put("userId","");
+        map.put("page","");
+        map.put("longitude","");
+        map.put("latitude","");
+        map.put("sex","");
+        map.put("rows","");
+        map.put("Token","");
+        mPresenter.getNearMerchant(map);
     }
 
     private void initCrOne(View view){
@@ -114,10 +140,10 @@ public class FindFragment extends BaseFragment implements View.OnClickListener {
         mCircleRecyclerView2.setAdapter(peoplesAdapter);
     }
 
-    private List<PeopleBean> getData(){
-        List<PeopleBean> list = new ArrayList<>();
+    private List<UserBean> getData(){
+        List<UserBean> list = new ArrayList<>();
         for (int i=0;i<10;i++){
-            PeopleBean peopleBean = new PeopleBean("张三"+i,10,1,System.currentTimeMillis(),"");
+            UserBean peopleBean = new UserBean("张三"+i,10,1,System.currentTimeMillis(),"");
             list.add(peopleBean);
         }
         return list;
@@ -197,5 +223,15 @@ public class FindFragment extends BaseFragment implements View.OnClickListener {
     private void startLoveActivity(){
         Intent intent = new Intent(getContext(), LoverActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void refreshMerchantList(MerchantBean merchantBean) {
+
+    }
+
+    @Override
+    public void refreshUserList(UserBean userBean) {
+
     }
 }

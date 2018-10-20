@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_toLeftOf="@id/rl_chat_head_img"
             android:background="@drawable/chat_bg_shop_right"
-            android:gravity="center|right"
+            android:gravity="center"
             android:maxWidth="200dp"
             android:textSize="13sp"
             android:paddingLeft="12dp"

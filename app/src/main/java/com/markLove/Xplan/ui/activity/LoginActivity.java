@@ -82,7 +82,7 @@ public class LoginActivity extends BaseContractActivity {
             }
         });
 
-
+        mWebView.loadUrl("file:///android_asset/package/main/index.html#/login/password");
     }
 
 

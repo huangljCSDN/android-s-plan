@@ -34,11 +34,12 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:maxWidth="100dp"
+        android:maxWidth="200dp"
         android:paddingLeft="16dp"
         android:paddingTop="9dp"
         android:paddingBottom="9dp"
         android:orientation="horizontal"
+        android:layout_marginLeft="8dp"
         android:background="@drawable/chat_bg_group_left">
 
         <LinearLayout

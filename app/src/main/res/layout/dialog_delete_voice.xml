@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="275dp"
+        android:layout_height="130dp"
+        android:background="@drawable/bg_report_dialog"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="33dp"
+            android:layout_marginRight="25dp"
+            android:text="@string/tip_delete_voice"
+            android:textColor="@color/color_2c2b2b"
+            android:textSize="15sp" />
+
+        <View
+            style="@style/DividerHorizontal"
+            android:layout_marginTop="30dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_cancel"
+                android:layout_width="70dp"
+                android:layout_height="30dp"
+                android:layout_marginRight="27dp"
+                android:gravity="center"
+                android:text="@string/cancel"
+                android:textColor="@color/color_acacac"
+                android:textSize="15sp" />
+
+            <View style="@style/DividerVertical" />
+
+            <TextView
+                android:id="@+id/tv_sure"
+                android:layout_width="70dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="27dp"
+                android:gravity="center"
+                android:text="@string/sure"
+                android:textColor="@color/color_30efec"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+</LinearLayout>

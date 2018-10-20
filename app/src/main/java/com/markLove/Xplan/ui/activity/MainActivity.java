@@ -11,7 +11,7 @@ import com.markLove.Xplan.ui.adapter.FragmentTabAdapter;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.PostQueryInfo;
 import com.markLove.Xplan.mvp.contract.MainContract;
-import com.markLove.Xplan.ui.fragment.FindFragment;
+import com.markLove.Xplan.ui.fragment.SearchFragment;
 import com.markLove.Xplan.ui.fragment.MineFragment;
 import com.markLove.Xplan.ui.fragment.MsgFragment;
 import com.markLove.Xplan.ui.fragment.TeamFragment;
@@ -41,7 +41,7 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
         radioGroup.check(R.id.rb_team);
         fragments = new ArrayList<Fragment>();
         fragments.add(new TeamFragment());
-        fragments.add(new FindFragment());
+        fragments.add(new SearchFragment());
         fragments.add(new MsgFragment());
         fragments.add(new MineFragment());
         fragmentTabAdapter = new FragmentTabAdapter(this, fragments, R.id.frame, radioGroup);

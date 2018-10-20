@@ -46,9 +46,12 @@
         <activity android:name=".ui.activity.GroupChatActivity" />
         <activity android:name=".ui.activity.SingleChatActivity" />
         <activity android:name=".ui.activity.ShopChatActivity" />
-        <activity android:name=".ui.activity.PlayersActivity"></activity>
-        <activity android:name=".ui.activity.GoodPlayActivity"></activity>
-        <activity android:name=".ui.activity.LoverActivity"></activity>
+        <activity android:name=".ui.activity.PlayersActivity" />
+        <activity android:name=".ui.activity.GoodPlayActivity" />
+        <activity android:name=".ui.activity.LoverActivity" />
+        <activity android:name=".ui.activity.CpChatActivity" />
+        <activity android:name=".ui.activity.TestActivity" />
+        <activity android:name=".ui.activity.PublishActivity"></activity>
     </application>
 
 </manifest>

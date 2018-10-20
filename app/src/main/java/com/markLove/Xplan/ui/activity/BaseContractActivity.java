@@ -16,7 +16,7 @@ import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.utils.Ln;
 import com.markLove.Xplan.utils.PhotoUtil;
-import com.markLove.Xplan.ui.widget.ChoosePicDialog;
+import com.markLove.Xplan.ui.dialog.ChoosePicDialog;
 
 import java.io.File;
 import java.util.ArrayList;

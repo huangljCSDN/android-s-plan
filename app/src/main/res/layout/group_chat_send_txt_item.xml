@@ -42,12 +42,13 @@
             android:id="@+id/chat_txt_msg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:textColor="@color/white"
-            android:paddingLeft="12dp"
+            android:gravity="center"
+            android:maxWidth="200dp"
             android:paddingRight="12dp"
+            android:paddingLeft="12dp"
+            android:layout_marginRight="8dp"
             android:background="@drawable/chat_bg_group_right"
-            android:gravity="center_vertical|right"
             android:layout_toLeftOf="@id/rl_chat_head_img"
             android:textSize="13sp"/>
 

@@ -26,6 +26,14 @@ public class LauncherActivity extends BaseActivity implements View.OnClickListen
         getPermissions();
         findViewById(R.id.btn_login).setOnClickListener(this);
         findViewById(R.id.btn_register).setOnClickListener(this);
+
+        findViewById(R.id.textView).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LauncherActivity.this,TestActivity.class);
+                LauncherActivity.this.startActivity(intent);
+            }
+        });
     }
 
     @Override

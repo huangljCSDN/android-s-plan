@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.markLove.Xplan.R;
-import com.markLove.Xplan.bean.PeopleBean;
+import com.markLove.Xplan.bean.UserBean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,14 +24,14 @@ import java.util.List;
 public class PeoplesAdapter extends RecyclerView.Adapter<PeoplesAdapter.MyViewHolder>{
 
     private Context context;
-    private List<PeopleBean> list = new ArrayList<>();
+    private List<UserBean> list = new ArrayList<>();
 
-    public PeoplesAdapter(Context context, List<PeopleBean> datas) {
+    public PeoplesAdapter(Context context, List<UserBean> datas) {
         this.context = context;
         this.list =datas;
     }
 
-    public void setData(List<PeopleBean> data){
+    public void setData(List<UserBean> data){
         this.list.addAll(data);
 //        notifyDataSetChanged();
     }
@@ -47,7 +47,7 @@ public class PeoplesAdapter extends RecyclerView.Adapter<PeoplesAdapter.MyViewHo
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         holder.contentView.setTag(position);
-        PeopleBean peopleBean = list.get(position);
+        UserBean peopleBean = list.get(position);
         holder.nickName.setText(peopleBean.getNickName());
         holder.tvTime.setText(peopleBean.getNickName());
         if (peopleBean.getSex() == 1){

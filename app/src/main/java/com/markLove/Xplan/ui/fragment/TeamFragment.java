@@ -95,29 +95,29 @@ public class TeamFragment extends BaseFragment {
         }
 
         @JavascriptInterface
-        public void goNative(String callFun, String param) {
+        public void goNative(String callFun) {
             ToastUtils.showLong(getContext(), "goNative");
         }
 
         /**
          * 拍照
          *
-         * @param uploadUrl
-         * @param sCallback photoFinish
+         *  uploadUrl
+         * sCallback photoFinish
          */
         @JavascriptInterface
-        public void goPhoto(String uploadUrl, String sCallback) {
+        public void goPhoto(String json) {
             ToastUtils.showLong(getContext(), "goPhoto");
         }
 
         /**
          * 视频
          *
-         * @param uploadUrl
-         * @param sCallback videoFinish
+         * uploadUrl
+         *  sCallback videoFinish
          */
         @JavascriptInterface
-        public void goVideo(String uploadUrl, String sCallback) {
+        public void goVideo(String json) {
             ToastUtils.showLong(getContext(), "goVideo");
 
         }
@@ -125,11 +125,11 @@ public class TeamFragment extends BaseFragment {
         /**
          * 录音
          *
-         * @param uploadUrl
-         * @param sCallback videoFinish
+         * uploadUrl
+         * sCallback videoFinish
          */
         @JavascriptInterface
-        public void goRecord(String uploadUrl, String sCallback) {
+        public void goRecord(String json) {
             ToastUtils.showLong(getContext(), "goRecord");
 
         }
@@ -137,16 +137,16 @@ public class TeamFragment extends BaseFragment {
         /**
          * 调用相册，视频
          *
-         * @param uploadUrl  后端提供的上传接口名
-         * @param selectType 选择内容：1-图片、2-视频、3图片和视频
-         * @param backType   选择方式-单选（single）、多选(multi) 注：如果是多选，则返回数组
-         * @param sCallback  photoFinish
+         * uploadUrl  后端提供的上传接口名
+         *  selectType 选择内容：1-图片、2-视频、3图片和视频
+         * backType   选择方式-单选（single）、多选(multi) 注：如果是多选，则返回数组
+         * sCallback  photoFinish
          */
         @JavascriptInterface
-        public void fromImgLibrary(String uploadUrl, String selectType, String backType, String sCallback) {
+        public void fromImgLibrary(String json) {
             ToastUtils.showLong(getContext(), "fromImgLibrary");
 
-            if (1 == Integer.parseInt(selectType)) {
+            if (1 == Integer.parseInt("111")) {
                 Intent intent = new Intent(getActivity(), SinglePickerActivity.class);
                 intent.putExtra(PickerConfig.SELECT_MODE, PickerConfig.PICKER_IMAGE);
                 getActivity().startActivityForResult(intent, 200);
@@ -166,34 +166,35 @@ public class TeamFragment extends BaseFragment {
         /**
          * 定位
          *
-         * @param sCallback 成功回调
-         * @param fCallback 失败回调  "{“status”:”error”,”msg”:”出错”}"
+         * sCallback 成功回调
+         * fCallback 失败回调  "{“status”:”error”,”msg”:”出错”}"
          */
         @JavascriptInterface
-        public void getQDLocationInfo(String sCallback, String fCallback) {
+        public void getQDLocationInfo(String json) {
             ToastUtils.showLong(getContext(), "getQDLocationInfo");
         }
 
         /**
          * 下载
          *
-         * @param fileInfo
-         * @param fCallback downLoadFinish
-         * @param type      "IMAGE"
+         * fileInfo
+         * fCallback downLoadFinish
+         *  type      "IMAGE"
          */
         @JavascriptInterface
-        public void goDownload(String fileInfo, String fCallback, String type) {
+        public void goDownload(String json) {
             ToastUtils.showLong(getContext(), "goDownload");
         }
 
         /**
-         * @param isTrue     配合goNative的参数callFun一起用，为true：goNative支持返回时调用前端函数
-         * @param urlPort    前端页面路径（路由
-         * @param networkUrl 外网路径
-         * @param isBack     是否显示返回按钮，如果是打开外网链接的话，打开的页面就需要一个返回按钮了，可以悬浮在左下角，点击返回上一个页面
+         *
+         * isTrue     配合goNative的参数callFun一起用，为true：goNative支持返回时调用前端函数
+         * urlPort    前端页面路径（路由
+         * networkUrl 外网路径
+         * isBack     是否显示返回按钮，如果是打开外网链接的话，打开的页面就需要一个返回按钮了，可以悬浮在左下角，点击返回上一个页面
          */
         @JavascriptInterface
-        public void goView(String isTrue, String urlPort, String networkUrl, String isBack) {
+        public void goView(String json) {
             ToastUtils.showLong(getContext(), "goView");
         }
 

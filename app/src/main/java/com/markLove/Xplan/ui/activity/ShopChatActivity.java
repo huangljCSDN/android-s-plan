@@ -32,7 +32,6 @@ import com.cjt2325.cameralibrary.util.FileUtil;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
 import com.markLove.Xplan.R;
-import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.ChatUser;
 import com.markLove.Xplan.bean.msg.Message;
@@ -43,12 +42,13 @@ import com.markLove.Xplan.db.DBDao;
 import com.markLove.Xplan.module.image.IImageCompressor;
 import com.markLove.Xplan.mvp.contract.ChatView;
 import com.markLove.Xplan.mvp.presenter.ChatPresenter;
+import com.markLove.Xplan.mvp.presenter.ShopChatPresenter;
 import com.markLove.Xplan.mvp.presenter.impl.ChatPresenterImpl;
 import com.markLove.Xplan.ui.adapter.ChatMessageAdapter;
-import com.markLove.Xplan.ui.widget.MorePopWindow;
-import com.markLove.Xplan.ui.widget.RemoveMsgDialog;
-import com.markLove.Xplan.ui.widget.ReportDialog;
-import com.markLove.Xplan.ui.widget.ResendMsgDialog;
+import com.markLove.Xplan.ui.dialog.MorePopWindow;
+import com.markLove.Xplan.ui.dialog.RemoveMsgDialog;
+import com.markLove.Xplan.ui.dialog.ReportDialog;
+import com.markLove.Xplan.ui.dialog.ResendMsgDialog;
 import com.markLove.Xplan.utils.AudioUtils;
 import com.markLove.Xplan.utils.DataUtils;
 import com.markLove.Xplan.utils.DensityUtils;
@@ -70,7 +70,7 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * 店铺聊天室
  */
-public class ShopChatActivity extends BaseActivity implements View.OnClickListener, ChatView {
+public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements View.OnClickListener, ChatView {
     private ArrayList<Media> select;
 
     private TextView mTvShopName, mTvAllPersonCount;
@@ -101,8 +101,8 @@ public class ShopChatActivity extends BaseActivity implements View.OnClickListen
     }
 
     @Override
-    public BasePresenter onCreatePresenter() {
-        return null;
+    public ShopChatPresenter onCreatePresenter() {
+        return new ShopChatPresenter();
     }
 
     @Override

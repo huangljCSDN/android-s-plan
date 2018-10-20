@@ -1,4 +1,4 @@
-package com.markLove.Xplan.ui.widget;
+package com.markLove.Xplan.ui.dialog;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -12,32 +12,32 @@ import com.markLove.Xplan.R;
  * 作者：created by huanglingjun on 2018/10/12
  * 描述：
  */
-public class ResendMsgDialog extends AlertDialog implements View.OnClickListener {
+public class RemoveMsgDialog extends AlertDialog implements View.OnClickListener {
     private OnMenuClickListener onMenuClickListener;
 
-    public ResendMsgDialog(Context context) {
+    public RemoveMsgDialog(Context context) {
         super(context, R.style.DialogBottom);
     }
 
-    public ResendMsgDialog setOnMenuClickListener(OnMenuClickListener onMenuClickListener) {
+    public RemoveMsgDialog setOnMenuClickListener(OnMenuClickListener onMenuClickListener) {
         this.onMenuClickListener = onMenuClickListener;
         return this;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setContentView(R.layout.popup_chat_msg_fail);
+        setContentView(R.layout.dialog_remove_msg);
         getWindow().setGravity(Gravity.BOTTOM);
 
-        findViewById(R.id.popup_again).setOnClickListener(this);
-        findViewById(R.id.popup_cancel).setOnClickListener(this);
+        findViewById(R.id.tvRemove).setOnClickListener(this);
+        findViewById(R.id.btnCancel).setOnClickListener(this);
 
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.popup_again:
+            case R.id.tvRemove:
                 onMenuClickListener.onMenuClick();
                 break;
         }

@@ -53,4 +53,24 @@
     <string name="boy">男生</string>
     <string name="girl">女生</string>
     <string name="all">全部</string>
+    <string name="tip">提示</string>
+    <string name="time_end">时间到~相遇不易，关注对方可以继续给Ta发送消息哦</string>
+    <string name="care">关注</string>
+    <string name="care_ta">关注Ta</string>
+    <string name="cared">已关注</string>
+    <string name="exit_room_tip">确定要现在退出房间么?退出房间本次对话将会立即结束</string>
+    <string name="other_exit_room_tip">对方已经退出房间，本次聊天已结束</string>
+    <string name="confirm_exit_chat_room">确定退出聊天室?</string>
+    <string name="tip_chat">不善言语的小伙伴可以参考话题哟</string>
+
+    <string name="publish">发布</string>
+    <string name="where">你在哪里</string>
+    <string name="open">公开</string>
+    <string name="tip_publish_content">点击下方麦克风可以录制音频，点击拍照可以录制小视频哦~</string>
+    <string name="all_people_can_see">所有人可见</string>
+    <string name="only_see_by_myself">仅自己可见</string>
+    <string name="tip_publish_null_content">不能发布视频、照片或文案为空的内容哦</string>
+    <string name="i_know">我知道了</string>
+    <string name="tip_exit_edit">退出此次编辑?</string>
+    <string name="tip_delete_voice">确定要上出此条音频吗?</string>
 </resources>

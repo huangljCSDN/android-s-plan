@@ -22,6 +22,7 @@ public abstract class ChatBaseViewHolder extends RecyclerView.ViewHolder {
     public ImageView userHead;
     public Button btnAgree;
     public View status;
+    public View chatBgView; //聊天框背景
 
     public ChatBaseViewHolder(View itemView) {
         super(itemView);

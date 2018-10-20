@@ -36,10 +36,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/chat_bg_group_left"
-        android:gravity="left|center_vertical"
+        android:gravity="center"
         android:maxWidth="200dp"
         android:textSize="13sp"
-        android:paddingRight="5dp"
+        android:paddingRight="12dp"
+        android:paddingLeft="12dp"
         android:layout_marginLeft="8dp"
         android:textColor="@color/color_333333" />
 

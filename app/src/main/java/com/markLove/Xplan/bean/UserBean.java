@@ -4,7 +4,7 @@ package com.markLove.Xplan.bean;
  * 作者：created by huanglingjun on 2018/10/18
  * 描述：
  */
-public class PeopleBean {
+public class UserBean {
 
     private String nickName;
     public int age;
@@ -12,7 +12,7 @@ public class PeopleBean {
     public long time;
     public String headUrl;
 
-    public PeopleBean(String nickName, int age, int sex, long time, String headUrl) {
+    public UserBean(String nickName, int age, int sex, long time, String headUrl) {
         this.nickName = nickName;
         this.age = age;
         this.sex = sex;
@@ -62,7 +62,7 @@ public class PeopleBean {
 
     @Override
     public String toString() {
-        return "PeopleBean{" +
+        return "UserBean{" +
                 "nickName='" + nickName + '\'' +
                 ", age=" + age +
                 ", sex=" + sex +

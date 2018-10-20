@@ -1,4 +1,4 @@
-package com.markLove.Xplan.ui.widget;
+package com.markLove.Xplan.ui.dialog;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -7,6 +7,8 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
+
+import com.markLove.Xplan.ui.widget.BubbleRelativeLayout;
 
 
 /**
