@@ -29,19 +29,20 @@ android {
         debug {
             debuggable true
             signingConfig signingConfigs.config
-            buildConfigField(STRING, APP_HOST, '"http://appdtdev.opt.snsshop.net"')
+            buildConfigField(STRING, APP_HOST, '"http://120.76.228.171:8080/xplay/"')
         }
         // beta 测试环境
         beta {
             debuggable true
             signingConfig signingConfigs.config
-            buildConfigField(STRING, APP_HOST, '"http://appdt.testopt.snsshop.net"')
+            buildConfigField(STRING, APP_HOST, '"http://120.76.228.171:8080/xplay/"')
         }
 
         release {
             debuggable false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField(STRING, APP_HOST, '"http://120.76.228.171:8080/xplay/"')
         }
     }
 }
@@ -66,12 +67,11 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.1.1'
     implementation 'com.android.support:recyclerview-v7:27.1.1'
     //Gson
-    compile 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.google.code.gson:gson:2.8.5'
     //EventBus
-    compile 'org.greenrobot:eventbus:3.1.1'
+    implementation 'org.greenrobot:eventbus:3.1.1'
     //修改状态栏的颜色
-    compile 'com.readystatesoftware.systembartint:systembartint:1.0.4'
-
+    implementation 'com.readystatesoftware.systembartint:systembartint:1.0.4'
     //压缩
     compile 'top.zibin:Luban:1.1.7'
 

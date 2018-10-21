@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.markLove.Xplan.R;
+import com.markLove.Xplan.bean.NearUserBean;
 import com.markLove.Xplan.bean.UserBean;
 
 import java.util.ArrayList;
@@ -19,20 +20,20 @@ import java.util.List;
 
 /**
  * 作者：created by huanglingjun on 2018/10/18
- * 描述：
+ * 描述：用户列表
  */
-public class PeoplesAdapter extends RecyclerView.Adapter<PeoplesAdapter.MyViewHolder>{
+public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.MyViewHolder>{
 
     private Context context;
-    private List<UserBean> list = new ArrayList<>();
+    private List<NearUserBean.NearUserEntity> list = new ArrayList<>();
 
-    public PeoplesAdapter(Context context, List<UserBean> datas) {
+    public UserListAdapter(Context context, List<NearUserBean.NearUserEntity> datas) {
         this.context = context;
         this.list =datas;
     }
 
-    public void setData(List<UserBean> data){
-        this.list.addAll(data);
+    public void setData(List<NearUserBean.NearUserEntity> data){
+        this.list = data;
 //        notifyDataSetChanged();
     }
 
@@ -46,22 +47,26 @@ public class PeoplesAdapter extends RecyclerView.Adapter<PeoplesAdapter.MyViewHo
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        holder.contentView.setTag(position);
-        UserBean peopleBean = list.get(position);
-        holder.nickName.setText(peopleBean.getNickName());
-        holder.tvTime.setText(peopleBean.getNickName());
-        if (peopleBean.getSex() == 1){
-            holder.ivSex.setImageResource(R.drawable.ic_man);
+        if (position == getItemCount() - 1 || position == getItemCount() -2){
+            holder.contentView.setVisibility(View.INVISIBLE);
         } else {
-            holder.ivSex.setImageResource(R.drawable.ic_woman);
+            holder.contentView.setVisibility(View.VISIBLE);
+            holder.contentView.setTag(position);
+            NearUserBean.NearUserEntity peopleBean = list.get(position);
+            holder.nickName.setText(peopleBean.getNickName());
+            holder.tvTime.setText(peopleBean.getLastOnline());
+            if (peopleBean.getSex() == 1){
+                holder.ivSex.setImageResource(R.drawable.ic_man);
+            } else {
+                holder.ivSex.setImageResource(R.drawable.ic_woman);
+            }
+
+            Glide.with(context).load(R.drawable.icon)
+                    .apply(RequestOptions.placeholderOf(R.drawable.bg_circle))
+                    .apply(RequestOptions.errorOf(R.drawable.bg_circle))
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(holder.ivHead);
         }
-
-        Glide.with(context).load(R.drawable.icon)
-                .apply(RequestOptions.placeholderOf(R.drawable.bg_circle))
-                .apply(RequestOptions.errorOf(R.drawable.bg_circle))
-                .apply(RequestOptions.circleCropTransform())
-                .into(holder.ivHead);
-
     }
 
     @Override

@@ -51,7 +51,8 @@
         <activity android:name=".ui.activity.LoverActivity" />
         <activity android:name=".ui.activity.CpChatActivity" />
         <activity android:name=".ui.activity.TestActivity" />
-        <activity android:name=".ui.activity.PublishActivity"></activity>
+        <activity android:name=".ui.activity.PublishActivity" />
+        <activity android:name=".ui.activity.UserInfoActivity"></activity>
     </application>
 
 </manifest>

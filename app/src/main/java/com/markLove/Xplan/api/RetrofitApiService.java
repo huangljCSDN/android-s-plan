@@ -42,31 +42,31 @@ public interface RetrofitApiService {
      * @param map
      * @return
      */
-    @POST("/merchant/discover/getMerchantUserList")
-    Observable<UserBean> getMerchantUserList(@QueryMap Map<String, String> map);
+    @POST("merchant/discover/getMerchantUserList")
+    Observable<Object> getMerchantUserList(@QueryMap Map<String, String> map);
 
     /**
      * 附近的店
      * @param map
      * @return
      */
-    @POST("/merchant/discover/getNearMerchant")
-    Observable<MerchantBean> getNearMerchant(@QueryMap Map<String, String> map);
+    @POST("merchant/discover/getNearMerchant")
+    Observable<Object> getNearMerchant(@QueryMap Map<String, String> map);
 
     /**
      * 附近的人
      * @param map
      * @return
      */
-    @POST("/merchant/discover/getNearUser")
-    Observable<UserBean> getNearUser(@QueryMap Map<String, String> map);
+    @POST("merchant/discover/getNearUser")
+    Observable<Object> getNearUser(@QueryMap Map<String, String> map);
 
     /**
      * 更新定位
      * @param map
      * @return
      */
-    @POST("/merchant/discover/updateUserPlace")
+    @POST("merchant/discover/updateUserPlace")
     Observable<PlaceBean> updateUserPlace(@QueryMap Map<String, String> map);
 
     /**
@@ -74,7 +74,7 @@ public interface RetrofitApiService {
      * @param map
      * @return
      */
-    @GET("/system/dfs/download")
+    @GET("system/dfs/download")
     Observable<BaseMsgBean> download(@QueryMap Map<String, String> map);
 
     /**
@@ -82,7 +82,7 @@ public interface RetrofitApiService {
      * @param map
      * @return
      */
-    @POST("/system/dfs/upload")
+    @POST("system/dfs/upload")
     Observable<BaseMsgBean> upload(@QueryMap Map<String, String> map);
 
     /**
@@ -90,7 +90,7 @@ public interface RetrofitApiService {
      * @param map
      * @return
      */
-    @POST("/user/group/joinGroup")
+    @POST("user/group/joinGroup")
     Observable<BaseMsgBean> joinGroup(@QueryMap Map<String, String> map);
 
     /**
@@ -98,7 +98,7 @@ public interface RetrofitApiService {
      * @param map
      * @return
      */
-    @POST("/user/group/participateGroup")
+    @POST("user/group/participateGroup")
     Observable<BaseMsgBean> participateGroup(@QueryMap Map<String, String> map);
 
     /**
@@ -106,7 +106,7 @@ public interface RetrofitApiService {
      * @param map
      * @return
      */
-    @POST("/user/operation/focus")
+    @POST("user/operation/focus")
     Observable<BaseMsgBean> focus(@QueryMap Map<String, String> map);
 
 }

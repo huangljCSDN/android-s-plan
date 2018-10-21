@@ -1,16 +1,22 @@
 package com.markLove.Xplan.ui.activity;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.ViewGroup;
+import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.LinearLayout;
 
+import com.cjt2325.cameralibrary.util.LogUtil;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.mvp.BasePresenter;
+import com.markLove.Xplan.ui.fragment.TeamFragment;
+import com.markLove.Xplan.utils.PreferencesUtils;
+import com.markLove.Xplan.utils.ToastUtils;
 
 public class LoginActivity extends BaseContractActivity {
     private WebView mWebView;
@@ -81,8 +87,28 @@ public class LoginActivity extends BaseContractActivity {
                 return true;
             }
         });
-
+        mWebView.addJavascriptInterface(new JSInterface(), "xplanfunc");
         mWebView.loadUrl("file:///android_asset/package/main/index.html#/login/password");
+    }
+
+    // 继承自Object类
+    public class JSInterface extends Object {
+
+        // 被JS调用的方法必须加入@JavascriptInterface注解
+
+        /**
+         * 获取用户信息
+         *
+         * @param userInfo
+         */
+        @JavascriptInterface
+        public void toHomePage(String userInfo) {
+            ToastUtils.showLong(LoginActivity.this, "toHomePage");
+            LogUtil.i("userInfo= "+userInfo);
+            PreferencesUtils.putString(LoginActivity.this,PreferencesUtils.KEY_USER,userInfo);
+            Intent intent = new Intent(LoginActivity.this,MainActivity.class);
+            LoginActivity.this.startActivity(intent);
+        }
     }
 
 

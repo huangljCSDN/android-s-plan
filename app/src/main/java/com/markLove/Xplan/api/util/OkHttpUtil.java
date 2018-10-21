@@ -2,6 +2,8 @@ package com.markLove.Xplan.api.util;
 
 import android.util.Log;
 
+import com.markLove.Xplan.base.App;
+
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -52,13 +54,12 @@ public class OkHttpUtil {
                             Request request = chain.request();
                             HttpUrl httpUrl = request.url()
                                     .newBuilder()
-                                    .addQueryParameter("token","123")
-                                    .addQueryParameter("username","xiaoming")
                                     .build();
 
                             Request newRequest = chain.request()
                                     .newBuilder()
-//                                .addHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+                                .addHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+                                    .addHeader("Token", App.getInstance().getToken())
 //                                .addHeader("Accept-Encoding", "gzip, deflate")
 //                                .addHeader("Connection", "keep-alive")
 //                                .addHeader("Accept", "*/*")
@@ -66,7 +67,6 @@ public class OkHttpUtil {
                                     .build();
                             return chain.proceed(newRequest);
                         }
-
                     })
                     .build();
         }

@@ -30,4 +30,9 @@ public class SearchModel extends SearchContract.Model {
     public void getNearUser(Map<String, String> map, RequestCallBack requestCallBack) {
         requestData(retrofitApiService.getNearUser(map),requestCallBack);
     }
+
+    @Override
+    public void getMerchantUserList(Map<String, String> map, RequestCallBack requestCallBack) {
+        requestData(retrofitApiService.getMerchantUserList(map),requestCallBack);
+    }
 }

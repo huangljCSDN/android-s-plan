@@ -5,6 +5,10 @@ import android.app.Application;
 import android.content.Context;
 import android.os.StrictMode;
 
+import com.markLove.Xplan.bean.UserBean;
+import com.markLove.Xplan.utils.GsonUtils;
+import com.markLove.Xplan.utils.PreferencesUtils;
+
 import java.util.Iterator;
 import java.util.List;
 
@@ -78,5 +82,13 @@ public class App extends Application {
 //        Toast.makeText(App.getInstance(), getString(R.string.token_expires), Toast.LENGTH_SHORT).show();
 //    }
 
+    public String getToken(){
+        String token = "";
+        UserBean userBean = GsonUtils.json2Bean(PreferencesUtils.getString(this,PreferencesUtils.KEY_USER),UserBean.class);
+        if (userBean != null){
+            token = userBean.getToken();
+        }
+        return token;
+    }
 }
 

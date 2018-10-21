@@ -45,7 +45,7 @@ public class LauncherActivity extends BaseActivity implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btn_login:
-                Intent intent = new Intent(this,MainActivity.class);
+                Intent intent = new Intent(this,LoginActivity.class);
                 startActivity(intent);
                 break;
             case R.id.btn_register:

@@ -10,6 +10,7 @@ import com.markLove.Xplan.mvp.contract.MainContract;
 import com.markLove.Xplan.mvp.contract.SearchContract;
 import com.markLove.Xplan.mvp.model.MainModel;
 import com.markLove.Xplan.mvp.model.SearchModel;
+import com.markLove.Xplan.utils.LogUtils;
 
 import java.util.Map;
 
@@ -29,16 +30,15 @@ public class SearchPresenter extends SearchContract.Presenter {
         if (!isAttach()) return;
         getView().showLoading();
 
-        mModel.getNearMerchant(map, new RequestCallBack<MerchantBean>() {
+        mModel.getNearMerchant(map, new RequestCallBack<Object>() {
             @Override
-            public void onSuccess(MerchantBean merchantBean) {
+            public void onSuccess(Object json) {
                 getView().hideLoading();
-                getView().refreshMerchantList(merchantBean);
+//                getView().refreshMerchantList(json);
             }
 
             @Override
             public void onFail(String result) {
-                Log.i("MainPresenter",result);
                 getView().hideLoading();
                 getView().showError(result);
             }
@@ -50,11 +50,31 @@ public class SearchPresenter extends SearchContract.Presenter {
         if (!isAttach()) return;
         getView().showLoading();
 
-        mModel.getNearUser(map, new RequestCallBack<UserBean>() {
+        mModel.getNearUser(map, new RequestCallBack<Object>() {
             @Override
-            public void onSuccess(UserBean o) {
+            public void onSuccess(Object o) {
                 getView().hideLoading();
-                getView().refreshUserList(o);
+                getView().refreshUserList(o.toString());
+            }
+
+            @Override
+            public void onFail(String result) {
+                getView().hideLoading();
+                getView().showError(result);
+            }
+        });
+    }
+
+    @Override
+    public void getMerchantUserList(Map<String, String> map) {
+        if (!isAttach()) return;
+        getView().showLoading();
+
+        mModel.getMerchantUserList(map, new RequestCallBack<Object>() {
+            @Override
+            public void onSuccess(Object json) {
+                getView().hideLoading();
+//                getView().refreshUserList(json);
             }
 
             @Override

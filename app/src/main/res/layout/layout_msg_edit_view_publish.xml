@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:visibility="gone"
+        android:orientation="horizontal">
+        <EditText
+            android:id="@+id/et_input_msg"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_report_dialog"
+            android:hint="@string/hint_input_msg"
+            android:paddingRight="15dp"
+            android:textSize="14sp"
+            android:layout_marginLeft="15dp"
+            android:textColor="@color/color_333333"
+            android:textColorHint="@color/color_a7a7a7"/>
+
+        <ImageView
+            android:id="@+id/btn_send"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingRight="15dp"
+            android:paddingLeft="15dp"
+            android:textColor="@color/white"
+            android:src="@drawable/bg_send_btn"
+            android:gravity="center"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/color_white"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:id="@+id/fl_sound"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/iv_record"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_sound" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/fl_camera"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/camera" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/fl_pic"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_pic" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/fl_emoji"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/iv_emoji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_emoji" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <include
+        android:id="@+id/chat_emoji_pager"
+        layout="@layout/chat_emoji_ll"
+        android:visibility="gone" />
+
+    <RelativeLayout
+        android:id="@+id/ll_record_sound"
+        android:layout_width="match_parent"
+        android:layout_height="194dp"
+        android:visibility="gone"
+        android:background="@color/color_0b083d"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_record_tip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:textColor="@color/color_white"
+            android:textSize="10sp"
+            android:layout_centerHorizontal="true"
+            android:text="@string/pressed_say"/>
+
+        <TextView
+            android:id="@+id/tv_record_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:textColor="@color/color_white"
+            android:textSize="10sp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="40dp"
+            tools:text="0.01"/>
+
+        <ImageView
+            android:id="@+id/id_recorder_button"
+            android:layout_width="68dp"
+            android:layout_height="68dp"
+            android:layout_marginTop="69dp"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/ic_record_sound">
+
+        </ImageView>
+
+
+    </RelativeLayout>
+</LinearLayout>

@@ -18,17 +18,19 @@ import retrofit2.http.QueryMap;
 public interface SearchContract {
 
     interface View extends BaseView {
-        void refreshMerchantList(MerchantBean merchantBean);
-        void refreshUserList(UserBean userBean);
+        void refreshMerchantList(String json);
+        void refreshUserList(String json);
     }
 
     abstract class Model extends BaseModel {
         public abstract void getNearMerchant(@QueryMap Map<String, String> map, RequestCallBack requestCallBack);
         public abstract void getNearUser(@QueryMap Map<String, String> map, RequestCallBack requestCallBack);
+        public abstract void getMerchantUserList(@QueryMap Map<String, String> map, RequestCallBack requestCallBack);
     }
 
     abstract class Presenter extends BasePresenter<View> {
         public abstract void getNearMerchant(@QueryMap Map<String, String> map);
         public abstract void getNearUser(@QueryMap Map<String, String> map);
+        public abstract void getMerchantUserList(@QueryMap Map<String, String> map);
     }
 }

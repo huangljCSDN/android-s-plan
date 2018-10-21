@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.markLove.Xplan.R;
-import com.markLove.Xplan.bean.ShopItemBean;
+import com.markLove.Xplan.bean.MerchantBean;
 import com.markLove.Xplan.ui.widget.GlideRoundImage;
 
 import java.util.ArrayList;
@@ -20,19 +20,19 @@ import java.util.List;
 
 /**
  * 作者：created by huanglingjun on 2018/10/18
- * 描述：店铺聊天室列表
+ * 描述：店铺列表
  */
-public class ShopChatAdapter extends RecyclerView.Adapter<ShopChatAdapter.MyViewHolder>{
+public class MerchantListAdapter extends RecyclerView.Adapter<MerchantListAdapter.MyViewHolder>{
 
     private Context context;
-    private List<ShopItemBean> list = new ArrayList<>();
+    private List<MerchantBean> list = new ArrayList<>();
 
-    public ShopChatAdapter(Context context, List<ShopItemBean> datas) {
+    public MerchantListAdapter(Context context, List<MerchantBean> datas) {
         this.context = context;
         this.list =datas;
     }
 
-    public void setData(List<ShopItemBean> data){
+    public void setData(List<MerchantBean> data){
         this.list.addAll(data);
 //        notifyDataSetChanged();
     }
@@ -46,11 +46,11 @@ public class ShopChatAdapter extends RecyclerView.Adapter<ShopChatAdapter.MyView
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
         holder.contentView.setTag(position);
-        ShopItemBean shopItemBean = list.get(position);
-        holder.tvShopName.setText(shopItemBean.shopName);
-        holder.tvShopCount.setText(shopItemBean.shopCount);
+        MerchantBean MerchantBean = list.get(position);
+        holder.tvShopName.setText(MerchantBean.shopName);
+        holder.tvShopCount.setText(MerchantBean.shopCount);
 
         Glide.with(context).load(R.drawable.icon)
                 .apply(RequestOptions.placeholderOf(R.drawable.icon_loading_default))
@@ -58,6 +58,14 @@ public class ShopChatAdapter extends RecyclerView.Adapter<ShopChatAdapter.MyView
                 .apply(RequestOptions.bitmapTransform(new GlideRoundImage(context)))
                 .into(holder.ivBg);
 
+        holder.contentView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (onItemClickListener != null){
+                    onItemClickListener.onItemClick(view,position);
+                }
+            }
+        });
     }
 
     @Override
@@ -81,4 +89,13 @@ public class ShopChatAdapter extends RecyclerView.Adapter<ShopChatAdapter.MyView
         }
     }
 
+    public interface OnItemClickListener{
+        void onItemClick(View view,int position);
+    }
+
+    public OnItemClickListener onItemClickListener;
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
 }
