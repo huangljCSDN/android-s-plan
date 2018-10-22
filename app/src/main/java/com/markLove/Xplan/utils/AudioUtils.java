@@ -47,6 +47,10 @@ public class AudioUtils {
             mediaPlayer.release();
             mediaPlayer = null;
         }
+        if (null != this.playStatusListener) {
+            this.playStatusListener.playEnd();
+            this.playStatusListener = null;
+        }
     }
 
 

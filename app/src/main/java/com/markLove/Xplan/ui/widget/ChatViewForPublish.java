@@ -31,6 +31,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cjt2325.cameralibrary.util.AudioUtil;
 import com.dmcbig.mediapicker.PickerActivity;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
@@ -45,6 +46,7 @@ import com.markLove.Xplan.module.emoji.EmojiOnClickListener;
 import com.markLove.Xplan.module.emoji.EmojiUtils;
 import com.markLove.Xplan.ui.activity.CameraActivity;
 import com.markLove.Xplan.ui.adapter.EmojiPagerAdapter;
+import com.markLove.Xplan.ui.dialog.DeleteVoiceDialog;
 import com.markLove.Xplan.utils.AudioUtils;
 import com.markLove.Xplan.utils.FileUtils;
 import com.markLove.Xplan.utils.LogUtils;
@@ -60,7 +62,7 @@ import java.util.List;
  * 作者：created by huanglingjun on 2018/10/16
  * 描述：
  */
-public class ChatViewForPublish extends FrameLayout implements View.OnClickListener{
+public class ChatViewForPublish extends FrameLayout implements View.OnClickListener {
 
     private EditText etChatSnedMsg;
     private RelativeLayout mRlRecord;
@@ -76,13 +78,19 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
     private ImageView mIvEmoji, mIvRecord;
     private EmojiPointerView llChatEmojiPoint;
     private ImageView tvChatSend;
-    private ImageView ivDeleteVoice,ivConfirmVoice;
+    private ImageView ivDeleteVoice, ivConfirmVoice;
     private Message voiceMessage;
+    private CircleProgressBar circleProgressBar;
+    private int totalProgress = 300;
+    private int currentProgress;
 
     int moveY = 0;
     boolean isRecordering = false;
     boolean isEnd = false;
     boolean isPlaying = false;
+    boolean isReset = false;
+    int voiceDuration;
+
     boolean isLikeAndUser = false;
     boolean toUserIDIsLove = false;
     boolean meIsLove = false;
@@ -94,11 +102,11 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
     private BaseActivity mActivity;
 
     public ChatViewForPublish(@NonNull Context context) {
-        this(context,null);
+        this(context, null);
     }
 
     public ChatViewForPublish(@NonNull Context context, @Nullable AttributeSet attrs) {
-        this(context, attrs,0);
+        this(context, attrs, 0);
     }
 
     public ChatViewForPublish(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
@@ -107,7 +115,7 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
         initView();
     }
 
-    private void initView(){
+    private void initView() {
         llChatEmojiPoint = findViewById(R.id.chat_emoji_point);
         mRlRecord = findViewById(R.id.ll_record_sound);
         etChatSnedMsg = findViewById(R.id.et_input_msg);
@@ -122,6 +130,8 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
         ivDeleteVoice = findViewById(R.id.iv_delete_voice);
         etChatSnedMsg.clearFocus();
         mAudioRecorderButton = findViewById(R.id.id_recorder_button);
+        circleProgressBar = findViewById(R.id.progress_circle);
+        circleProgressBar.setTotalProgress(totalProgress);
 
         tvChatSend.setEnabled(false);
         findViewById(R.id.fl_sound).setOnClickListener(this);
@@ -167,7 +177,7 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fl_sound:
-                if (!mRlRecord.isShown()){
+                if (!mRlRecord.isShown()) {
                     startRecordSound();
                 } else {
                     hideRlRecord();
@@ -191,14 +201,17 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
                 break;
             case R.id.iv_confirm_voice:
                 resetRecordering();
+                if (onSendMessageListener != null) {
+                    onSendMessageListener.onSendMessage(voiceMessage);
+                }
                 break;
             case R.id.iv_delete_voice:
-                resetRecordering();
+                showDeleteRecoredVoiceDialog();
                 break;
         }
     }
 
-    public void setActivity(BaseActivity baseActivity){
+    public void setActivity(BaseActivity baseActivity) {
         mActivity = baseActivity;
     }
 
@@ -215,7 +228,7 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
             message.setStatus(Message.ChatStatus.SENDING);
 //            //判断是否被拉黑
 //            judeBlackList(message);
-            if (onSendMessageListener != null){
+            if (onSendMessageListener != null) {
                 onSendMessageListener.onSendMessage(message);
             }
             etChatSnedMsg.setText("");
@@ -227,7 +240,7 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
     public void showRlRecord() {
         hideEmojiView();
         if (!mRlRecord.isShown()) {
-            mIvRecord.setImageResource(R.drawable.ic_recored_selected);
+            mIvRecord.setImageResource(R.drawable.ic_voice_selected_blue);
             mRlRecord.setVisibility(View.VISIBLE);
         } else {
             hideRlRecord();
@@ -240,7 +253,7 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
         hideRlRecord();
         if (!emojiView.isShown()) {
             emojiView.setVisibility(View.VISIBLE);
-            mIvEmoji.setImageResource(R.drawable.ic_emoji_selected);
+            mIvEmoji.setImageResource(R.drawable.ic_emoji_selected_blue);
         } else {
             hideEmojiView();
 //            setVisibility(GONE);
@@ -263,6 +276,7 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
     }
 
     MyHandler handler = new MyHandler();
+    private int startTime;
 
     class MyHandler extends Handler {
 
@@ -274,6 +288,14 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
                     postRecorderingMessage();
                     setRecorderingTime();
                     break;
+                case 1:
+                    startTime--;
+                    setRecorderingTime(startTime);
+                    handler.removeMessages(1);
+                    if (startTime > 0) {
+                        handler.sendEmptyMessageDelayed(1, 1000);
+                    }
+                    break;
             }
         }
     }
@@ -282,16 +304,21 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
      * 开始录音
      */
     public void startRecordering() {
-        mTvRecordTime.setText("");
+        currentProgress = 0;
+        circleProgressBar.setProgress(0);
+        circleProgressBar.setVisibility(VISIBLE);
+        isReset = false;
         mTvRecordTip.setText(getString(R.string.recoreding_voice));
         mAudioRecorderButton.setImageResource(R.drawable.ic_recoreding);
     }
 
     /**
      * 停止录音
+     *
      */
     public void stopRecordering() {
         isEnd = true;
+        circleProgressBar.setVisibility(GONE);
         mTvRecordTip.setText(getString(R.string.recoreding_voice_completed));
         ivDeleteVoice.setVisibility(VISIBLE);
         ivConfirmVoice.setVisibility(VISIBLE);
@@ -302,16 +329,19 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
     /**
      * 重置录音
      */
-    public void resetRecordering(){
-        if (isPlaying){
-            AudioUtils.getInstance().stop();
-        }
+    public void resetRecordering() {
+        isReset = true;
         isEnd = false;
+        handler.removeMessages(1);
         mTvRecordTip.setText(getString(R.string.pressed_say));
         ivDeleteVoice.setVisibility(GONE);
         ivConfirmVoice.setVisibility(GONE);
-        mTvRecordTime.setText("0S");
+        mTvRecordTime.setText("0s");
         mAudioRecorderButton.setImageResource(R.drawable.ic_recored);
+        if (isPlaying) {
+            AudioUtils.getInstance().stop();
+            isPlaying = false;
+        }
     }
 
     /**
@@ -319,7 +349,6 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
      */
     public void startPlayRecordering() {
         isPlaying = true;
-        mTvRecordTime.setText("");
         mTvRecordTip.setText(getString(R.string.playing_voice));
         mAudioRecorderButton.setImageResource(R.drawable.ic_recoreding);
     }
@@ -329,12 +358,15 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
      */
     public void endPlayRecordering() {
         isPlaying = false;
-        mTvRecordTime.setText("");
-        mTvRecordTip.setText(getString(R.string.playing_voice_end));
-        mAudioRecorderButton.setImageResource(R.drawable.ic_recoreded);
+        if (!isReset) {
+            mTvRecordTip.setText(getString(R.string.playing_voice_end));
+            mAudioRecorderButton.setImageResource(R.drawable.ic_recoreded);
+            mTvRecordTime.setText(voiceDuration + "s");
+            handler.removeMessages(1);
+        }
     }
 
-    private String getString(@StringRes int resId){
+    private String getString(@StringRes int resId) {
         return getContext().getString(resId);
     }
 
@@ -343,13 +375,13 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
      */
     public void cancelRecordring() {
         isEnd = true;
-        mTvRecordTime.setText("");
+        mTvRecordTime.setText("0s");
         mTvRecordTime.setVisibility(View.GONE);
         mTvRecordTip.setText(getString(R.string.pressed_say));
     }
 
     public void postRecorderingMessage() {
-        handler.sendEmptyMessageDelayed(0, 100);
+        handler.sendEmptyMessageDelayed(0, 1000);
     }
 
     public void setVoiceState() {
@@ -366,13 +398,35 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
         } else if (AudioUtils.getInstance().getCurrentTimeInterval() >= AudioUtils.MAX_VOICE_TIME) {
             isEnd = true;
         }
-        mTvRecordTime.setText(showTimeCount(AudioUtils.getInstance().getCurrentTimeInterval() * 1000) +"s");
+//        mTvRecordTime.setText(showTimeCount(AudioUtils.getInstance().getCurrentTimeInterval() * 1000) +"s");
+        mTvRecordTime.setText(AudioUtils.getInstance().getCurrentTimeInterval() + "s");
+        currentProgress += 1;
+        circleProgressBar.setProgress(currentProgress);
         if (isEnd) {
             if (isRecordering) {
                 AudioUtils.getInstance().stopRecording();
             } else {
                 AudioUtils.getInstance().cancelRecording();
             }
+        }
+
+        if (currentProgress == totalProgress){
+            if (!isEnd) {
+                if (isRecordering) {
+                    isEnd = true;
+                    AudioUtils.getInstance().stopRecording();
+                } else {
+                    AudioUtils.getInstance().cancelRecording();
+                }
+            }
+        }
+    }
+
+    private void setRecorderingTime(int time) {
+        if (time > 0) {
+            mTvRecordTime.setText(time + "s");
+        } else {
+            mTvRecordTime.setText(0 + "s");
         }
     }
 
@@ -423,9 +477,9 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
                 } else {
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
-                            if (!isEnd){
+                            if (!isEnd) {
                                 AudioUtils.getInstance().startRecording(audioRecoderListener);
-                            }else  {
+                            } else {
                                 playVoice();
                             }
                             break;
@@ -487,6 +541,7 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
             if (AudioUtils.getInstance().getTimeInterval() < 1000) {
                 ToastUtils.showCenter(getActivity(), "录制时间过短", 0);
                 FileUtils.delete(AudioUtils.getInstance().getFilePath());
+                resetRecordering();
                 return;
             }
             String voicePath = AudioUtils.getInstance().getFilePath();
@@ -496,9 +551,6 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
                 voiceMessage = Message.createVoiceMessage(Message.Type.CHAT, me_user_id, to_user_id, voiceName, voicePath);
                 voiceMessage.setStatus(Message.ChatStatus.SENDING);
 //                judeBlackList(voiceMessage);
-                if (onSendMessageListener != null){
-                    onSendMessageListener.onSendMessage(voiceMessage);
-                }
             } else {
                 ToastUtils.showCenter(getActivity(), "录音无效，请检查录音权限", 0);
                 FileUtils.delete(AudioUtils.getInstance().getFilePath());
@@ -511,7 +563,7 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
         }
     };
 
-    
+
     /**
      * 开始录音
      */
@@ -626,12 +678,12 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
             Toast.makeText(getContext(), getString(com.dmcbig.mediapicker.R.string.cant_play_video), Toast.LENGTH_SHORT).show();
         }
     }
-    
-    public BaseActivity getActivity(){
-        if (mActivity != null){
+
+    public BaseActivity getActivity() {
+        if (mActivity != null) {
             return mActivity;
         }
-        return (BaseActivity)getContext();
+        return (BaseActivity) getContext();
     }
 
 
@@ -662,14 +714,14 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
             }
         });
     }
-    
-    public void hideView(){
+
+    public void hideView() {
         hideEmojiView();
         hideRlRecord();
     }
 
-    public boolean isShow(){
-        if (emojiView.isShown() || mRlRecord.isShown()){
+    public boolean isShow() {
+        if (emojiView.isShown() || mRlRecord.isShown()) {
             return true;
         }
         return false;
@@ -725,8 +777,8 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
 //                    SpannableString spannableString = EmojiUtils.parseEmoji(getContext(), str);
 //                    etChatSnedMsg.setText(spannableString);
 //                    etChatSnedMsg.setSelection(spannableString.length());
-                    if (onSendMessageListener != null){
-                        onSendMessageListener.onEmojiMessage(str,position);
+                    if (onSendMessageListener != null) {
+                        onSendMessageListener.onEmojiMessage(str, position);
                     }
                 }
             } else {
@@ -748,9 +800,10 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
     /**
      * 发送消息回调接口
      */
-    public interface OnSendMessageListener{
+    public interface OnSendMessageListener {
         void onSendMessage(Message message);
-        void onEmojiMessage(String str,int position);
+
+        void onEmojiMessage(String str, int position);
     }
 
     public OnSendMessageListener onSendMessageListener;
@@ -769,6 +822,10 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
     }
 
     private void playVoice() {
+        if (isPlaying) {
+            AudioUtils.getInstance().stop();
+            return;
+        }
         if (voiceMessage == null) return;
         FileMessageBody voiceMessageBody = (FileMessageBody) voiceMessage.getBody();
         String voicePath = "";
@@ -779,6 +836,8 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
         } else if (new File(voicePath2).exists()) {
             voicePath = voicePath2;
         }
+        voiceDuration = FileUtils.getAmrDuration(voicePath) - 1;
+        startTime = voiceDuration;
         AudioUtils.getInstance().play(voicePath, new AudioUtils.PlayStatusListener() {
             @Override
             public void playEnd() {
@@ -788,7 +847,19 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
             @Override
             public void playStart() {
                 startPlayRecordering();
+                handler.sendEmptyMessageDelayed(1, 1000);
             }
         });
+    }
+
+    private void showDeleteRecoredVoiceDialog() {
+        DeleteVoiceDialog deleteVoiceDialog = new DeleteVoiceDialog(getContext());
+        deleteVoiceDialog.setOnDialogCallBack(new DeleteVoiceDialog.OnDialogCallBack() {
+            @Override
+            public void onCallBack(String content) {
+                resetRecordering();
+            }
+        });
+        deleteVoiceDialog.show();
     }
 }

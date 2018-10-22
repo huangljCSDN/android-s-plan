@@ -34,6 +34,7 @@ public class Constants {
     public static final int REQUEST_CODE_CAMERA = 101; //相机
     public static final int REQUEST_CODE_PICKER = 102; //相册
     public static final int REQUEST_CODE_PREVIEW = 103; //发布照片预览
+    public static final int REQUEST_CODE_VISIBLE = 104; //发布动态权限
 
 
     /**

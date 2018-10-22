@@ -72,9 +72,11 @@
     <string name="tip_publish_null_content">不能发布视频、照片或文案为空的内容哦</string>
     <string name="i_know">我知道了</string>
     <string name="tip_exit_edit">退出此次编辑?</string>
-    <string name="tip_delete_voice">确定要上出此条音频吗?</string>
+    <string name="tip_delete_voice">确定要删除此条音频吗?</string>
     <string name="recoreding_voice">录制中</string>
     <string name="recoreding_voice_completed">录制完成</string>
     <string name="playing_voice">播放中</string>
     <string name="playing_voice_end">播放完成</string>
+    <string name="all_see">所有人可见</string>
+    <string name="only_me_see">仅自己可见</string>
 </resources>

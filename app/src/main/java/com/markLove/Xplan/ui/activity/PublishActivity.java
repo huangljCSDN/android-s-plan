@@ -71,6 +71,7 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
     private int voiceDuration;
     private MyHandler handler = new MyHandler(this);
     private int startTime;
+    private int visible;
 
     @Override
     protected int getContentViewId() {
@@ -140,6 +141,7 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
                 publish();
                 break;
             case R.id.tv_open:
+                startSetPermissionActivity();
                 break;
             case R.id.ll_location:
                 break;
@@ -152,6 +154,12 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
                 playVoice();
                 break;
         }
+    }
+
+    private void startSetPermissionActivity(){
+        Intent intent = new Intent(this,SetPermissionActivity.class);
+        intent.putExtra("visible",visible);
+        startActivityForResult(intent,Constants.REQUEST_CODE_VISIBLE);
     }
 
     void createAdapter() {
@@ -309,6 +317,14 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
             if (requestCode == Constants.REQUEST_CODE_PREVIEW) {
                 photoList = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
                 gridAdapter.setData(photoList);
+            }
+            if (requestCode == Constants.REQUEST_CODE_VISIBLE) {
+                visible = data.getIntExtra("visible",0);
+                if (visible == 0){
+                    mTvOpen.setText(getString(R.string.open));
+                } else {
+                    mTvOpen.setText(getString(R.string.only_me_see));
+                }
             }
 
             if (resultCode == 102) {
@@ -515,6 +531,7 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
     protected void onDestroy() {
         handler.removeCallbacksAndMessages(null);
         handler = null;
+        chatView.onDestroy();
         super.onDestroy();
     }
 }

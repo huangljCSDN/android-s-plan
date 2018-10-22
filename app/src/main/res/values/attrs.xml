@@ -35,4 +35,11 @@
         <attr name="cornerRadius" format="dimension" />
         <attr name="halfBaseOfLeg" format="dimension" />
     </declare-styleable>
+
+    <declare-styleable name="CircleProgressbar">
+        <attr name="radiu" format="dimension" />
+        <attr name="stroke_Width" format="dimension" />
+        <attr name="ringColor" format="color" />
+        <attr name="textColor" format="color" />
+    </declare-styleable>
 </resources>
