@@ -55,6 +55,7 @@ import com.markLove.Xplan.utils.DensityUtils;
 import com.markLove.Xplan.utils.ImageUtils;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
+import com.markLove.Xplan.utils.StatusBarUtil;
 import com.markLove.Xplan.utils.ToastUtils;
 
 import java.util.ArrayList;
@@ -107,6 +108,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 
     @Override
     protected void init(Bundle savedInstanceState) {
+        StatusBarUtil.setStatusBarColor(this,R.color.color_17204C);
         rlChatMsgList = findViewById(R.id.chat_msg_list);
         mTvShopName = findViewById(R.id.tv_shop_name);
         mTvAllPersonCount = findViewById(R.id.tv_person_count);
@@ -701,7 +703,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
                 if (!writeGranted) {
                     size2++;
                 }
-                //录音权限
+                //录音权限fvf
                 int recordPermissionResult = grantResults[1];
                 boolean recordPermissionGranted = recordPermissionResult == PackageManager.PERMISSION_GRANTED;
                 if (!recordPermissionGranted) {

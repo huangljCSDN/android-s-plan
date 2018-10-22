@@ -48,6 +48,7 @@ import com.markLove.Xplan.utils.DensityUtils;
 import com.markLove.Xplan.utils.ImageUtils;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
+import com.markLove.Xplan.utils.StatusBarUtil;
 import com.markLove.Xplan.utils.ToastUtils;
 
 import java.util.ArrayList;
@@ -100,6 +101,7 @@ public class CpChatActivity extends BaseActivity<CpChatPresenter> implements Vie
 
     @Override
     protected void init(Bundle savedInstanceState) {
+        StatusBarUtil.setStatusBarColor(this,R.color.color_12032C);
         rlChatMsgList = findViewById(R.id.chat_msg_list);
         mRlTitleBar = findViewById(R.id.rl_title_bar);
         mRlCancel = findViewById(R.id.rl_cancel);

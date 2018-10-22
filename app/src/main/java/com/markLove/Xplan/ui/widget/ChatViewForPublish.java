@@ -15,7 +15,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
-import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -40,6 +39,7 @@ import com.markLove.Xplan.base.App;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.Recorder;
 import com.markLove.Xplan.bean.msg.Message;
+import com.markLove.Xplan.bean.msg.body.FileMessageBody;
 import com.markLove.Xplan.config.Constants;
 import com.markLove.Xplan.module.emoji.EmojiOnClickListener;
 import com.markLove.Xplan.module.emoji.EmojiUtils;
@@ -76,9 +76,13 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
     private ImageView mIvEmoji, mIvRecord;
     private EmojiPointerView llChatEmojiPoint;
     private ImageView tvChatSend;
+    private ImageView ivDeleteVoice,ivConfirmVoice;
+    private Message voiceMessage;
+
     int moveY = 0;
     boolean isRecordering = false;
     boolean isEnd = false;
+    boolean isPlaying = false;
     boolean isLikeAndUser = false;
     boolean toUserIDIsLove = false;
     boolean meIsLove = false;
@@ -114,6 +118,8 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
         mIvRecord = findViewById(R.id.iv_record);
         mIvEmoji = findViewById(R.id.iv_emoji);
         tvChatSend = findViewById(R.id.btn_send);
+        ivConfirmVoice = findViewById(R.id.iv_confirm_voice);
+        ivDeleteVoice = findViewById(R.id.iv_delete_voice);
         etChatSnedMsg.clearFocus();
         mAudioRecorderButton = findViewById(R.id.id_recorder_button);
 
@@ -123,6 +129,10 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
         findViewById(R.id.fl_pic).setOnClickListener(this);
         findViewById(R.id.fl_emoji).setOnClickListener(this);
         findViewById(R.id.btn_send).setOnClickListener(this);
+        findViewById(R.id.btn_send).setOnClickListener(this);
+        findViewById(R.id.btn_send).setOnClickListener(this);
+        findViewById(R.id.iv_confirm_voice).setOnClickListener(this);
+        findViewById(R.id.iv_delete_voice).setOnClickListener(this);
 
         initVoice();
         initEmoji();
@@ -178,6 +188,12 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
                 break;
             case R.id.btn_send:
                 send();
+                break;
+            case R.id.iv_confirm_voice:
+                resetRecordering();
+                break;
+            case R.id.iv_delete_voice:
+                resetRecordering();
                 break;
         }
     }
@@ -267,8 +283,8 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
      */
     public void startRecordering() {
         mTvRecordTime.setText("");
-        mTvRecordTime.setVisibility(View.VISIBLE);
-        mTvRecordTip.setText(getString(R.string.cancel_send));
+        mTvRecordTip.setText(getString(R.string.recoreding_voice));
+        mAudioRecorderButton.setImageResource(R.drawable.ic_recoreding);
     }
 
     /**
@@ -276,8 +292,46 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
      */
     public void stopRecordering() {
         isEnd = true;
-        mTvRecordTime.setVisibility(View.GONE);
+        mTvRecordTip.setText(getString(R.string.recoreding_voice_completed));
+        ivDeleteVoice.setVisibility(VISIBLE);
+        ivConfirmVoice.setVisibility(VISIBLE);
+        mAudioRecorderButton.setImageResource(R.drawable.ic_recoreded);
+        handler.removeMessages(0);
+    }
+
+    /**
+     * 重置录音
+     */
+    public void resetRecordering(){
+        if (isPlaying){
+            AudioUtils.getInstance().stop();
+        }
+        isEnd = false;
         mTvRecordTip.setText(getString(R.string.pressed_say));
+        ivDeleteVoice.setVisibility(GONE);
+        ivConfirmVoice.setVisibility(GONE);
+        mTvRecordTime.setText("0S");
+        mAudioRecorderButton.setImageResource(R.drawable.ic_recored);
+    }
+
+    /**
+     * 开始播放录音
+     */
+    public void startPlayRecordering() {
+        isPlaying = true;
+        mTvRecordTime.setText("");
+        mTvRecordTip.setText(getString(R.string.playing_voice));
+        mAudioRecorderButton.setImageResource(R.drawable.ic_recoreding);
+    }
+
+    /**
+     * 播放结束
+     */
+    public void endPlayRecordering() {
+        isPlaying = false;
+        mTvRecordTime.setText("");
+        mTvRecordTip.setText(getString(R.string.playing_voice_end));
+        mAudioRecorderButton.setImageResource(R.drawable.ic_recoreded);
     }
 
     private String getString(@StringRes int resId){
@@ -312,7 +366,7 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
         } else if (AudioUtils.getInstance().getCurrentTimeInterval() >= AudioUtils.MAX_VOICE_TIME) {
             isEnd = true;
         }
-        mTvRecordTime.setText(showTimeCount(AudioUtils.getInstance().getCurrentTimeInterval() * 1000));
+        mTvRecordTime.setText(showTimeCount(AudioUtils.getInstance().getCurrentTimeInterval() * 1000) +"s");
         if (isEnd) {
             if (isRecordering) {
                 AudioUtils.getInstance().stopRecording();
@@ -343,9 +397,10 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
         long secc = (time - hourc * 3600000 - minuec * 60000) / 1000;
         String sec = "0" + secc;
         System.out.println("sec=" + sec);
+
         sec = sec.substring(sec.length() - 2, sec.length());
         System.out.println("sec2=" + sec);
-        timeCount = minue + ":" + sec;
+        timeCount = sec;
         System.out.println("timeCount=" + timeCount);
         return timeCount;
     }
@@ -368,17 +423,21 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
                 } else {
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
-                            AudioUtils.getInstance().startRecording(audioRecoderListener);
+                            if (!isEnd){
+                                AudioUtils.getInstance().startRecording(audioRecoderListener);
+                            }else  {
+                                playVoice();
+                            }
                             break;
                         case MotionEvent.ACTION_MOVE:
-                            moveY = (int) event.getY();
-                            //当滑动的距离超出父容器的距离，则取消发送
-                            if (moveY < 0 && Math.abs(moveY) > v.getTop()) {
-                                isRecordering = false;
-                            } else {
-                                isRecordering = true;
-                            }
-                            setVoiceState();
+//                            moveY = (int) event.getY();
+//                            //当滑动的距离超出父容器的距离，则取消发送
+//                            if (moveY < 0 && Math.abs(moveY) > v.getTop()) {
+//                                isRecordering = false;
+//                            } else {
+//                                isRecordering = true;
+//                            }
+//                            setVoiceState();
                             break;
                         case MotionEvent.ACTION_UP:
                             if (!isEnd) {
@@ -434,7 +493,7 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
             File file = new File(voicePath);
             if (file.exists() && file.length() > 0) {
                 String voiceName = voicePath.substring(voicePath.lastIndexOf("/") + 1, voicePath.length());
-                final Message voiceMessage = Message.createVoiceMessage(Message.Type.CHAT, me_user_id, to_user_id, voiceName, voicePath);
+                voiceMessage = Message.createVoiceMessage(Message.Type.CHAT, me_user_id, to_user_id, voiceName, voicePath);
                 voiceMessage.setStatus(Message.ChatStatus.SENDING);
 //                judeBlackList(voiceMessage);
                 if (onSendMessageListener != null){
@@ -483,12 +542,28 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
      */
     private void startPickerActivity() {
         Intent intent = new Intent(getActivity(), PickerActivity.class);
-        intent.putExtra(PickerConfig.SELECT_MODE, PickerConfig.PICKER_IMAGE_VIDEO);//default image and video (Optional)
+        intent.putExtra(PickerConfig.SELECT_MODE, PickerConfig.PICKER_IMAGE);//default image and video (Optional)
         long maxSize = 188743680L;//long long long
         intent.putExtra(PickerConfig.MAX_SELECT_SIZE, maxSize); //default 180MB (Optional)
         intent.putExtra(PickerConfig.MAX_SELECT_COUNT, 15);  //default 40 (Optional)
         intent.putExtra(PickerConfig.DEFAULT_SELECTED_LIST, select); // (Optional)
-        getActivity().startActivityForResult(intent, Constants.REQUEST_CODE_PICKER);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager
+                    .PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager
+                            .PERMISSION_GRANTED) {
+                getActivity().startActivityForResult(intent, Constants.REQUEST_CODE_PICKER);
+            } else {
+                //不具有获取权限，需要进行权限申请
+                ActivityCompat.requestPermissions(getActivity(), new String[]{
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                }, Constants.REQUEST_CODE_PERMISSION_ONE);
+            }
+        } else {
+            getActivity().startActivityForResult(intent, Constants.REQUEST_CODE_PICKER);
+        }
     }
 
     /**
@@ -691,5 +766,29 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
                 imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
             }
         }
+    }
+
+    private void playVoice() {
+        if (voiceMessage == null) return;
+        FileMessageBody voiceMessageBody = (FileMessageBody) voiceMessage.getBody();
+        String voicePath = "";
+        String voicePath1 = Constants.LOCAL_VOICE_PATH + voiceMessageBody.getFileName();
+        String voicePath2 = getContext().getExternalFilesDir("voice").getAbsolutePath() + File.separator + voiceMessageBody.getFileName();
+        if (new File(voicePath1).exists()) {
+            voicePath = voicePath1;
+        } else if (new File(voicePath2).exists()) {
+            voicePath = voicePath2;
+        }
+        AudioUtils.getInstance().play(voicePath, new AudioUtils.PlayStatusListener() {
+            @Override
+            public void playEnd() {
+                endPlayRecordering();
+            }
+
+            @Override
+            public void playStart() {
+                startPlayRecordering();
+            }
+        });
     }
 }

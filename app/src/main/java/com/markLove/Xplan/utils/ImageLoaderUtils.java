@@ -228,4 +228,12 @@ public class ImageLoaderUtils {
                 .into(imageView);
     }
 
+    public static void displayLocationRoundImage(Context context, String path, ImageView imageView) {
+        Glide.with(context).load(path)
+                .apply(RequestOptions.placeholderOf(R.drawable.icon_loading_default))
+                .apply(RequestOptions.errorOf(R.drawable.icon_loading_default))
+                .apply(RequestOptions.bitmapTransform(new GlideRoundImage(context)))
+                .into(imageView);
+    }
+
 }

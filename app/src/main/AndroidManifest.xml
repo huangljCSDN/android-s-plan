@@ -53,6 +53,7 @@
         <activity android:name=".ui.activity.TestActivity" />
         <activity android:name=".ui.activity.PublishActivity" />
         <activity android:name=".ui.activity.UserInfoActivity"></activity>
+        <activity android:name=".ui.activity.PublishPreviewActivity"></activity>
     </application>
 
 </manifest>

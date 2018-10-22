@@ -73,4 +73,8 @@
     <string name="i_know">我知道了</string>
     <string name="tip_exit_edit">退出此次编辑?</string>
     <string name="tip_delete_voice">确定要上出此条音频吗?</string>
+    <string name="recoreding_voice">录制中</string>
+    <string name="recoreding_voice_completed">录制完成</string>
+    <string name="playing_voice">播放中</string>
+    <string name="playing_voice_end">播放完成</string>
 </resources>
