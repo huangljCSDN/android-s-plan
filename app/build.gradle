@@ -3,10 +3,10 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         config {
-            keyAlias 'android'
-            keyPassword 'salesman123$$'
-            storePassword 'salesman123$$'
-            storeFile file('sctek_salesman.keystore')
+            keyAlias 'xplan'
+            keyPassword 'xplan123'
+            storePassword 'xplan123'
+            storeFile file('xplan.kjs')
         }
     }
 
@@ -41,6 +41,7 @@ android {
         release {
             debuggable false
             minifyEnabled false
+            signingConfig signingConfigs.config
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField(STRING, APP_HOST, '"http://120.76.228.171:8080/xplay/"')
         }
@@ -73,7 +74,9 @@ dependencies {
     //修改状态栏的颜色
     implementation 'com.readystatesoftware.systembartint:systembartint:1.0.4'
     //压缩
-    compile 'top.zibin:Luban:1.1.7'
+    implementation 'top.zibin:Luban:1.1.7'
+    implementation 'com.amap.api:search:latest.integration'
+    implementation 'com.amap.api:location:latest.integration'
 
     implementation project(':mediapicker')
     implementation project(':camera')

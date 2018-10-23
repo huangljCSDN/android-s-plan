@@ -2,14 +2,11 @@ package com.markLove.Xplan.api.util;
 
 import android.util.Log;
 
-import com.markLove.Xplan.api.RetrofitApiService;
-
 import java.io.IOException;
 
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
-import retrofit2.Call;
 
 /**
  * Created by huanglingjun on 2018/5/15.
@@ -27,7 +24,7 @@ public class TokenInterceptor implements Interceptor {
             String newToken = getNewToken();
             Request newRequest = chain.request()
                     .newBuilder()
-                    .header("token",newToken)
+//                    .header("token",newToken)
 //                    .header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
 //                    .header("Accept-Encoding", "gzip, deflate")
                     .build();
@@ -43,13 +40,14 @@ public class TokenInterceptor implements Interceptor {
      * @throws IOException
      */
     private String getNewToken() throws IOException{
-        String refreshToken = "12412414";
-        // 通过一个特定的接口获取新的token，此处要用到同步的retrofit请求
-        RetrofitApiService service = RetrofitUtil.getInstance().getApiServer(RetrofitApiService.class);
-        Call<String> call = service.refreshToken(refreshToken);
-
-        //要用retrofit的同步方式
-        String newToken = call.execute().body();
+//        String refreshToken = "12412414";
+//        // 通过一个特定的接口获取新的token，此处要用到同步的retrofit请求
+//        RetrofitApiService service = RetrofitUtil.getInstance().getApiServer(RetrofitApiService.class);
+//        Call<String> call = service.refreshToken(refreshToken);
+//
+//        //要用retrofit的同步方式
+//        String newToken = call.execute().body();
+        String newToken = "";
 
         return newToken;
     }

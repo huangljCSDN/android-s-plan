@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by dmcBig on 2017/8/9.
+ * Created by huanglingjun on 2018/10/13.
  */
 
 public class PublishPreviewActivity extends FragmentActivity implements View.OnClickListener, ViewPager.OnPageChangeListener {

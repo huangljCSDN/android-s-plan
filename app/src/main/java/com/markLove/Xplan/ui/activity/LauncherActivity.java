@@ -13,7 +13,7 @@ import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseActivity;
 
-public class LauncherActivity extends BaseActivity implements View.OnClickListener{
+public class LauncherActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     protected int getContentViewId() {
@@ -30,7 +30,7 @@ public class LauncherActivity extends BaseActivity implements View.OnClickListen
         findViewById(R.id.textView).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(LauncherActivity.this,TestActivity.class);
+                Intent intent = new Intent(LauncherActivity.this, TestActivity.class);
                 LauncherActivity.this.startActivity(intent);
             }
         });
@@ -43,13 +43,13 @@ public class LauncherActivity extends BaseActivity implements View.OnClickListen
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.btn_login:
-                Intent intent = new Intent(this,LoginActivity.class);
+                Intent intent = new Intent(this, LoginActivity.class);
                 startActivity(intent);
                 break;
             case R.id.btn_register:
-                Intent intent2 = new Intent(this,RegisterActivity.class);
+                Intent intent2 = new Intent(this, RegisterActivity.class);
                 startActivity(intent2);
                 break;
         }
@@ -64,14 +64,23 @@ public class LauncherActivity extends BaseActivity implements View.OnClickListen
                     ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager
                             .PERMISSION_GRANTED &&
                     ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager
+                            .PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager
+                            .PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager
+                            .PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager
                             .PERMISSION_GRANTED) {
-            } else {
+            } else{
                 //不具有获取权限，需要进行权限申请
                 ActivityCompat.requestPermissions(this, new String[]{
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
                         Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.RECORD_AUDIO,
                         Manifest.permission.CAMERA,
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.READ_PHONE_STATE,
                 }, 100);
             }
         }

@@ -1,14 +1,7 @@
 package com.markLove.Xplan.mvp.presenter;
 
-import android.util.Log;
-
 import com.markLove.Xplan.api.util.RequestCallBack;
-import com.markLove.Xplan.bean.MerchantBean;
-import com.markLove.Xplan.bean.PostQueryInfo;
-import com.markLove.Xplan.bean.UserBean;
-import com.markLove.Xplan.mvp.contract.MainContract;
 import com.markLove.Xplan.mvp.contract.SearchContract;
-import com.markLove.Xplan.mvp.model.MainModel;
 import com.markLove.Xplan.mvp.model.SearchModel;
 import com.markLove.Xplan.utils.LogUtils;
 
@@ -33,8 +26,9 @@ public class SearchPresenter extends SearchContract.Presenter {
         mModel.getNearMerchant(map, new RequestCallBack<Object>() {
             @Override
             public void onSuccess(Object json) {
+                LogUtils.i("SearchPresenter",json.toString());
                 getView().hideLoading();
-//                getView().refreshMerchantList(json);
+                getView().refreshMerchantList(json.toString());
             }
 
             @Override
@@ -52,9 +46,10 @@ public class SearchPresenter extends SearchContract.Presenter {
 
         mModel.getNearUser(map, new RequestCallBack<Object>() {
             @Override
-            public void onSuccess(Object o) {
+            public void onSuccess(Object json) {
+                LogUtils.i("SearchPresenter",json.toString());
                 getView().hideLoading();
-                getView().refreshUserList(o.toString());
+                getView().refreshUserList(json.toString());
             }
 
             @Override
@@ -73,13 +68,14 @@ public class SearchPresenter extends SearchContract.Presenter {
         mModel.getMerchantUserList(map, new RequestCallBack<Object>() {
             @Override
             public void onSuccess(Object json) {
+                LogUtils.i("SearchPresenter",json.toString());
                 getView().hideLoading();
-//                getView().refreshUserList(json);
+                getView().refreshUserList(json.toString());
             }
 
             @Override
             public void onFail(String result) {
-                Log.i("MainPresenter",result);
+                LogUtils.i("SearchPresenter",result);
                 getView().hideLoading();
                 getView().showError(result);
             }

@@ -4,9 +4,7 @@ import com.markLove.Xplan.api.util.RequestCallBack;
 import com.markLove.Xplan.base.mvp.BaseModel;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.mvp.BaseView;
-import com.markLove.Xplan.bean.BaseMsgBean;
-import com.markLove.Xplan.bean.MerchantBean;
-import com.markLove.Xplan.bean.UserBean;
+import com.markLove.Xplan.bean.BaseBean;
 
 import java.util.Map;
 
@@ -18,8 +16,8 @@ import retrofit2.http.QueryMap;
 public interface GroupChatContract {
 
     interface View extends BaseView {
-        void onJoinGroup(BaseMsgBean baseMsgBean);
-        void onParticipateGroup(BaseMsgBean baseMsgBean);
+        void onJoinGroup(BaseBean baseBean);
+        void onParticipateGroup(BaseBean baseBean);
     }
 
     abstract class Model extends BaseModel {

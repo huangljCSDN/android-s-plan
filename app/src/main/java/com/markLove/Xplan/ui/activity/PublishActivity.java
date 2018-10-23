@@ -18,17 +18,22 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amap.api.location.AMapLocation;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.adapter.SpacingDecoration;
 import com.dmcbig.mediapicker.entity.Media;
 import com.markLove.Xplan.R;
-import com.markLove.Xplan.base.mvp.BasePresenter;
+import com.markLove.Xplan.base.App;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.msg.Message;
 import com.markLove.Xplan.bean.msg.body.FileMessageBody;
 import com.markLove.Xplan.config.Constants;
 import com.markLove.Xplan.module.emoji.EmojiUtils;
 import com.markLove.Xplan.module.image.IImageCompressor;
+import com.markLove.Xplan.mvp.contract.FileContract;
+import com.markLove.Xplan.mvp.contract.PublishContract;
+import com.markLove.Xplan.mvp.presenter.FilePresenter;
+import com.markLove.Xplan.mvp.presenter.PublishPresenter;
 import com.markLove.Xplan.ui.adapter.PublishMediaGridAdapter;
 import com.markLove.Xplan.ui.dialog.ContentEmptyDialog;
 import com.markLove.Xplan.ui.dialog.DeleteVoiceDialog;
@@ -38,11 +43,14 @@ import com.markLove.Xplan.utils.AudioUtils;
 import com.markLove.Xplan.utils.FileUtils;
 import com.markLove.Xplan.utils.ImageUtils;
 import com.markLove.Xplan.utils.LogUtils;
+import com.markLove.Xplan.utils.ToastUtils;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -55,10 +63,12 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * 发布动态
  */
-public class PublishActivity extends BaseActivity implements View.OnClickListener {
+public class PublishActivity extends BaseActivity<PublishPresenter> implements View.OnClickListener,PublishContract.View,FileContract.View {
     private ImageView mIvHead;
+    private ImageView mIvLocation;
     private TextView mTvPublish, mTvOpen;
     private TextView mTvVoice;
+    private TextView mTvLocation;
     private EditText mEditext;
     private RecyclerView mRecycleView;
     private LinearLayout mLocation;
@@ -69,9 +79,14 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
     private ArrayList<Media> photoList = new ArrayList<>();
     private Message voiceMessage;
     private int voiceDuration;
+    private int videoDuration;
     private MyHandler handler = new MyHandler(this);
+    private FilePresenter filePresenter;
     private int startTime;
     private int visible;
+    //1：图片，2：视频(第一个文件是视频，第二个是缩略图)，3：语音
+    private int type;
+    private String city;
 
     @Override
     protected int getContentViewId() {
@@ -87,6 +102,8 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
         mRecycleView = findViewById(R.id.recyclerView);
         chatView = findViewById(R.id.chatview);
         mTvVoice = findViewById(R.id.tv_voice);
+        mTvLocation = findViewById(R.id.tv_location);
+        mIvLocation = findViewById(R.id.iv_location);
 
         mTvPublish.setOnClickListener(this);
         mTvOpen.setOnClickListener(this);
@@ -94,10 +111,15 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
         findViewById(R.id.ll_location).setOnClickListener(this);
         findViewById(R.id.fl_back).setOnClickListener(this);
 
-        Media media = new Media("", "", 0, 999, 0, R.drawable.ic_add_img, "");
-        mediaList.add(media);
         initSoftKeyboard();
+        setListener();
+        createAdapter();
 
+        filePresenter = new FilePresenter();
+        filePresenter.attachView(this);
+    }
+
+    private void setListener(){
         chatView.setOnSendMessageListener(new ChatViewForPublish.OnSendMessageListener() {
             @Override
             public void onSendMessage(Message message) {
@@ -113,8 +135,9 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
                 } else if (new File(voicePath2).exists()) {
                     voicePath = voicePath2;
                 }
-                voiceDuration = FileUtils.getAmrDuration(voicePath) - 1;
-                mTvVoice.setText((voiceDuration > 60 ? 60 : voiceDuration) + "\"");
+                voiceDuration = FileUtils.getAmrDuration(voicePath);
+                mTvVoice.setText((voiceDuration > 60 ? 60 : voiceDuration - 1) + "\"");
+                type = 3;
             }
 
             @Override
@@ -125,13 +148,12 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
                 mEditext.setSelection(spannableString.length());
             }
         });
-
-        createAdapter();
     }
 
+
     @Override
-    public BasePresenter onCreatePresenter() {
-        return null;
+    public PublishPresenter onCreatePresenter() {
+        return new PublishPresenter();
     }
 
     @Override
@@ -144,6 +166,7 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
                 startSetPermissionActivity();
                 break;
             case R.id.ll_location:
+                getLocation();
                 break;
             case R.id.fl_back:
                 if (!checkContentIsEmpty()) {
@@ -156,10 +179,21 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
         }
     }
 
-    private void startSetPermissionActivity(){
-        Intent intent = new Intent(this,SetPermissionActivity.class);
-        intent.putExtra("visible",visible);
-        startActivityForResult(intent,Constants.REQUEST_CODE_VISIBLE);
+    private void getLocation(){
+        AMapLocation aMapLocation = App.getInstance().getaMapLocation();
+        if (aMapLocation != null){
+            city = aMapLocation.getCity();
+            mTvLocation.setText(city);
+            mIvLocation.setSelected(true);
+        } else {
+            ToastUtils.showShort(this,"获取定位失败");
+        }
+    }
+
+    private void startSetPermissionActivity() {
+        Intent intent = new Intent(this, SetPermissionActivity.class);
+        intent.putExtra("visible", visible);
+        startActivityForResult(intent, Constants.REQUEST_CODE_VISIBLE);
     }
 
     void createAdapter() {
@@ -173,7 +207,7 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
         ArrayList<Media> medias = new ArrayList<>();
 //        ArrayList<Media> select = argsIntent.getParcelableArrayListExtra(PickerConfig.DEFAULT_SELECTED_LIST);
         ArrayList<Media> select = new ArrayList<>();
-        int maxSelect = 8;
+        int maxSelect = 9;
         long maxSize = 999999;
         gridAdapter = new PublishMediaGridAdapter(medias, this, select, maxSelect, maxSize);
         mRecycleView.setAdapter(gridAdapter);
@@ -194,13 +228,44 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
     }
 
     private void publish() {
-        if (checkContentIsEmpty()) {
-
+        if (!checkContentIsEmpty()) {
+//            if ()
         } else {
             showContentEmptyDialog();
         }
     }
 
+    /**
+     * 网络请求:发布
+     */
+    private void addLocus(){
+        Map<String,String> map = new HashMap<>();
+//            map.put("path",mediaList);
+        //1：图片，2：视频(第一个文件是视频，第二个是缩略图)，3：语音
+        map.put("type",String.valueOf(type));
+        //上传视频/语音时长
+        if (type == 2){
+            map.put("duration", String.valueOf(videoDuration));
+        } else if (type == 3){
+            map.put("duration",String.valueOf(voiceDuration));
+        }
+        map.put("content",mEditext.getText().toString().trim());
+        map.put("address",city);
+        map.put("visible",String.valueOf(visible));
+        mPresenter.addLocus(map);
+    }
+
+    private void upload(){
+        Map<String,String> map = new HashMap<>();
+        map.put("file",String.valueOf(visible));
+//        map.put("Token",token);
+        mPresenter.addLocus(map);
+    }
+
+    /**
+     * 校验发布的内容是否为空
+     * @return
+     */
     public boolean checkContentIsEmpty() {
         int count = 0;
         if (mEditext.getText().toString().trim().isEmpty()) {
@@ -208,6 +273,10 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
         }
 
         if (mediaList.size() > 1) {
+            count++;
+        }
+
+        if (voiceMessage != null) {
             count++;
         }
 
@@ -292,6 +361,8 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
                     photoList.clear();
                     Media media = new Media(path, "", 0, 3, 999, 9999, "");
                     photoList.add(media);
+                    videoDuration = FileUtils.getAmrDuration(path);
+                    type = 2;
                 } else {
                     //视频图片不能同时存在
                     if (photoList.get(0).mediaType == 3) {
@@ -299,6 +370,7 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
                     }
                     Media media = new Media(path, "", 0, 2, 999, 9999, "");
                     photoList.add(media);
+                    type = 1;
                 }
                 gridAdapter.setData(photoList);
             }
@@ -312,6 +384,7 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
                 for (final Media media : select) {
                     onImageReturn(null, media.path, isOrigin);
                 }
+                type = 1;
             }
 
             if (requestCode == Constants.REQUEST_CODE_PREVIEW) {
@@ -319,8 +392,8 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
                 gridAdapter.setData(photoList);
             }
             if (requestCode == Constants.REQUEST_CODE_VISIBLE) {
-                visible = data.getIntExtra("visible",0);
-                if (visible == 0){
+                visible = data.getIntExtra("visible", 0);
+                if (visible == 0) {
                     mTvOpen.setText(getString(R.string.open));
                 } else {
                     mTvOpen.setText(getString(R.string.only_me_see));
@@ -484,15 +557,30 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
         AudioUtils.getInstance().play(voicePath, new AudioUtils.PlayStatusListener() {
             @Override
             public void playEnd() {
-                mTvVoice.setText((voiceDuration > 60 ? 60 : voiceDuration) + "\"");
+                mTvVoice.setText((voiceDuration > 60 ? 60 : voiceDuration -1) + "\"");
             }
 
             @Override
             public void playStart() {
-                startTime = voiceDuration;
-                handler.sendEmptyMessageDelayed(1,1000);
+                startTime = voiceDuration -1;
+                handler.sendEmptyMessageDelayed(1, 1000);
             }
         });
+    }
+
+    @Override
+    public void uploadSuccess(String json) {
+
+    }
+
+    @Override
+    public void downloadSuccess(String json) {
+
+    }
+
+    @Override
+    public void refreshUI(String json) {
+
     }
 
 
@@ -508,19 +596,19 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
             super.handleMessage(msg);
             switch (msg.what) {
                 case 1:
-                    startTime --;
+                    startTime--;
                     mActivity.get().setRecorderingTime(startTime);
                     handler.removeMessages(1);
-                    if (startTime > 0){
-                        handler.sendEmptyMessageDelayed(1,1000);
+                    if (startTime > 0) {
+                        handler.sendEmptyMessageDelayed(1, 1000);
                     }
                     break;
             }
         }
     }
 
-    private void setRecorderingTime(int time){
-        if (time > 0){
+    private void setRecorderingTime(int time) {
+        if (time > 0) {
             mTvVoice.setText(time + "\"");
         } else {
             mTvVoice.setText(0 + "\"");
@@ -532,6 +620,7 @@ public class PublishActivity extends BaseActivity implements View.OnClickListene
         handler.removeCallbacksAndMessages(null);
         handler = null;
         chatView.onDestroy();
+        filePresenter.detachView();
         super.onDestroy();
     }
 }

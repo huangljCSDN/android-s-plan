@@ -7,10 +7,11 @@ import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
+import com.amap.api.location.AMapLocation;
 import com.cjt2325.cameralibrary.util.LogUtil;
 import com.markLove.Xplan.R;
+import com.markLove.Xplan.base.App;
 import com.markLove.Xplan.base.ui.BaseFragment;
 import com.markLove.Xplan.bean.MerchantBean;
 import com.markLove.Xplan.bean.NearUserBean;
@@ -23,8 +24,8 @@ import com.markLove.Xplan.mvp.presenter.SearchPresenter;
 import com.markLove.Xplan.ui.activity.GoodPlayActivity;
 import com.markLove.Xplan.ui.activity.LoverActivity;
 import com.markLove.Xplan.ui.activity.PlayersActivity;
-import com.markLove.Xplan.ui.adapter.UserListAdapter;
 import com.markLove.Xplan.ui.adapter.MerchantListAdapter;
+import com.markLove.Xplan.ui.adapter.UserListAdapter;
 import com.markLove.Xplan.utils.GsonUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
 
@@ -52,8 +53,8 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
     private List<MerchantBean> merchantBeanList = new ArrayList<>();
     private UserListAdapter userListAdapter;
     private MerchantListAdapter merchantListAdapter;
-    private SwipeRefreshLayout refreshLayoutOne;
-    private SwipeRefreshLayout refreshLayoutTwo;
+    private SwipeRefreshLayout refreshLayoutMerchant;
+    private SwipeRefreshLayout refreshLayoutUser;
     // 0：全部 1：男 2：女
     private int selectType;
     private int currentUserPage = 1;
@@ -65,8 +66,9 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
     private boolean isSearchMerchantUser;
     private boolean isOnlyRefreshMerchant;
     private String token;
-    private boolean isTouchUserList = true;
+    private boolean isTouchUserList = false;
     private boolean isTouchMerchantList = false;
+    private boolean isTouchAll = true;
 
     @Override
     public SearchPresenter onCreatePresenter() {
@@ -81,24 +83,19 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
     @Override
     protected void init(View view) {
         btnAll = view.findViewById(R.id.btn_all);
-        btnBoy = view.findViewById(R.id.btn_boy);
-        btnGirl = view.findViewById(R.id.btn_girl);
-        refreshLayoutOne = view.findViewById(R.id.refresh_layout_one);
-        refreshLayoutTwo = view.findViewById(R.id.refresh_layout_two);
+        refreshLayoutMerchant = view.findViewById(R.id.refresh_layout_one);
+        refreshLayoutUser = view.findViewById(R.id.refresh_layout_two);
 
         btnAll.setOnClickListener(this);
-        btnBoy.setOnClickListener(this);
-        btnGirl.setOnClickListener(this);
         view.findViewById(R.id.tv_play).setOnClickListener(this);
         view.findViewById(R.id.tv_players).setOnClickListener(this);
         view.findViewById(R.id.tv_find_cp).setOnClickListener(this);
 
         btnAll.setSelected(true);
-        btnBoy.setSelected(false);
-        btnGirl.setSelected(false);
 
-        initCrOne(view);
-        initCrTwo(view);
+        initCrMerchant(view);
+        initCrUser(view);
+
 
         String userInfo = PreferencesUtils.getString(getContext(),PreferencesUtils.KEY_USER);
         meUserBean = GsonUtils.json2Bean(userInfo,UserBean.class);
@@ -106,23 +103,22 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
         isSearchMeNearUser = true;
         isOnlyRefreshMerchant = true;
         setListener();
-
         getNearUser(meUserBean.getUserInfo());
     }
 
     private void setListener(){
-        refreshLayoutOne.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        refreshLayoutMerchant.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refreshLayoutTwo.setEnabled(false);
+                refreshLayoutUser.setEnabled(false);
                 getMerchantList(centerUser.getUserId()+"");
             }
         });
 
-        refreshLayoutTwo.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        refreshLayoutUser.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refreshLayoutOne.setEnabled(false);
+                refreshLayoutMerchant.setEnabled(false);
                 if (isSearchMeNearUser){
                     getNearUser(meUserBean.getUserInfo());
                 } else {
@@ -132,39 +128,50 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
         });
     }
 
-
+    /**
+     * 获取店铺列表
+     * @param userId
+     */
     private void getMerchantList(String userId){
         Map<String,String> map = new HashMap<>();
         map.put("userId",userId);
         map.put("page",String.valueOf(currentMerchantPage));
         map.put("rows",String.valueOf(DEFAULT_ROWS));
-//        map.put("Token",token);
         mPresenter.getNearMerchant(map);
     }
 
+    /**
+     * 获取附近的人列表
+     * @param userBean
+     */
     private void getNearUser(UserBean.UserInfoEntity userBean){
+        AMapLocation aMapLocation = App.getInstance().getaMapLocation();
         Map<String,String> map = new HashMap<>();
         map.put("userId",userBean.getUserId()+"");
         map.put("page",String.valueOf(currentUserPage));
-        map.put("longitude",userBean.getLongitude()+"");
-        map.put("latitude",""+userBean.getLatitude());
+        if (aMapLocation != null){
+            map.put("longitude",String.valueOf(aMapLocation.getLongitude()));
+            map.put("latitude",String.valueOf(aMapLocation.getLatitude()));
+        }
         map.put("sex",String.valueOf(selectType));
         map.put("rows",String.valueOf(DEFAULT_ROWS));
-//        map.put("Token",token);
         mPresenter.getNearUser(map);
     }
 
+    /**
+     * 获取店里的人列表
+     * @param merchantBean
+     */
     private void getMerchantUserList(MerchantBean merchantBean){
         Map<String,String> map = new HashMap<>();
         map.put("merchantId","");
         map.put("sex",String.valueOf(selectType));
         map.put("page",String.valueOf(currentUserPage));
         map.put("rows",String.valueOf(DEFAULT_ROWS));
-//        map.put("Token",token);
         mPresenter.getMerchantUserList(map);
     }
 
-    private void initCrOne(View view){
+    private void initCrMerchant(View view){
         mItemViewMode = new CircularViewMode();
         ((CircularViewMode)mItemViewMode).setxOffset(450);
 
@@ -175,14 +182,14 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
         mCircleRecyclerView.setNeedCenterForce(true);
         mCircleRecyclerView.setNeedLoop(!mIsNotLoop);
 
-        mCircleRecyclerView.setOnCenterItemClickListener(new CircleRecyclerView.OnCenterItemClickListener() {
-            @Override
-            public void onCenterItemClick(View v) {
-                Toast.makeText(getContext(), "Center Clicked", Toast.LENGTH_SHORT).show();
-            }
-        });
+//        mCircleRecyclerView.setOnCenterItemClickListener(new CircleRecyclerView.OnCenterItemClickListener() {
+//            @Override
+//            public void onCenterItemClick(View v) {
+//                Toast.makeText(getContext(), "Center Clicked", Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
-        ((CircularViewMode) mItemViewMode).setOnScrollCenterListener(onScrollCenterListener1);
+        ((CircularViewMode) mItemViewMode).setOnScrollCenterListener(onScrollCenterListenerMerchant);
         merchantListAdapter = new MerchantListAdapter(getContext(),merchantBeanList);
 
         merchantListAdapter.setOnItemClickListener(new MerchantListAdapter.OnItemClickListener() {
@@ -198,12 +205,13 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 isTouchMerchantList = true;
                 isTouchUserList = false;
+                isTouchAll = false;
                 return false;
             }
         });
     }
 
-    private void initCrTwo(View view){
+    private void initCrUser(View view){
         mItemViewMode2 = new CircularViewMode();
         ((CircularViewMode)mItemViewMode2).setxOffset(100);
         ((CircularViewMode)mItemViewMode2).setOffset11(150);
@@ -214,7 +222,7 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
         mCircleRecyclerView2.setNeedCenterForce(true);
         mCircleRecyclerView2.setNeedLoop(!mIsNotLoop);
 
-        ((CircularViewMode) mItemViewMode2).setOnScrollCenterListener(onScrollCenterListener2);
+        ((CircularViewMode) mItemViewMode2).setOnScrollCenterListener(onScrollCenterListenerUser);
         userListAdapter = new UserListAdapter(getContext(),new ArrayList<NearUserBean.NearUserEntity>());
 //        userListAdapter.setData(getData());
         mCircleRecyclerView2.setAdapter(userListAdapter);
@@ -224,12 +232,14 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 isTouchUserList = true;
                 isTouchMerchantList = false;
+                isTouchAll = false;
                 return false;
             }
         });
+
     }
 
-    CircularViewMode.OnScrollCenterListener onScrollCenterListener1 = new CircularViewMode.OnScrollCenterListener() {
+    CircularViewMode.OnScrollCenterListener onScrollCenterListenerMerchant = new CircularViewMode.OnScrollCenterListener() {
         @Override
         public void onCenterView(View view) {
             LogUtil.i("huang","view.getTag() 1 =="+view.getTag());
@@ -237,8 +247,8 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
             if (currentPositionOne != currentPosition){
                 currentPositionOne = currentPosition;
                 centerMerchant = merchantBeanList.get(currentPosition);
-                if (!isOnlyRefreshMerchant){
-                    currentUserPage = 0;
+                if (isTouchMerchantList){
+                    currentUserPage = 1;
                     getMerchantUserList(centerMerchant);
                 }
                 isOnlyRefreshMerchant = false;
@@ -246,17 +256,18 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
         }
     };
 
-    CircularViewMode.OnScrollCenterListener onScrollCenterListener2 = new CircularViewMode.OnScrollCenterListener() {
+    CircularViewMode.OnScrollCenterListener onScrollCenterListenerUser = new CircularViewMode.OnScrollCenterListener() {
         @Override
         public void onCenterView(View view) {
             LogUtil.i("huang","view.getTag() 2 =="+view.getTag());
-            isOnlyRefreshMerchant = true;
-            currentMerchantPage = 0;
             int currentPosition = (int)view.getTag();
             if (currentPositionTwo != currentPosition){
                 currentPositionTwo = currentPosition;
-                centerUser = userBeanList.get(currentPosition);
-                getMerchantList(centerUser.getUserId()+"");
+                if (isTouchAll || isTouchUserList){
+                    currentMerchantPage = 1;
+                    centerUser = userBeanList.get(currentPosition);
+                    getMerchantList(centerUser.getUserId()+"");
+                }
             }
         }
     };
@@ -265,32 +276,11 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.btn_all:
-                isSearchMeNearUser = true;
-                btnAll.setSelected(true);
-                btnGirl.setSelected(false);
-                btnBoy.setSelected(false);
+//                isSearchMeNearUser = true;
+                isTouchAll = true;
+                isTouchUserList = false;
+                isTouchMerchantList = false;
                 selectType = 0;
-                currentUserPage = 1;
-                currentMerchantPage = 1;
-                getNearUser(meUserBean.getUserInfo());
-                break;
-            case R.id.btn_boy:
-                btnBoy.setSelected(true);
-                btnGirl.setSelected(false);
-                btnAll.setSelected(false);
-                selectType = 1;
-//                if (isSearchMeNearUser){
-//
-//                }
-                currentUserPage = 1;
-                currentMerchantPage = 1;
-                getNearUser(meUserBean.getUserInfo());
-                break;
-            case R.id.btn_girl:
-                btnGirl.setSelected(true);
-                btnAll.setSelected(false);
-                btnBoy.setSelected(false);
-                selectType = 2;
                 currentUserPage = 1;
                 currentMerchantPage = 1;
                 getNearUser(meUserBean.getUserInfo());
@@ -325,8 +315,8 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
     @Override
     public void refreshMerchantList(String json) {
         currentMerchantPage +=1;
-        refreshLayoutTwo.setEnabled(true);
-        refreshLayoutOne.setRefreshing(false);
+        refreshLayoutUser.setEnabled(true);
+        refreshLayoutMerchant.setRefreshing(false);
         if (!TextUtils.isEmpty(json)){
             merchantListAdapter.setData(merchantBeanList);
             merchantListAdapter.notifyDataSetChanged();
@@ -341,8 +331,8 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
     @Override
     public void refreshUserList(String json) {
         currentUserPage +=1;
-        refreshLayoutOne.setEnabled(true);
-        refreshLayoutTwo.setRefreshing(false);
+        refreshLayoutMerchant.setEnabled(true);
+        refreshLayoutUser.setRefreshing(false);
         if (!TextUtils.isEmpty(json)){
             NearUserBean nearUserBean = GsonUtils.json2Bean(json,NearUserBean.class);
             int size = nearUserBean.getData().size();

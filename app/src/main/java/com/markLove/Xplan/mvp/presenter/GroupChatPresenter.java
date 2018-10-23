@@ -3,13 +3,9 @@ package com.markLove.Xplan.mvp.presenter;
 import android.util.Log;
 
 import com.markLove.Xplan.api.util.RequestCallBack;
-import com.markLove.Xplan.bean.BaseMsgBean;
-import com.markLove.Xplan.bean.MerchantBean;
-import com.markLove.Xplan.bean.UserBean;
+import com.markLove.Xplan.bean.BaseBean;
 import com.markLove.Xplan.mvp.contract.GroupChatContract;
-import com.markLove.Xplan.mvp.contract.SearchContract;
 import com.markLove.Xplan.mvp.model.GroupChatModel;
-import com.markLove.Xplan.mvp.model.SearchModel;
 
 import java.util.Map;
 
@@ -29,9 +25,9 @@ public class GroupChatPresenter extends GroupChatContract.Presenter {
         if (!isAttach()) return;
         getView().showLoading();
 
-        mModel.joinGroup(map, new RequestCallBack<BaseMsgBean>() {
+        mModel.joinGroup(map, new RequestCallBack<BaseBean>() {
             @Override
-            public void onSuccess(BaseMsgBean o) {
+            public void onSuccess(BaseBean o) {
                 getView().hideLoading();
                 getView().onJoinGroup(o);
             }
@@ -50,9 +46,9 @@ public class GroupChatPresenter extends GroupChatContract.Presenter {
         if (!isAttach()) return;
         getView().showLoading();
 
-        mModel.participateGroup(map, new RequestCallBack<BaseMsgBean>() {
+        mModel.participateGroup(map, new RequestCallBack<BaseBean>() {
             @Override
-            public void onSuccess(BaseMsgBean o) {
+            public void onSuccess(BaseBean o) {
                 getView().hideLoading();
                 getView().onParticipateGroup(o);
             }

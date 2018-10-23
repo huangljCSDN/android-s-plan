@@ -4,8 +4,7 @@ import com.markLove.Xplan.api.util.RequestCallBack;
 import com.markLove.Xplan.base.mvp.BaseModel;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.mvp.BaseView;
-import com.markLove.Xplan.bean.BaseMsgBean;
-import com.markLove.Xplan.bean.UserBean;
+import com.markLove.Xplan.bean.BaseBean;
 
 import java.util.Map;
 
@@ -24,7 +23,7 @@ public interface CpChatContract {
         public abstract void focus(@QueryMap Map<String, String> map, RequestCallBack requestCallBack);
     }
 
-    abstract class Presenter extends BasePresenter<View<BaseMsgBean>> {
+    abstract class Presenter extends BasePresenter<View<BaseBean>> {
         public abstract void focus(@QueryMap Map<String, String> map);
     }
 }

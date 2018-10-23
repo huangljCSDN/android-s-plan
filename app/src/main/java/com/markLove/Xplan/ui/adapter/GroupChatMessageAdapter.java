@@ -455,55 +455,21 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
 
         @Override
         public void sending() {
-//            if (status instanceof ImageView) {
-//                if (1 != (int) status.getTag()) {
-//                    status.setTag(1);
-//                    ((ImageView) status).setImageResource(R.drawable.anim_refresh);
-//                }
-//                View v = itemView.findViewById(R.id.reject_status);
-//                if (null != v) {
-//                    v.setVisibility(View.GONE);
-//                }
-//            }
+
         }
 
         @Override
         public void success() {
-//            status.setTag(2);
-//            status.setVisibility(View.GONE);
-//            status.setClickable(false);
-//            View v = itemView.findViewById(R.id.reject_status);
-//            if (null != v) {
-//                v.setVisibility(View.GONE);
-//            }
+
         }
 
         @Override
         public void fail() {
-//            if (status instanceof ImageView) {
-//                status.setTag(3);
-//                ((ImageView) status).setImageResource(R.mipmap.chat_message_fail);
-//                status.setVisibility(View.VISIBLE);
-//                status.setClickable(true);
-//                View v = itemView.findViewById(R.id.reject_status);
-//                if (null != v) {
-//                    v.setVisibility(View.GONE);
-//                }
-//            }
+
         }
 
         @Override
         public void rejected() {
-//            if (status instanceof ImageView) {
-//                status.setTag(3);
-//                ((ImageView) status).setImageResource(R.mipmap.chat_message_fail);
-//                status.setVisibility(View.VISIBLE);
-//                status.setClickable(true);
-//                View v = itemView.findViewById(R.id.reject_status);
-//                if (null != v) {
-//                    v.setVisibility(View.VISIBLE);
-//                }
-//            }
         }
 
         @Override
@@ -1139,8 +1105,8 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
         BecomeLovesDialog.Builder builder = new BecomeLovesDialog.Builder(context);
         builder.setContentView(R.layout.custom_dialog)
                 .setTextViewStyle(R.id.custom_dialog_content, "是否删除该条信息", -1, -1, View.VISIBLE)
-                .setTextViewStyle(R.id.custom_dialog_cancel, "取消", -1, Color.parseColor("#40A6EA"), View.VISIBLE)
-                .setTextViewStyle(R.id.custom_dialog_define, "确定", -1, Color.parseColor("#40A6EA"), View.VISIBLE)
+                .setTextViewStyle(R.id.custom_dialog_cancel, "取消", -1, Color.parseColor("#4A4A4A"), View.VISIBLE)
+                .setTextViewStyle(R.id.custom_dialog_define, "确定", -1, Color.parseColor("#FF396E"), View.VISIBLE)
                 .setOnClickListener(R.id.custom_dialog_cancel, null)
                 .setOnClickListener(R.id.custom_dialog_define, new BecomeLovesDialog.DialogViewOnClick() {
                     @Override
@@ -1312,7 +1278,7 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
                     popupWindow.setBubbleView(bubbleView);
                     popupWindow.setOutsideTouchable(true);
                     popupWindow.setParam(DensityUtils.dip2px(context, 232), ViewGroup.LayoutParams.WRAP_CONTENT);
-                    popupWindow.setBubbleViewShadowColor("#3A3A3A");
+                    popupWindow.setBubbleViewShadowColor("#000000");
                 }
                 final Message msg = mDatas.get(mGestureDetector.getPosition());
                 if (msg.getChatType() != Message.ChatType.TXT) {

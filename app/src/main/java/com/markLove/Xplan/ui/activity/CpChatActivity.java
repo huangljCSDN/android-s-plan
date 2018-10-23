@@ -27,7 +27,7 @@ import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.ui.BaseActivity;
-import com.markLove.Xplan.bean.BaseMsgBean;
+import com.markLove.Xplan.bean.BaseBean;
 import com.markLove.Xplan.bean.msg.Message;
 import com.markLove.Xplan.bean.msg.body.FileMessageBody;
 import com.markLove.Xplan.config.Constants;
@@ -64,7 +64,7 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * 三分钟情侣聊天
  */
-public class CpChatActivity extends BaseActivity<CpChatPresenter> implements View.OnClickListener, ChatView,CpChatContract.View<BaseMsgBean> {
+public class CpChatActivity extends BaseActivity<CpChatPresenter> implements View.OnClickListener, ChatView,CpChatContract.View<BaseBean> {
     private ArrayList<Media> select;
 
     private TextView mTvTime,mTvCare,mTvTitle;
@@ -152,7 +152,7 @@ public class CpChatActivity extends BaseActivity<CpChatPresenter> implements Vie
     }
 
     @Override
-    public void refreshUI(BaseMsgBean baseMsgBean) {
+    public void refreshUI(BaseBean baseBean) {
         mTvCare.setText(getString(R.string.cared));
         mTvCare.setBackground(getDrawable(R.drawable.ic_cared));
     }

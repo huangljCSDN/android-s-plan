@@ -1,12 +1,9 @@
 package com.markLove.Xplan.mvp.presenter;
 
 import com.markLove.Xplan.api.util.RequestCallBack;
-import com.markLove.Xplan.bean.BaseMsgBean;
-import com.markLove.Xplan.bean.UserBean;
+import com.markLove.Xplan.bean.BaseBean;
 import com.markLove.Xplan.mvp.contract.CpChatContract;
-import com.markLove.Xplan.mvp.contract.ShopChatContract;
 import com.markLove.Xplan.mvp.model.CpChatModel;
-import com.markLove.Xplan.mvp.model.ShopChatModel;
 
 import java.util.Map;
 
@@ -26,9 +23,9 @@ public class CpChatPresenter extends CpChatContract.Presenter {
         if (!isAttach()) return;
         getView().showLoading();
 
-        mModel.focus(map, new RequestCallBack<BaseMsgBean>() {
+        mModel.focus(map, new RequestCallBack<BaseBean>() {
             @Override
-            public void onSuccess(BaseMsgBean o) {
+            public void onSuccess(BaseBean o) {
                 getView().hideLoading();
                 getView().refreshUI(o);
             }

@@ -13,10 +13,10 @@
         android:layout_height="wrap_content"
         android:background="@drawable/shape_select_photo"
         android:gravity="center"
-        android:padding="12dp"
+        android:padding="15dp"
         android:text="保存到相册"
         android:textColor="@color/color_333333"
-        android:textSize="16sp" />
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/zoom_img_cancel"
@@ -26,9 +26,9 @@
         android:layout_marginTop="8dp"
         android:background="@drawable/shape_select_photo"
         android:gravity="center"
-        android:padding="12dp"
+        android:padding="15dp"
         android:text="取消"
         android:textColor="@color/color_FF396E"
-        android:textSize="16sp" />
+        android:textSize="18sp" />
 
 </LinearLayout>

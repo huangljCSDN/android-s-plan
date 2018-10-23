@@ -127,6 +127,12 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 
         chatView = findViewById(R.id.chatView);
         chatView.setActivity(this);
+        setListener();
+        initSoftKeyboard();
+        initData();
+    }
+
+    private void setListener(){
         chatView.setOnSendMessageListener(new com.markLove.Xplan.ui.widget.ChatView.OnSendMessageListener() {
             @Override
             public void onSendMessage(Message message) {
@@ -153,8 +159,6 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
                 return false;
             }
         });
-        initSoftKeyboard();
-        initData();
     }
 
     @Override

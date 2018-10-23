@@ -1,11 +1,12 @@
 package com.markLove.Xplan.mvp.presenter;
 
-import android.util.Log;
-
 import com.markLove.Xplan.api.util.RequestCallBack;
-import com.markLove.Xplan.bean.PostQueryInfo;
+import com.markLove.Xplan.bean.BaseBean;
 import com.markLove.Xplan.mvp.contract.MainContract;
 import com.markLove.Xplan.mvp.model.MainModel;
+import com.markLove.Xplan.utils.LogUtils;
+
+import java.util.Map;
 
 /**
  * Created by huanglingjun on 2018/5/16.
@@ -18,25 +19,22 @@ public class MainPresenter extends MainContract.Presenter {
         mModel = new MainModel();
     }
 
-    /**
-     * 请求数据
-     * @param type
-     * @param postid
-     */
-    public void getData(String type, String postid){
+    @Override
+    public void updateUserPlace(Map<String, String> map) {
         if (!isAttach()) return;
         getView().showLoading();
 
-        mModel.searchRx(type, postid, new RequestCallBack<PostQueryInfo>() {
+        mModel.updateUserPlace(map, new RequestCallBack<BaseBean>() {
             @Override
-            public void onSuccess(PostQueryInfo o) {
+            public void onSuccess(BaseBean baseBean) {
+                LogUtils.i("MainPresenter",baseBean.toString());
                 getView().hideLoading();
-                getView().refreshUI(o);
+//                getView().refreshUI(baseBean);
             }
 
             @Override
             public void onFail(String result) {
-                Log.i("MainPresenter",result);
+                LogUtils.i("MainPresenter",result);
                 getView().hideLoading();
                 getView().showError(result);
             }

@@ -11,30 +11,32 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="8dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="5dp"
         android:visibility="gone" />
 
 
     <RelativeLayout
         android:id="@+id/chat_txt_ll"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/chat_select_view">
 
         <RelativeLayout
             android:id="@+id/rl_chat_head_img"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginRight="16dp"
+            android:layout_marginRight="15dp"
+            android:layout_alignParentRight="true"
             android:background="@drawable/bg_circle"
             android:gravity="center">
 
             <ImageView
                 android:id="@+id/chat_head_img"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:src="@mipmap/agent_user_pho" />
         </RelativeLayout>
 

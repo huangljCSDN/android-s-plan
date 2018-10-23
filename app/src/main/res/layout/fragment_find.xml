@@ -121,6 +121,7 @@
                 android:background="@drawable/btn_sex_selector"
                 android:gravity="center"
                 android:text="@string/boy"
+                android:visibility="gone"
                 android:textColor="@color/btn_sex_color_selector"
                 android:textSize="9sp" />
 
@@ -132,6 +133,7 @@
                 android:layout_marginLeft="50dp"
                 android:background="@drawable/btn_sex_selector"
                 android:gravity="center"
+                android:visibility="gone"
                 android:text="@string/girl"
                 android:textColor="@color/btn_sex_color_selector"
                 android:textSize="9sp" />

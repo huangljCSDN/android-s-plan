@@ -27,7 +27,7 @@ import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.ui.BaseActivity;
-import com.markLove.Xplan.bean.BaseMsgBean;
+import com.markLove.Xplan.bean.BaseBean;
 import com.markLove.Xplan.bean.ChatUser;
 import com.markLove.Xplan.bean.msg.Message;
 import com.markLove.Xplan.bean.msg.body.FileMessageBody;
@@ -68,7 +68,7 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * 私聊
  */
-public class SingleChatActivity extends BaseActivity<CpChatPresenter> implements View.OnClickListener, ChatView,CpChatContract.View<BaseMsgBean> {
+public class SingleChatActivity extends BaseActivity<CpChatPresenter> implements View.OnClickListener, ChatView,CpChatContract.View<BaseBean> {
 
     private ArrayList<Media> select;
     private TextView mTvCare,mTvTitle;
@@ -119,6 +119,12 @@ public class SingleChatActivity extends BaseActivity<CpChatPresenter> implements
 
         chatView = findViewById(R.id.chatView);
         chatView.setActivity(this);
+        setListener();
+        initSoftKeyboard();
+        initData();
+    }
+
+    private void setListener(){
         chatView.setOnSendMessageListener(new com.markLove.Xplan.ui.widget.ChatView.OnSendMessageListener() {
             @Override
             public void onSendMessage(Message message) {
@@ -145,8 +151,6 @@ public class SingleChatActivity extends BaseActivity<CpChatPresenter> implements
                 return false;
             }
         });
-        initSoftKeyboard();
-        initData();
     }
 
     @Override
@@ -840,7 +844,7 @@ public class SingleChatActivity extends BaseActivity<CpChatPresenter> implements
     }
 
     @Override
-    public void refreshUI(BaseMsgBean baseMsgBean) {
+    public void refreshUI(BaseBean baseBean) {
         mTvCare.setText(getString(R.string.cared));
         mTvCare.setBackground(getDrawable(R.drawable.ic_cared));
         mTvCare.setTextColor(getResources().getColor(R.color.color_333333));
