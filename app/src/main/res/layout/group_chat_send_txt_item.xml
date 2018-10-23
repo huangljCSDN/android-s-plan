@@ -13,9 +13,8 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_marginRight="10dp"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="20dp"
         android:visibility="gone" />
-
 
     <RelativeLayout
         android:id="@+id/chat_txt_ll"
@@ -35,8 +34,8 @@
 
             <ImageView
                 android:id="@+id/chat_head_img"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:src="@mipmap/agent_user_pho" />
         </RelativeLayout>
 

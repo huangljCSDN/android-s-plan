@@ -1,92 +1,79 @@
 package com.markLove.Xplan.bean;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class NearUserBean {
-    public List<NearUserBean.NearUserEntity> Data;
-    public int Status;
 
-    public List<NearUserBean.NearUserEntity> getData() {
-        return Data;
+    /**
+     * distance : 10341.660783600611
+     * nickName : 测试3
+     * headImageUrl :
+     * sex : 1
+     * lastOnline : 一小时前
+     * userId : 369024
+     */
+    private double distance;
+    private String nickName;
+    private String headImageUrl;
+    private int sex;
+    private String lastOnline;
+    private long userId;
+
+    public void setDistance(double distance) {
+        this.distance = distance;
     }
 
-    public void setData(List<NearUserBean.NearUserEntity> data) {
-        Data = data;
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
     }
 
-    public int getStatus() {
-        return Status;
+    public void setHeadImageUrl(String headImageUrl) {
+        this.headImageUrl = headImageUrl;
     }
 
-    public void setStatus(int status) {
-        Status = status;
+    public void setSex(int sex) {
+        this.sex = sex;
     }
 
-    public class NearUserEntity{
-        public String nickName;
-        public int sex;
-        public String lastOnline;
-        public long userId;
-        public String headUrl;
+    public void setLastOnline(String lastOnline) {
+        this.lastOnline = lastOnline;
+    }
 
-        public String getNickName() {
-            return nickName;
-        }
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
 
-        public void setNickName(String nickName) {
-            this.nickName = nickName;
-        }
+    public double getDistance() {
+        return distance;
+    }
 
-        public int getSex() {
-            return sex;
-        }
+    public String getNickName() {
+        return nickName;
+    }
 
-        public void setSex(int sex) {
-            this.sex = sex;
-        }
+    public String getHeadImageUrl() {
+        return headImageUrl;
+    }
 
-        public String getLastOnline() {
-            return lastOnline;
-        }
+    public long getSex() {
+        return sex;
+    }
 
-        public void setLastOnline(String lastOnline) {
-            this.lastOnline = lastOnline;
-        }
+    public String getLastOnline() {
+        return lastOnline;
+    }
 
-        public long getUserId() {
-            return userId;
-        }
-
-        public void setUserId(long userId) {
-            this.userId = userId;
-        }
-
-        public String getHeadUrl() {
-            return headUrl;
-        }
-
-        public void setHeadUrl(String headUrl) {
-            this.headUrl = headUrl;
-        }
-
-        @Override
-        public String toString() {
-            return "NearUserEntity{" +
-                    "nickName='" + nickName + '\'' +
-                    ", sex=" + sex +
-                    ", lastOnline='" + lastOnline + '\'' +
-                    ", userId=" + userId +
-                    ", headUrl='" + headUrl + '\'' +
-                    '}';
-        }
+    public long getUserId() {
+        return userId;
     }
 
     @Override
     public String toString() {
         return "NearUserBean{" +
-                "Data=" + Data +
-                ", Status=" + Status +
+                "distance=" + distance +
+                ", nickName='" + nickName + '\'' +
+                ", headImageUrl='" + headImageUrl + '\'' +
+                ", sex=" + sex +
+                ", lastOnline='" + lastOnline + '\'' +
+                ", userId=" + userId +
                 '}';
     }
 }

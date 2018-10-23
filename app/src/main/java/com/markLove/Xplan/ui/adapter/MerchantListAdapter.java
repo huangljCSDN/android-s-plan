@@ -48,24 +48,29 @@ public class MerchantListAdapter extends RecyclerView.Adapter<MerchantListAdapte
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
         holder.contentView.setTag(position);
-        MerchantBean MerchantBean = list.get(position);
-        holder.tvShopName.setText(MerchantBean.shopName);
-        holder.tvShopCount.setText(MerchantBean.shopCount);
+        if (position == getItemCount() - 1 || position == getItemCount() -2){
+            holder.contentView.setVisibility(View.INVISIBLE);
+        } else {
+            holder.contentView.setVisibility(View.VISIBLE);
+            MerchantBean MerchantBean = list.get(position);
+            holder.tvShopName.setText(MerchantBean.getShopName());
+            holder.tvShopCount.setText(MerchantBean.getGroupCount()+"");
 
-        Glide.with(context).load(R.drawable.icon)
-                .apply(RequestOptions.placeholderOf(R.drawable.icon_loading_default))
-                .apply(RequestOptions.errorOf(R.drawable.icon_loading_default))
-                .apply(RequestOptions.bitmapTransform(new GlideRoundImage(context)))
-                .into(holder.ivBg);
+            Glide.with(context).load(R.drawable.icon)
+                    .apply(RequestOptions.placeholderOf(R.drawable.icon_loading_default))
+                    .apply(RequestOptions.errorOf(R.drawable.icon_loading_default))
+                    .apply(RequestOptions.bitmapTransform(new GlideRoundImage(context)))
+                    .into(holder.ivBg);
 
-        holder.contentView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (onItemClickListener != null){
-                    onItemClickListener.onItemClick(view,position);
+            holder.contentView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (onItemClickListener != null){
+                        onItemClickListener.onItemClick(view,position);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     @Override

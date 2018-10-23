@@ -1,13 +1,21 @@
 package com.markLove.Xplan.api;
 
 import com.markLove.Xplan.bean.BaseBean;
+import com.markLove.Xplan.bean.MerchantBean;
+import com.markLove.Xplan.bean.NearUserBean;
 import com.markLove.Xplan.bean.PostQueryInfo;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observable;
+import okhttp3.MultipartBody;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Query;
 import retrofit2.http.QueryMap;
 
@@ -39,7 +47,7 @@ public interface RetrofitApiService {
      * @return
      */
     @POST("merchant/discover/getMerchantUserList")
-    Observable<Object> getMerchantUserList(@QueryMap Map<String, String> map);
+    Observable<BaseBean<ArrayList<NearUserBean>>> getMerchantUserList(@QueryMap Map<String, String> map);
 
     /**
      * 附近的店
@@ -47,7 +55,7 @@ public interface RetrofitApiService {
      * @return
      */
     @POST("merchant/discover/getNearMerchant")
-    Observable<Object> getNearMerchant(@QueryMap Map<String, String> map);
+    Observable<BaseBean<ArrayList<MerchantBean>>> getNearMerchant(@QueryMap Map<String, String> map);
 
     /**
      * 附近的人
@@ -55,7 +63,7 @@ public interface RetrofitApiService {
      * @return
      */
     @POST("merchant/discover/getNearUser")
-    Observable<Object> getNearUser(@QueryMap Map<String, String> map);
+    Observable<BaseBean<ArrayList<NearUserBean>>> getNearUser(@QueryMap Map<String, String> map);
 
     /**
      * 新增轨迹
@@ -82,12 +90,21 @@ public interface RetrofitApiService {
     Observable<BaseBean> download(@QueryMap Map<String, String> map);
 
     /**
-     * 文件上传
-     * @param map
+     * 文件上传  通过 List<MultipartBody.Part> 传入多个part实现多文件上传
+     * @param parts  每个part代表一个
+     * @return
+     */
+    @Multipart
+    @POST("system/dfs/upload")
+    Observable<BaseBean> upload(@Part() List<MultipartBody.Part> parts);
+
+    /**
+     * 文件上传  通过 MultipartBody和@body作为参数来上传
+     * @param multipartBody   MultipartBody包含多个Part
      * @return
      */
     @POST("system/dfs/upload")
-    Observable<Object> upload(@QueryMap Map<String, String> map);
+    Observable<BaseBean> upload(@Body MultipartBody multipartBody);
 
     /**
      * 加入组局

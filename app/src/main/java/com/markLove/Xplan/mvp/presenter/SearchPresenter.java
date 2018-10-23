@@ -1,10 +1,14 @@
 package com.markLove.Xplan.mvp.presenter;
 
 import com.markLove.Xplan.api.util.RequestCallBack;
+import com.markLove.Xplan.bean.BaseBean;
+import com.markLove.Xplan.bean.MerchantBean;
+import com.markLove.Xplan.bean.NearUserBean;
 import com.markLove.Xplan.mvp.contract.SearchContract;
 import com.markLove.Xplan.mvp.model.SearchModel;
 import com.markLove.Xplan.utils.LogUtils;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -23,12 +27,12 @@ public class SearchPresenter extends SearchContract.Presenter {
         if (!isAttach()) return;
         getView().showLoading();
 
-        mModel.getNearMerchant(map, new RequestCallBack<Object>() {
+        mModel.getNearMerchant(map, new RequestCallBack<BaseBean<ArrayList<MerchantBean>>>() {
             @Override
-            public void onSuccess(Object json) {
-                LogUtils.i("SearchPresenter",json.toString());
+            public void onSuccess(BaseBean<ArrayList<MerchantBean>> baseBean) {
+                LogUtils.i("SearchPresenter",baseBean.toString());
                 getView().hideLoading();
-                getView().refreshMerchantList(json.toString());
+                getView().refreshMerchantList(baseBean.Data);
             }
 
             @Override
@@ -44,12 +48,12 @@ public class SearchPresenter extends SearchContract.Presenter {
         if (!isAttach()) return;
         getView().showLoading();
 
-        mModel.getNearUser(map, new RequestCallBack<Object>() {
+        mModel.getNearUser(map, new RequestCallBack<BaseBean<ArrayList<NearUserBean>>>() {
             @Override
-            public void onSuccess(Object json) {
+            public void onSuccess(BaseBean<ArrayList<NearUserBean>> json) {
                 LogUtils.i("SearchPresenter",json.toString());
                 getView().hideLoading();
-                getView().refreshUserList(json.toString());
+                getView().refreshUserList(json.Data);
             }
 
             @Override
@@ -65,12 +69,12 @@ public class SearchPresenter extends SearchContract.Presenter {
         if (!isAttach()) return;
         getView().showLoading();
 
-        mModel.getMerchantUserList(map, new RequestCallBack<Object>() {
+        mModel.getMerchantUserList(map, new RequestCallBack<BaseBean<ArrayList<NearUserBean>>>() {
             @Override
-            public void onSuccess(Object json) {
-                LogUtils.i("SearchPresenter",json.toString());
+            public void onSuccess(BaseBean<ArrayList<NearUserBean>> baseBean) {
+                LogUtils.i("SearchPresenter",baseBean.toString());
                 getView().hideLoading();
-                getView().refreshUserList(json.toString());
+                getView().refreshUserList(baseBean.Data);
             }
 
             @Override

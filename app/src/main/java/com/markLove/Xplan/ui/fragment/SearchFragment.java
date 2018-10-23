@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SearchFragment extends BaseFragment<SearchPresenter> implements View.OnClickListener,SearchContract.View {
+public class SearchFragment extends BaseFragment<SearchPresenter> implements View.OnClickListener, SearchContract.View {
 
     private CircleRecyclerView mCircleRecyclerView2;
     private CircleRecyclerView mCircleRecyclerView;
@@ -45,11 +45,11 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
     private boolean mIsNotLoop;
     private int currentPositionOne;
     private int currentPositionTwo;
-    private Button btnAll,btnBoy,btnGirl;
+    private Button btnAll, btnBoy, btnGirl;
     private UserBean meUserBean;
-    private NearUserBean.NearUserEntity centerUser;
+    private NearUserBean centerUser;
     private MerchantBean centerMerchant;
-    private List<NearUserBean.NearUserEntity> userBeanList = new ArrayList<>();
+    private List<NearUserBean> userBeanList = new ArrayList<>();
     private List<MerchantBean> merchantBeanList = new ArrayList<>();
     private UserListAdapter userListAdapter;
     private MerchantListAdapter merchantListAdapter;
@@ -60,15 +60,14 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
     private int currentUserPage = 1;
     private int currentMerchantPage = 1;
     private static final int DEFAULT_ROWS = 10;
-    //是否是刷新我附近的人
-    private boolean isSearchMeNearUser;
-    //是否是刷新店铺里的人
-    private boolean isSearchMerchantUser;
-    private boolean isOnlyRefreshMerchant;
+
     private String token;
     private boolean isTouchUserList = false;
     private boolean isTouchMerchantList = false;
     private boolean isTouchAll = true;
+    private boolean isRefreshUserList;
+    private boolean isRefreshMerchantList;
+    private boolean isSearchMeNearUser = true;
 
     @Override
     public SearchPresenter onCreatePresenter() {
@@ -97,83 +96,101 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
         initCrUser(view);
 
 
-        String userInfo = PreferencesUtils.getString(getContext(),PreferencesUtils.KEY_USER);
-        meUserBean = GsonUtils.json2Bean(userInfo,UserBean.class);
+        String userInfo = PreferencesUtils.getString(getContext(), PreferencesUtils.KEY_USER);
+        meUserBean = GsonUtils.json2Bean(userInfo, UserBean.class);
         token = meUserBean.getToken();
-        isSearchMeNearUser = true;
-        isOnlyRefreshMerchant = true;
         setListener();
         getNearUser(meUserBean.getUserInfo());
     }
 
-    private void setListener(){
+    private void setListener() {
         refreshLayoutMerchant.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                isRefreshMerchantList = true;
                 refreshLayoutUser.setEnabled(false);
-                getMerchantList(centerUser.getUserId()+"");
+                getMerchantList(centerUser.getUserId() + "");
             }
         });
 
         refreshLayoutUser.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                isRefreshUserList = true;
                 refreshLayoutMerchant.setEnabled(false);
-                if (isSearchMeNearUser){
+                if (isSearchMeNearUser) {
                     getNearUser(meUserBean.getUserInfo());
                 } else {
-                    getMerchantList(centerMerchant.id+"");
+                    getMerchantUserList(centerMerchant);
                 }
             }
         });
     }
 
     /**
+     * 添加两条不可见的假数据
+     */
+    private void addNullData() {
+        for (int i = 0; i < 2; i++) {
+            NearUserBean nearUserBean = new NearUserBean();
+            userBeanList.add(nearUserBean);
+        }
+
+        for (int i = 0; i < 2; i++) {
+            MerchantBean merchantBean = new MerchantBean();
+            merchantBeanList.add(merchantBean);
+        }
+    }
+
+    /**
      * 获取店铺列表
+     *
      * @param userId
      */
-    private void getMerchantList(String userId){
-        Map<String,String> map = new HashMap<>();
-        map.put("userId",userId);
-        map.put("page",String.valueOf(currentMerchantPage));
-        map.put("rows",String.valueOf(DEFAULT_ROWS));
+    private void getMerchantList(String userId) {
+        Map<String, String> map = new HashMap<>();
+        map.put("userId", userId);
+        map.put("page", String.valueOf(currentMerchantPage));
+        map.put("rows", String.valueOf(DEFAULT_ROWS));
         mPresenter.getNearMerchant(map);
     }
 
     /**
      * 获取附近的人列表
+     *
      * @param userBean
      */
-    private void getNearUser(UserBean.UserInfoEntity userBean){
+    private void getNearUser(UserBean.UserInfoEntity userBean) {
         AMapLocation aMapLocation = App.getInstance().getaMapLocation();
-        Map<String,String> map = new HashMap<>();
-        map.put("userId",userBean.getUserId()+"");
-        map.put("page",String.valueOf(currentUserPage));
-        if (aMapLocation != null){
-            map.put("longitude",String.valueOf(aMapLocation.getLongitude()));
-            map.put("latitude",String.valueOf(aMapLocation.getLatitude()));
+        Map<String, String> map = new HashMap<>();
+        map.put("userId", userBean.getUserId() + "");
+        map.put("page", String.valueOf(currentUserPage));
+        if (aMapLocation != null) {
+            map.put("longitude", String.valueOf(aMapLocation.getLongitude()));
+            map.put("latitude", String.valueOf(aMapLocation.getLatitude()));
         }
-        map.put("sex",String.valueOf(selectType));
-        map.put("rows",String.valueOf(DEFAULT_ROWS));
+        map.put("sex", String.valueOf(selectType));
+        map.put("rows", String.valueOf(DEFAULT_ROWS));
         mPresenter.getNearUser(map);
     }
 
     /**
      * 获取店里的人列表
+     *
      * @param merchantBean
      */
-    private void getMerchantUserList(MerchantBean merchantBean){
-        Map<String,String> map = new HashMap<>();
-        map.put("merchantId","");
-        map.put("sex",String.valueOf(selectType));
-        map.put("page",String.valueOf(currentUserPage));
-        map.put("rows",String.valueOf(DEFAULT_ROWS));
+    private void getMerchantUserList(MerchantBean merchantBean) {
+        Map<String, String> map = new HashMap<>();
+        map.put("merchantId", String.valueOf(merchantBean.getMerchantId()));
+        map.put("sex", String.valueOf(selectType));
+        map.put("page", String.valueOf(currentUserPage));
+        map.put("rows", String.valueOf(DEFAULT_ROWS));
         mPresenter.getMerchantUserList(map);
     }
 
-    private void initCrMerchant(View view){
+    private void initCrMerchant(View view) {
         mItemViewMode = new CircularViewMode();
-        ((CircularViewMode)mItemViewMode).setxOffset(450);
+        ((CircularViewMode) mItemViewMode).setxOffset(450);
 
         mCircleRecyclerView = (CircleRecyclerView) view.findViewById(R.id.cr_one);
         mLayoutManager = new LinearLayoutManager(getContext());
@@ -190,7 +207,7 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
 //        });
 
         ((CircularViewMode) mItemViewMode).setOnScrollCenterListener(onScrollCenterListenerMerchant);
-        merchantListAdapter = new MerchantListAdapter(getContext(),merchantBeanList);
+        merchantListAdapter = new MerchantListAdapter(getContext(), merchantBeanList);
 
         merchantListAdapter.setOnItemClickListener(new MerchantListAdapter.OnItemClickListener() {
             @Override
@@ -211,10 +228,10 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
         });
     }
 
-    private void initCrUser(View view){
+    private void initCrUser(View view) {
         mItemViewMode2 = new CircularViewMode();
-        ((CircularViewMode)mItemViewMode2).setxOffset(100);
-        ((CircularViewMode)mItemViewMode2).setOffset11(150);
+        ((CircularViewMode) mItemViewMode2).setxOffset(100);
+        ((CircularViewMode) mItemViewMode2).setOffset11(150);
         mCircleRecyclerView2 = (CircleRecyclerView) view.findViewById(R.id.cr_two);
         mLayoutManager2 = new LinearLayoutManager(getContext());
         mCircleRecyclerView2.setLayoutManager(mLayoutManager2);
@@ -223,7 +240,7 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
         mCircleRecyclerView2.setNeedLoop(!mIsNotLoop);
 
         ((CircularViewMode) mItemViewMode2).setOnScrollCenterListener(onScrollCenterListenerUser);
-        userListAdapter = new UserListAdapter(getContext(),new ArrayList<NearUserBean.NearUserEntity>());
+        userListAdapter = new UserListAdapter(getContext(), new ArrayList<NearUserBean>());
 //        userListAdapter.setData(getData());
         mCircleRecyclerView2.setAdapter(userListAdapter);
         mCircleRecyclerView2.scrollToPosition(userListAdapter.getItemCount() - 1);
@@ -237,21 +254,29 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
             }
         });
 
+        userListAdapter.setOnItemClickListener(new MerchantListAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+
+            }
+        });
+
     }
 
     CircularViewMode.OnScrollCenterListener onScrollCenterListenerMerchant = new CircularViewMode.OnScrollCenterListener() {
         @Override
         public void onCenterView(View view) {
-            LogUtil.i("huang","view.getTag() 1 =="+view.getTag());
-            int currentPosition = (int)view.getTag();
-            if (currentPositionOne != currentPosition){
+            LogUtil.i("huang", "view.getTag() 1 ==" + view.getTag());
+            int currentPosition = (int) view.getTag();
+            if (currentPositionOne != currentPosition) {
                 currentPositionOne = currentPosition;
                 centerMerchant = merchantBeanList.get(currentPosition);
-                if (isTouchMerchantList){
+                if (isTouchMerchantList) {
                     currentUserPage = 1;
                     getMerchantUserList(centerMerchant);
+                    isSearchMeNearUser = false;
+                    isRefreshUserList = false;
                 }
-                isOnlyRefreshMerchant = false;
             }
         }
     };
@@ -259,14 +284,15 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
     CircularViewMode.OnScrollCenterListener onScrollCenterListenerUser = new CircularViewMode.OnScrollCenterListener() {
         @Override
         public void onCenterView(View view) {
-            LogUtil.i("huang","view.getTag() 2 =="+view.getTag());
-            int currentPosition = (int)view.getTag();
-            if (currentPositionTwo != currentPosition){
+            LogUtil.i("huang", "view.getTag() 2 ==" + view.getTag());
+            int currentPosition = (int) view.getTag();
+            if (currentPositionTwo != currentPosition) {
                 currentPositionTwo = currentPosition;
-                if (isTouchAll || isTouchUserList){
+                if (isTouchAll || isTouchUserList) {
                     currentMerchantPage = 1;
                     centerUser = userBeanList.get(currentPosition);
-                    getMerchantList(centerUser.getUserId()+"");
+                    getMerchantList(centerUser.getUserId() + "");
+                    isRefreshMerchantList = false;
                 }
             }
         }
@@ -274,9 +300,9 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.btn_all:
-//                isSearchMeNearUser = true;
+                isSearchMeNearUser = true;
                 isTouchAll = true;
                 isTouchUserList = false;
                 isTouchMerchantList = false;
@@ -297,51 +323,51 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
         }
     }
 
-    private void startPlayActivity(){
+    private void startPlayActivity() {
         Intent intent = new Intent(getContext(), GoodPlayActivity.class);
         startActivity(intent);
     }
 
-    private void startPlayerActivity(){
+    private void startPlayerActivity() {
         Intent intent = new Intent(getContext(), PlayersActivity.class);
         startActivity(intent);
     }
 
-    private void startLoveActivity(){
+    private void startLoveActivity() {
         Intent intent = new Intent(getContext(), LoverActivity.class);
         startActivity(intent);
     }
 
     @Override
-    public void refreshMerchantList(String json) {
-        currentMerchantPage +=1;
+    public void refreshMerchantList(ArrayList<MerchantBean> list) {
+        currentMerchantPage += 1;
         refreshLayoutUser.setEnabled(true);
         refreshLayoutMerchant.setRefreshing(false);
-        if (!TextUtils.isEmpty(json)){
-            merchantListAdapter.setData(merchantBeanList);
+        merchantListAdapter.setData(merchantBeanList);
+        merchantListAdapter.notifyDataSetChanged();
+        int size = list.size();
+        for (int i = size - 1; i >= 0; i--) {
+            merchantBeanList.add(0, list.get(i));
             merchantListAdapter.notifyDataSetChanged();
-            int size = merchantBeanList.size();
-            for (int i = size -1;i >= 0;i--){
-                MerchantBean merchantBean = new MerchantBean(11111,"水煮活鱼","100人推荐",null);
-                merchantBeanList.add(0,merchantBean);
-            }
+        }
+        if (!isRefreshMerchantList){
+            mCircleRecyclerView.scrollToPosition(merchantListAdapter.getItemCount() - 1);
         }
     }
 
     @Override
-    public void refreshUserList(String json) {
-        currentUserPage +=1;
+    public void refreshUserList(ArrayList<NearUserBean> list) {
+        currentUserPage += 1;
         refreshLayoutMerchant.setEnabled(true);
         refreshLayoutUser.setRefreshing(false);
-        if (!TextUtils.isEmpty(json)){
-            NearUserBean nearUserBean = GsonUtils.json2Bean(json,NearUserBean.class);
-            int size = nearUserBean.getData().size();
-            for (int i = size -1;i >= 0;i--){
-                userBeanList.add(0,nearUserBean.getData().get(i));
-            }
-            userListAdapter.setData(userBeanList);
-            userListAdapter.notifyDataSetChanged();
-            mCircleRecyclerView2.scrollToPosition(userListAdapter.getItemCount() -1);
+        int size = list.size();
+        for (int i = size - 1; i >= 0; i--) {
+            userBeanList.add(0, list.get(i));
+        }
+        userListAdapter.setData(userBeanList);
+        userListAdapter.notifyDataSetChanged();
+        if (!isRefreshUserList){
+            mCircleRecyclerView2.scrollToPosition(userListAdapter.getItemCount() - 1);
         }
     }
 }

@@ -5,9 +5,11 @@ import com.markLove.Xplan.base.mvp.BaseModel;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.mvp.BaseView;
 import com.markLove.Xplan.bean.MerchantBean;
+import com.markLove.Xplan.bean.NearUserBean;
 import com.markLove.Xplan.bean.PostQueryInfo;
 import com.markLove.Xplan.bean.UserBean;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import retrofit2.http.QueryMap;
@@ -18,8 +20,8 @@ import retrofit2.http.QueryMap;
 public interface SearchContract {
 
     interface View extends BaseView {
-        void refreshMerchantList(String json);
-        void refreshUserList(String json);
+        void refreshMerchantList(ArrayList<MerchantBean> list);
+        void refreshUserList(ArrayList<NearUserBean> list);
     }
 
     abstract class Model extends BaseModel {

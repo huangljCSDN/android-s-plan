@@ -25,14 +25,14 @@ import java.util.List;
 public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.MyViewHolder>{
 
     private Context context;
-    private List<NearUserBean.NearUserEntity> list = new ArrayList<>();
+    private List<NearUserBean> list = new ArrayList<>();
 
-    public UserListAdapter(Context context, List<NearUserBean.NearUserEntity> datas) {
+    public UserListAdapter(Context context, List<NearUserBean> datas) {
         this.context = context;
         this.list =datas;
     }
 
-    public void setData(List<NearUserBean.NearUserEntity> data){
+    public void setData(List<NearUserBean> data){
         this.list = data;
 //        notifyDataSetChanged();
     }
@@ -46,13 +46,13 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.MyView
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
+        holder.contentView.setTag(position);
         if (position == getItemCount() - 1 || position == getItemCount() -2){
             holder.contentView.setVisibility(View.INVISIBLE);
         } else {
             holder.contentView.setVisibility(View.VISIBLE);
-            holder.contentView.setTag(position);
-            NearUserBean.NearUserEntity peopleBean = list.get(position);
+            NearUserBean peopleBean = list.get(position);
             holder.nickName.setText(peopleBean.getNickName());
             holder.tvTime.setText(peopleBean.getLastOnline());
             if (peopleBean.getSex() == 1){
@@ -61,11 +61,20 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.MyView
                 holder.ivSex.setImageResource(R.drawable.ic_woman);
             }
 
-            Glide.with(context).load(R.drawable.icon)
+            Glide.with(context).load(peopleBean.getHeadImageUrl())
                     .apply(RequestOptions.placeholderOf(R.drawable.bg_circle))
                     .apply(RequestOptions.errorOf(R.drawable.bg_circle))
                     .apply(RequestOptions.circleCropTransform())
                     .into(holder.ivHead);
+
+            holder.contentView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (onItemClickListener != null){
+                        onItemClickListener.onItemClick(view,position);
+                    }
+                }
+            });
         }
     }
 
@@ -87,6 +96,16 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.MyView
             ivSex = (ImageView) itemView.findViewById(R.id.iv_sex);
             ivHead = (ImageView) itemView.findViewById(R.id.iv_head);
         }
+    }
+
+    public interface OnItemClickListener{
+        void onItemClick(View view,int position);
+    }
+
+    public MerchantListAdapter.OnItemClickListener onItemClickListener;
+
+    public void setOnItemClickListener(MerchantListAdapter.OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
     }
 
 }

@@ -229,7 +229,14 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
 
     private void publish() {
         if (!checkContentIsEmpty()) {
-//            if ()
+            if (type != 0){
+                List<File> files = new ArrayList<>();
+                for (Media media : photoList){
+                    String path = media.path;
+                    files.add(new File(path));
+                }
+                filePresenter.upload(files);
+            }
         } else {
             showContentEmptyDialog();
         }
@@ -271,15 +278,12 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
         if (mEditext.getText().toString().trim().isEmpty()) {
             count++;
         }
-
-        if (mediaList.size() > 1) {
+        if (mediaList.size() > 0) {
             count++;
         }
-
         if (voiceMessage != null) {
             count++;
         }
-
         if (count == 0) {
             return true;
         }
@@ -295,17 +299,6 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
             }
         });
         exitEditDialog.show();
-    }
-
-    private void showDeleteVoiceDialog() {
-        DeleteVoiceDialog deleteVoiceDialog = new DeleteVoiceDialog(this);
-        deleteVoiceDialog.setOnDialogCallBack(new DeleteVoiceDialog.OnDialogCallBack() {
-            @Override
-            public void onCallBack(String content) {
-
-            }
-        });
-        deleteVoiceDialog.show();
     }
 
     private void showContentEmptyDialog() {
@@ -365,8 +358,10 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
                     type = 2;
                 } else {
                     //视频图片不能同时存在
-                    if (photoList.get(0).mediaType == 3) {
-                        photoList.clear();
+                    if (!photoList.isEmpty()){
+                        if (photoList.get(0).mediaType == 3) {
+                            photoList.clear();
+                        }
                     }
                     Media media = new Media(path, "", 0, 2, 999, 9999, "");
                     photoList.add(media);
@@ -377,9 +372,12 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
             if (requestCode == Constants.REQUEST_CODE_PICKER) {
                 select = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
                 //视频图片不能同时存在
-                if (photoList.get(0).mediaType == 3 && select.size() > 0) {
-                    photoList.clear();
+                if (!photoList.isEmpty()){
+                    if (photoList.get(0).mediaType == 3 && select.size() > 0) {
+                        photoList.clear();
+                    }
                 }
+
                 Boolean isOrigin = data.getBooleanExtra(PickerConfig.IS_ORIGIN, false);
                 for (final Media media : select) {
                     onImageReturn(null, media.path, isOrigin);
