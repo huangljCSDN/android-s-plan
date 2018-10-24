@@ -102,6 +102,11 @@ public class App extends Application {
         return userId;
     }
 
+    public UserBean getUserBean(){
+        UserBean userBean = GsonUtils.json2Bean(PreferencesUtils.getString(this,PreferencesUtils.KEY_USER),UserBean.class);
+        return userBean;
+    }
+
     public AMapLocation getaMapLocation() {
         return aMapLocation;
     }

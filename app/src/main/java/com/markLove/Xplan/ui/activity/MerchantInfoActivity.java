@@ -1,7 +1,7 @@
-package com.markLove.Xplan.ui.fragment;
+package com.markLove.Xplan.ui.activity;
 
 import android.content.Intent;
-import android.view.View;
+import android.os.Bundle;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
@@ -10,29 +10,28 @@ import android.widget.LinearLayout;
 
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.mvp.BasePresenter;
-import com.markLove.Xplan.base.ui.BaseFragment;
+import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.ChatBean;
-import com.markLove.Xplan.ui.activity.CpChatActivity;
-import com.markLove.Xplan.ui.activity.GroupChatActivity;
-import com.markLove.Xplan.ui.activity.ShopChatActivity;
-import com.markLove.Xplan.ui.activity.SingleChatActivity;
 import com.markLove.Xplan.utils.GsonUtils;
 import com.markLove.Xplan.utils.LogUtils;
+import com.markLove.Xplan.utils.StatusBarUtil;
 
-public class MsgFragment extends BaseFragment {
+public class MerchantInfoActivity extends BaseActivity {
     private WebView mWebView;
+    private int id;
     @Override
-    protected int getContentViewLayoutID() {
-        return R.layout.fragment_msg;
+    protected int getContentViewId() {
+        return R.layout.activity_register;
     }
 
     @Override
-    protected void init(View view) {
-        mWebView = new WebView(getContext());
-        LinearLayout mll = view.findViewById(R.id.rootView);
-        //避免内存泄露，采用动态添加的方式
+    protected void init(Bundle savedInstanceState) {
+        fullScreen(this);
+        StatusBarUtil.StatusBarLightMode(this);
+        mWebView = new WebView(this);
+        LinearLayout mll = findViewById(R.id.rootView);
 
-//        mWebView = findViewById(R.id.webView);
+        id = getIntent().getIntExtra("chatId",0);
         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         mWebView.setLayoutParams(layoutParams);
         mll.addView(mWebView);
@@ -58,59 +57,28 @@ public class MsgFragment extends BaseFragment {
         settings.setJavaScriptEnabled(true);
         // 支持缩放
         settings.setSupportZoom(true);
+
         mWebView.addJavascriptInterface(new JSInterface(), "xplanfunc");
-        mWebView.loadUrl("file:///android_asset/package/main/index.html#/message/native/1");
+        id = getIntent().getIntExtra("chatId",0);
+        mWebView.loadUrl("file:///android_asset/package/main/index.html#/find/store/{"+id+"}");
 
     }
 
+    // 继承自Object类
     public class JSInterface extends Object {
 
         // 被JS调用的方法必须加入@JavascriptInterface注解
         @JavascriptInterface
         public void toChatRoom(String json) {
             LogUtils.i("huang", "toChatRoom=" + json);
-            ChatBean chatBean = GsonUtils.json2Bean(json, ChatBean.class);
-            switch (chatBean.getChatType()){
-                case 1:
-                    startGroupChatActivity(chatBean.getChatId());
-                    break;
-                case 2:
-                    startShopChatActivity(chatBean.getChatId());
-                    break;
-                case 3:
-                    startCpChatActivity(chatBean.getChatId());
-                    break;
-                case 4:
-                    startSingleChatActivity(chatBean.getChatId());
-                    break;
-            }
+            startShopChatActivity(json);
         }
     }
 
-    private void startShopChatActivity(int id) {
-        Intent intent = new Intent(getContext(), ShopChatActivity.class);
-        intent.putExtra("chatId", id);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-    }
-
-    private void startGroupChatActivity(int id) {
-        Intent intent = new Intent(getContext(), GroupChatActivity.class);
-        intent.putExtra("chatId", id);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-    }
-
-    private void startSingleChatActivity(int id) {
-        Intent intent = new Intent(getContext(), SingleChatActivity.class);
-        intent.putExtra("chatId", id);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-    }
-
-    private void startCpChatActivity(int id) {
-        Intent intent = new Intent(getContext(), CpChatActivity.class);
-        intent.putExtra("chatId", id);
+    private void startShopChatActivity(final String json) {
+        ChatBean chatBean = GsonUtils.json2Bean(json, ChatBean.class);
+        Intent intent = new Intent(this, ShopChatActivity.class);
+        intent.putExtra("chatId", chatBean.getChatId());
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
@@ -134,6 +102,11 @@ public class MsgFragment extends BaseFragment {
         mWebView.destroy();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+    }
 
     @Override
     public BasePresenter onCreatePresenter() {

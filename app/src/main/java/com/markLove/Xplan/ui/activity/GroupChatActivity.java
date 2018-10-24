@@ -32,8 +32,9 @@ import com.cjt2325.cameralibrary.util.FileUtil;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
 import com.markLove.Xplan.R;
-import com.markLove.Xplan.base.mvp.BasePresenter;
+import com.markLove.Xplan.base.App;
 import com.markLove.Xplan.base.ui.BaseActivity;
+import com.markLove.Xplan.bean.BaseBean;
 import com.markLove.Xplan.bean.ChatUser;
 import com.markLove.Xplan.bean.msg.Message;
 import com.markLove.Xplan.bean.msg.body.FileMessageBody;
@@ -42,7 +43,9 @@ import com.markLove.Xplan.config.Constants;
 import com.markLove.Xplan.db.DBDao;
 import com.markLove.Xplan.module.image.IImageCompressor;
 import com.markLove.Xplan.mvp.contract.ChatView;
+import com.markLove.Xplan.mvp.contract.GroupChatContract;
 import com.markLove.Xplan.mvp.presenter.ChatPresenter;
+import com.markLove.Xplan.mvp.presenter.GroupChatPresenter;
 import com.markLove.Xplan.mvp.presenter.impl.ChatPresenterImpl;
 import com.markLove.Xplan.ui.adapter.GroupChatMessageAdapter;
 import com.markLove.Xplan.ui.dialog.MorePopWindow;
@@ -61,7 +64,9 @@ import com.markLove.Xplan.utils.StatusBarUtil;
 import com.markLove.Xplan.utils.ToastUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -73,7 +78,7 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * 组局聊天室
  */
-public class GroupChatActivity extends BaseActivity implements View.OnClickListener, ChatView {
+public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implements View.OnClickListener, ChatView,GroupChatContract.View {
     private ArrayList<Media> select;
     private FrameLayout mFlMore;
     private RecyclerView rlChatMsgList;
@@ -107,8 +112,8 @@ public class GroupChatActivity extends BaseActivity implements View.OnClickListe
     }
 
     @Override
-    public BasePresenter onCreatePresenter() {
-        return null;
+    public GroupChatPresenter onCreatePresenter() {
+        return new GroupChatPresenter();
     }
 
     @Override
@@ -134,6 +139,7 @@ public class GroupChatActivity extends BaseActivity implements View.OnClickListe
         findViewById(R.id.tv_cancel).setOnClickListener(this);
         findViewById(R.id.iv_remove).setOnClickListener(this);
         findViewById(R.id.btn_enter).setOnClickListener(this);
+        mRlHeads.setOnClickListener(this);
         addPersonHeadPhoto();
 
         chatView = findViewById(R.id.chatView);
@@ -183,7 +189,11 @@ public class GroupChatActivity extends BaseActivity implements View.OnClickListe
                 break;
             case R.id.btn_enter:
 //                signUp();
-                getTestData();
+//                getTestData();
+                startInvitingFriendsActivity();
+                break;
+            case R.id.rl_heads:
+                startGroupMembersActivity();
                 break;
         }
     }
@@ -213,6 +223,18 @@ public class GroupChatActivity extends BaseActivity implements View.OnClickListe
         }
     }
 
+    private void startGroupMembersActivity(){
+        Intent intent = new Intent(GroupChatActivity.this,GroupMembersActivity.class);
+        intent.putExtra("chatId",to_user_id);
+        startActivity(intent);
+    }
+
+    private void startInvitingFriendsActivity(){
+        Intent intent = new Intent(GroupChatActivity.this,InvitingFriendsActivity.class);
+        intent.putExtra("chatId",to_user_id);
+        startActivity(intent);
+    }
+
     protected void initData() {
         mTvPlace.setText("市民一路");
         mTvTime.setText("10:11:22");
@@ -237,13 +259,14 @@ public class GroupChatActivity extends BaseActivity implements View.OnClickListe
 //        Bundle bundle = intent.getBundleExtra("data");
 //        if (null == bundle) {
 ////            ToastUtils.showCenter(this, "无效的接受者", 0);
-//            finish();o
+//            finish();
 //        } else {
-//            to_user_id = Integer.parseInt(bundle.getString("user_id"));
-//            nickName = bundle.getString("nick_name");
+//
+////            nickName = bundle.getString("nick_name");
 //            headImgUrl = bundle.getString("head_img_url");
 //        }
-        me_user_id = PreferencesUtils.getInt(this, Constants.ME_USER_ID);
+        to_user_id = intent.getIntExtra("chatId",0);
+        me_user_id = Integer.parseInt(App.getInstance().getUserId());
         LogUtils.d("me_user_id=" + me_user_id);
 //        tvChatUser.setText(nickName);
         LinearLayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -260,13 +283,45 @@ public class GroupChatActivity extends BaseActivity implements View.OnClickListe
 
         chatMessageAdapter.registerAdapterDataObserver(adapterDataObserver);
 
-
         chatPresenter = new ChatPresenterImpl();
         chatPresenter.setView(this);
 //        tvChatSendPrice.setText(gold + "");
 //        chatPresenter.getHistory(me_user_id, to_user_id);
 //        getGiftList();
         getChatOpen();
+        getGroupDetailInfo(to_user_id);
+    }
+
+    /**
+     * 获取组局聊天室详情
+     * @param groupId
+     */
+    private void getGroupDetailInfo(int groupId) {
+        Map<String, String> map = new HashMap<>();
+        map.put("groupId", String.valueOf(groupId));
+        mPresenter.joinGroup(map);
+    }
+
+    /**
+     * 报名参加组局
+     * @param groupId
+     */
+    private void applyGroup(int groupId) {
+        Map<String, String> map = new HashMap<>();
+        map.put("groupId", String.valueOf(groupId));
+        mPresenter.applyGroup(map);
+    }
+
+    /**
+     * 同意报名
+     * @param targetUserId
+     * @param groupId
+     */
+    private void participateGroup(long targetUserId,int groupId) {
+        Map<String, String> map = new HashMap<>();
+        map.put("targetUserId", String.valueOf(targetUserId));
+        map.put("groupId", String.valueOf(groupId));
+        mPresenter.participateGroup(map);
     }
 
     /**
@@ -538,9 +593,9 @@ public class GroupChatActivity extends BaseActivity implements View.OnClickListe
                 }
             });
         } else {
-            if (message.getChatType() == Message.ChatType.LOVE) {
-                PreferencesUtils.putLong(this, Constants.BECOME_COUPLE_TIME_KEY + to_user_id, 0);
-            }
+//            if (message.getChatType() == Message.ChatType.LOVE) {
+//                PreferencesUtils.putLong(this, Constants.BECOME_COUPLE_TIME_KEY + to_user_id, 0);
+//            }
             ToastUtils.showCenter(this, "该服务正在紧急维护当中，请稍后再试", 0);
             updataMessage(message.getMsgID(), Message.ChatStatus.FAIL.ordinal());
         }
@@ -956,4 +1011,18 @@ public class GroupChatActivity extends BaseActivity implements View.OnClickListe
         });
     }
 
+    @Override
+    public void onJoinGroup(BaseBean baseBean) {
+
+    }
+
+    @Override
+    public void onParticipateGroup(BaseBean baseBean) {
+
+    }
+
+    @Override
+    public void onApplyGroup(BaseBean baseBean) {
+
+    }
 }

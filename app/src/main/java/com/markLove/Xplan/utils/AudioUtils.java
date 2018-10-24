@@ -16,6 +16,7 @@ import java.io.RandomAccessFile;
 
 public class AudioUtils {
     public final static int MAX_VOICE_TIME = 60;
+    public final static int MAX_VOICE_TIME_LAGER = 60*5;
     public final static int COUNTDOWN_VOICE_TIME = 55;
     private MediaPlayer mediaPlayer;
     private static final String TAG = "RecorderUtil";

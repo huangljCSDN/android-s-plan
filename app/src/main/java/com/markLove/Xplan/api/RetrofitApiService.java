@@ -96,7 +96,7 @@ public interface RetrofitApiService {
      */
     @Multipart
     @POST("system/dfs/upload")
-    Observable<BaseBean> upload(@Part() List<MultipartBody.Part> parts);
+    Observable<BaseBean<Object>> upload(@Part() List<MultipartBody.Part> parts);
 
     /**
      * 文件上传  通过 MultipartBody和@body作为参数来上传
@@ -107,12 +107,12 @@ public interface RetrofitApiService {
     Observable<BaseBean> upload(@Body MultipartBody multipartBody);
 
     /**
-     * 加入组局
+     * 进入组局，组局详情
      * @param map
      * @return
      */
     @POST("user/group/joinGroup")
-    Observable<BaseBean> joinGroup(@QueryMap Map<String, String> map);
+    Observable<BaseBean<Object>> joinGroup(@QueryMap Map<String, String> map);
 
     /**
      * 同意报名
@@ -120,7 +120,15 @@ public interface RetrofitApiService {
      * @return
      */
     @POST("user/group/participateGroup")
-    Observable<BaseBean> participateGroup(@QueryMap Map<String, String> map);
+    Observable<BaseBean<Object>> participateGroup(@QueryMap Map<String, String> map);
+
+    /**
+     * 报名参加组局
+     * @param map
+     * @return
+     */
+    @POST("/user/group/applyGroup")
+    Observable<BaseBean<Object>> applyGroup(@QueryMap Map<String, String> map);
 
     /**
      * 关注
@@ -129,5 +137,13 @@ public interface RetrofitApiService {
      */
     @POST("user/operation/focus")
     Observable<BaseBean> focus(@QueryMap Map<String, String> map);
+
+    /**
+     * 取消关注
+     * @param map
+     * @return
+     */
+    @POST("/user/operation/cancelFocus")
+    Observable<BaseBean> cancelFocus(@QueryMap Map<String, String> map);
 
 }

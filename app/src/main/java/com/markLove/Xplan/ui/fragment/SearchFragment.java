@@ -3,7 +3,6 @@ package com.markLove.Xplan.ui.fragment;
 import android.content.Intent;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
-import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -23,7 +22,9 @@ import com.markLove.Xplan.mvp.contract.SearchContract;
 import com.markLove.Xplan.mvp.presenter.SearchPresenter;
 import com.markLove.Xplan.ui.activity.GoodPlayActivity;
 import com.markLove.Xplan.ui.activity.LoverActivity;
+import com.markLove.Xplan.ui.activity.MerchantInfoActivity;
 import com.markLove.Xplan.ui.activity.PlayersActivity;
+import com.markLove.Xplan.ui.activity.UserInfoActivity;
 import com.markLove.Xplan.ui.adapter.MerchantListAdapter;
 import com.markLove.Xplan.ui.adapter.UserListAdapter;
 import com.markLove.Xplan.utils.GsonUtils;
@@ -212,7 +213,10 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
         merchantListAdapter.setOnItemClickListener(new MerchantListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-//                UserBean.UserInfoEntity nearUser = userBeanList.get(position);
+                MerchantBean merchantBean = merchantBeanList.get(position);
+                Intent intent = new Intent(getContext(), MerchantInfoActivity.class);
+                intent.putExtra("chatId",merchantBean.getMerchantId());
+                startActivity(intent);
             }
         });
         mCircleRecyclerView.setAdapter(merchantListAdapter);
@@ -257,7 +261,10 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
         userListAdapter.setOnItemClickListener(new MerchantListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-
+                NearUserBean nearUserBean = userBeanList.get(position);
+                Intent intent = new Intent(getContext(), UserInfoActivity.class);
+                intent.putExtra("chatId",nearUserBean.getUserId());
+                startActivity(intent);
             }
         });
 

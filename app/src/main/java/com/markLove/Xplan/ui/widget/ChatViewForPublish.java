@@ -31,7 +31,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.cjt2325.cameralibrary.util.AudioUtil;
 import com.dmcbig.mediapicker.PickerActivity;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
@@ -90,12 +89,7 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
     boolean isPlaying = false;
     boolean isReset = false;
     int voiceDuration;
-
-    boolean isLikeAndUser = false;
-    boolean toUserIDIsLove = false;
     boolean meIsLove = false;
-    boolean isBlackUser = false;
-    boolean keyboardIsShown = false;
     int me_user_id;
     int to_user_id;
 
@@ -161,8 +155,8 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
                 } else {
                     tvChatSend.setEnabled(false);
                 }
-                if (s.length() >= 200) {
-                    ToastUtils.show(getContext(), "最多200个字符", 0);
+                if (s.length() >= 500) {
+                    ToastUtils.show(getContext(), "最多500个字符", 0);
                 }
             }
 
@@ -314,7 +308,6 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
 
     /**
      * 停止录音
-     *
      */
     public void stopRecordering() {
         isEnd = true;
@@ -394,8 +387,8 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
 
     public void setRecorderingTime() {
         long timeInterval = AudioUtils.getInstance().getCurrentTimeInterval();
-        if (timeInterval >= AudioUtils.COUNTDOWN_VOICE_TIME && timeInterval < AudioUtils.MAX_VOICE_TIME) {
-        } else if (AudioUtils.getInstance().getCurrentTimeInterval() >= AudioUtils.MAX_VOICE_TIME) {
+        if (timeInterval >= AudioUtils.COUNTDOWN_VOICE_TIME && timeInterval < AudioUtils.MAX_VOICE_TIME_LAGER) {
+        } else if (AudioUtils.getInstance().getCurrentTimeInterval() >= AudioUtils.MAX_VOICE_TIME_LAGER) {
             isEnd = true;
         }
 //        mTvRecordTime.setText(showTimeCount(AudioUtils.getInstance().getCurrentTimeInterval() * 1000) +"s");
@@ -407,17 +400,6 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
                 AudioUtils.getInstance().stopRecording();
             } else {
                 AudioUtils.getInstance().cancelRecording();
-            }
-        }
-
-        if (currentProgress == totalProgress){
-            if (!isEnd) {
-                if (isRecordering) {
-                    isEnd = true;
-                    AudioUtils.getInstance().stopRecording();
-                } else {
-                    AudioUtils.getInstance().cancelRecording();
-                }
             }
         }
     }
@@ -461,7 +443,7 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
 
     //初始化语音
     private void initVoice() {
-        mAudioRecorderButton.setOnTouchListener(new OnTouchListener() {
+        mAudioRecorderButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 final String recorderingPermission = Manifest.permission.RECORD_AUDIO;
@@ -478,36 +460,18 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
                             if (!isEnd) {
-                                AudioUtils.getInstance().startRecording(audioRecoderListener);
+                                if (isRecordering) {
+                                    isEnd = true;
+                                    isRecordering = false;
+                                    AudioUtils.getInstance().stopRecording();
+                                } else {
+                                    AudioUtils.getInstance().startRecording(audioRecoderListener);
+                                }
                             } else {
                                 playVoice();
                             }
                             break;
-                        case MotionEvent.ACTION_MOVE:
-//                            moveY = (int) event.getY();
-//                            //当滑动的距离超出父容器的距离，则取消发送
-//                            if (moveY < 0 && Math.abs(moveY) > v.getTop()) {
-//                                isRecordering = false;
-//                            } else {
-//                                isRecordering = true;
-//                            }
-//                            setVoiceState();
-                            break;
-                        case MotionEvent.ACTION_UP:
-                            if (!isEnd) {
-                                if (isRecordering) {
-                                    isEnd = true;
-                                    AudioUtils.getInstance().stopRecording();
-                                } else {
-                                    AudioUtils.getInstance().cancelRecording();
-                                }
-                            }
-                            break;
-                        case MotionEvent.ACTION_CANCEL:
-                            if (isRecordering)
-                                isEnd = true;
-                            AudioUtils.getInstance().cancelRecording();
-                            break;
+
                         default:
                             break;
                     }

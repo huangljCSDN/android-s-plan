@@ -36,7 +36,7 @@ public class FileModel extends FileContract.Model {
         MultipartBody.Builder builder = new MultipartBody.Builder();
 
         for (File file : files) {
-            // TODO: 16-4-2  这里为了简单起见，没有判断file的类型
+            // 这里为了简单起见，没有判断file的类型
 //            RequestBody requestBody = RequestBody.create(MediaType.parse("image/png"), file);
             RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
             builder.addFormDataPart("file", file.getName(), requestBody);
@@ -49,7 +49,6 @@ public class FileModel extends FileContract.Model {
     public static List<MultipartBody.Part> filesToMultipartBodyParts(List<File> files) {
         List<MultipartBody.Part> parts = new ArrayList<>(files.size());
         for (File file : files) {
-            // TODO: 16-4-2  这里为了简单起见，没有判断file的类型
             RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
             MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
             parts.add(part);

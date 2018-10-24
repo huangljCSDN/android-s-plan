@@ -32,8 +32,10 @@ import com.cjt2325.cameralibrary.util.FileUtil;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
 import com.markLove.Xplan.R;
+import com.markLove.Xplan.base.App;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.ChatUser;
+import com.markLove.Xplan.bean.UserBean;
 import com.markLove.Xplan.bean.msg.Message;
 import com.markLove.Xplan.bean.msg.body.FileMessageBody;
 import com.markLove.Xplan.bean.msg.body.TxtMessageBody;
@@ -121,6 +123,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
         findViewById(R.id.fl_more).setOnClickListener(this);
         findViewById(R.id.tv_cancel).setOnClickListener(this);
         findViewById(R.id.iv_remove).setOnClickListener(this);
+        mLlPersons.setOnClickListener(this);
         mTvShopName.setText("重庆火锅");
         mTvAllPersonCount.setText("21314124人");
         addPersonHeadPhoto();
@@ -173,7 +176,16 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
             case R.id.iv_remove:
                 showRemoveDialog();
                 break;
+            case R.id.ll_person_count:
+                startMerchantMemberActivity();
+                break;
         }
+    }
+
+    private void startMerchantMemberActivity(){
+        Intent intent = new Intent(ShopChatActivity.this,MerchantMemberActivity.class);
+        intent.putExtra("chatId",to_user_id);
+        startActivity(intent);
     }
 
     protected void initData() {
@@ -197,8 +209,14 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 //            nickName = bundle.getString("nick_name");
 //            headImgUrl = bundle.getString("head_img_url");
 //        }
-        me_user_id = PreferencesUtils.getInt(this, Constants.ME_USER_ID);
-        LogUtils.d("me_user_id=" + me_user_id);
+        to_user_id = getIntent().getIntExtra("chatId",0);
+        String meHeadImgUrl="";
+        UserBean meUserBean = App.getInstance().getUserBean();
+        if (meUserBean != null){
+            me_user_id = meUserBean.getUserInfo().getUserId();
+            //        String meHeadImgUrl = meUserBean.getUserInfo().getNickName()
+        }
+        LogUtils.i("me_user_id=" + me_user_id + " to_user_id="+to_user_id);
 //        tvChatUser.setText(nickName);
         LinearLayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         chatMessageAdapter = new ChatMessageAdapter(this, new ArrayList<Message>());
@@ -206,7 +224,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
         String url = FileUtil.saveBitmap("haha", bitmap);
 //        chatMessageAdapter.setToHeadImgUrl(headImgUrl);
         chatMessageAdapter.setToHeadImgUrl(url);
-        chatMessageAdapter.setFromHeadImgUrl(PreferencesUtils.getString(this, Constants.ME_HEAD_IMG_URL));
+        chatMessageAdapter.setFromHeadImgUrl(meHeadImgUrl);
         chatMessageAdapter.setFailMessageResend(failMessageResend);
         manager.setStackFromEnd(false);
         rlChatMsgList.setLayoutManager(manager);

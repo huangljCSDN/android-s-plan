@@ -6,6 +6,7 @@ import com.markLove.Xplan.api.util.RequestCallBack;
 import com.markLove.Xplan.bean.BaseBean;
 import com.markLove.Xplan.mvp.contract.GroupChatContract;
 import com.markLove.Xplan.mvp.model.GroupChatModel;
+import com.markLove.Xplan.utils.LogUtils;
 
 import java.util.Map;
 
@@ -25,16 +26,17 @@ public class GroupChatPresenter extends GroupChatContract.Presenter {
         if (!isAttach()) return;
         getView().showLoading();
 
-        mModel.joinGroup(map, new RequestCallBack<BaseBean>() {
+        mModel.joinGroup(map, new RequestCallBack<BaseBean<Object>>() {
             @Override
-            public void onSuccess(BaseBean o) {
+            public void onSuccess(BaseBean<Object> baseBean) {
+                LogUtils.i("GroupChatPresenter",baseBean.toString());
                 getView().hideLoading();
-                getView().onJoinGroup(o);
+//                getView().onJoinGroup(baseBean);
             }
 
             @Override
             public void onFail(String result) {
-                Log.i("MainPresenter",result);
+                LogUtils.i("GroupChatPresenter",result);
                 getView().hideLoading();
                 getView().showError(result);
             }
@@ -48,14 +50,37 @@ public class GroupChatPresenter extends GroupChatContract.Presenter {
 
         mModel.participateGroup(map, new RequestCallBack<BaseBean>() {
             @Override
-            public void onSuccess(BaseBean o) {
+            public void onSuccess(BaseBean baseBean) {
+                LogUtils.i("GroupChatPresenter",baseBean.toString());
                 getView().hideLoading();
-                getView().onParticipateGroup(o);
+//                getView().onParticipateGroup(baseBean);
             }
 
             @Override
             public void onFail(String result) {
-                Log.i("MainPresenter",result);
+                Log.i("GroupChatPresenter",result);
+                getView().hideLoading();
+                getView().showError(result);
+            }
+        });
+    }
+
+    @Override
+    public void applyGroup(Map<String, String> map) {
+        if (!isAttach()) return;
+        getView().showLoading();
+
+        mModel.applyGroup(map, new RequestCallBack<BaseBean>() {
+            @Override
+            public void onSuccess(BaseBean baseBean) {
+                LogUtils.i("GroupChatPresenter",baseBean.toString());
+                getView().hideLoading();
+//                getView().onParticipateGroup(baseBean);
+            }
+
+            @Override
+            public void onFail(String result) {
+                Log.i("GroupChatPresenter",result);
                 getView().hideLoading();
                 getView().showError(result);
             }

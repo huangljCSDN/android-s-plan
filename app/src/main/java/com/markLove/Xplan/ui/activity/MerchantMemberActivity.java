@@ -3,6 +3,7 @@ package com.markLove.Xplan.ui.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.ViewGroup;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.LinearLayout;
@@ -10,10 +11,12 @@ import android.widget.LinearLayout;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseActivity;
+import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.StatusBarUtil;
 
-public class RegisterActivity extends BaseActivity {
+public class MerchantMemberActivity extends BaseActivity {
     private WebView mWebView;
+    private int id;
     @Override
     protected int getContentViewId() {
         return R.layout.activity_register;
@@ -21,12 +24,12 @@ public class RegisterActivity extends BaseActivity {
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        StatusBarUtil.StatusBarLightModeAndFullscreen(this);
+        fullScreen(this);
+        StatusBarUtil.StatusBarLightMode(this);
         mWebView = new WebView(this);
         LinearLayout mll = findViewById(R.id.rootView);
-        //避免内存泄露，采用动态添加的方式
 
-//        mWebView = findViewById(R.id.webView);
+        id = getIntent().getIntExtra("chatId",0);
         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         mWebView.setLayoutParams(layoutParams);
         mll.addView(mWebView);
@@ -53,10 +56,22 @@ public class RegisterActivity extends BaseActivity {
         // 支持缩放
         settings.setSupportZoom(true);
 
-        mWebView.loadUrl("file:///android_asset/package/main/index.html#/login/registration");
+        mWebView.addJavascriptInterface(new JSInterface(), "xplanfunc");
+        id = getIntent().getIntExtra("chatId",0);
+        mWebView.loadUrl("file:///android_asset/package/main/index.html#/find/store/member/{"+id+"}");
 
     }
 
+    // 继承自Object类
+    public class JSInterface extends Object {
+
+        // 被JS调用的方法必须加入@JavascriptInterface注解
+        @JavascriptInterface
+        public void exitGroup() {
+            LogUtils.i("huang", "exitGroup=");
+
+        }
+    }
 
 //    @Override
 //    public void onBackPressed() {

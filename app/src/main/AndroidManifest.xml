@@ -62,7 +62,8 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".ui.activity.GroupChatActivity" />
+        <activity android:name=".ui.activity.GroupChatActivity"
+            android:launchMode="standard"/>
         <activity android:name=".ui.activity.SingleChatActivity" />
         <activity android:name=".ui.activity.ShopChatActivity" />
         <activity android:name=".ui.activity.PlayersActivity" />
@@ -73,6 +74,11 @@
         <activity android:name=".ui.activity.PublishActivity" />
         <activity android:name=".ui.activity.UserInfoActivity" />
         <activity android:name=".ui.activity.PublishPreviewActivity" />
+        <activity android:name=".ui.activity.GroupMembersActivity" />
+        <activity android:name=".ui.activity.InvitingFriendsActivity" />
+        <activity android:name=".ui.activity.MerchantInfoActivity" />
+        <activity android:name=".ui.activity.MerchantMemberActivity" />
+        <activity android:name=".ui.activity.WebViewActivity" />
         <activity android:name=".ui.activity.SetPermissionActivity"></activity>
 
         <service android:name="com.amap.api.location.APSService"></service>

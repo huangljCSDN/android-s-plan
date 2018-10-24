@@ -12,8 +12,12 @@ import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.utils.StatusBarUtil;
 
-public class RegisterActivity extends BaseActivity {
+/**
+ * 邀请好友
+ */
+public class InvitingFriendsActivity extends BaseActivity {
     private WebView mWebView;
+    private int id;
     @Override
     protected int getContentViewId() {
         return R.layout.activity_register;
@@ -21,7 +25,8 @@ public class RegisterActivity extends BaseActivity {
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        StatusBarUtil.StatusBarLightModeAndFullscreen(this);
+        fullScreen(this);
+        StatusBarUtil.StatusBarLightMode(this);
         mWebView = new WebView(this);
         LinearLayout mll = findViewById(R.id.rootView);
         //避免内存泄露，采用动态添加的方式
@@ -52,8 +57,8 @@ public class RegisterActivity extends BaseActivity {
         settings.setJavaScriptEnabled(true);
         // 支持缩放
         settings.setSupportZoom(true);
-
-        mWebView.loadUrl("file:///android_asset/package/main/index.html#/login/registration");
+        id = getIntent().getIntExtra("chatId",0);
+        mWebView.loadUrl("file:///android_asset/package/main/index.html#/bureau/invitation/{"+id+"}");
 
     }
 

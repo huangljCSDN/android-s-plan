@@ -12,25 +12,16 @@
         android:id="@+id/rl_title_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:minHeight="35dp"
         android:background="@color/white"
-        android:gravity="center_vertical"
-        android:paddingTop="25dp">
-
-        <TextView
-            android:id="@+id/tv_cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="15dp"
-            android:text="@string/cancel"
-            android:textColor="@color/color_333333"
-            android:visibility="gone"
-            android:textSize="15sp" />
+        android:gravity="center_vertical">
 
         <FrameLayout
             android:id="@+id/fl_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="15dp">
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp">
 
             <ImageView
                 android:layout_width="wrap_content"

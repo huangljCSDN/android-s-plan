@@ -6,6 +6,7 @@ import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.mvp.BaseView;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +18,7 @@ import retrofit2.http.QueryMap;
 public interface FileContract {
 
     interface View extends BaseView {
-        void uploadSuccess(String json);
+        void uploadSuccess(ArrayList<String> path);
         void downloadSuccess(String json);
     }
 

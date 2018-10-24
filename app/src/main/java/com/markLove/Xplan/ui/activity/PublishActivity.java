@@ -25,6 +25,7 @@ import com.dmcbig.mediapicker.entity.Media;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.App;
 import com.markLove.Xplan.base.ui.BaseActivity;
+import com.markLove.Xplan.bean.UserBean;
 import com.markLove.Xplan.bean.msg.Message;
 import com.markLove.Xplan.bean.msg.body.FileMessageBody;
 import com.markLove.Xplan.config.Constants;
@@ -36,13 +37,13 @@ import com.markLove.Xplan.mvp.presenter.FilePresenter;
 import com.markLove.Xplan.mvp.presenter.PublishPresenter;
 import com.markLove.Xplan.ui.adapter.PublishMediaGridAdapter;
 import com.markLove.Xplan.ui.dialog.ContentEmptyDialog;
-import com.markLove.Xplan.ui.dialog.DeleteVoiceDialog;
 import com.markLove.Xplan.ui.dialog.ExitEditDialog;
 import com.markLove.Xplan.ui.widget.ChatViewForPublish;
 import com.markLove.Xplan.utils.AudioUtils;
 import com.markLove.Xplan.utils.FileUtils;
 import com.markLove.Xplan.utils.ImageUtils;
 import com.markLove.Xplan.utils.LogUtils;
+import com.markLove.Xplan.utils.StatusBarUtil;
 import com.markLove.Xplan.utils.ToastUtils;
 
 import java.io.File;
@@ -63,7 +64,7 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * 发布动态
  */
-public class PublishActivity extends BaseActivity<PublishPresenter> implements View.OnClickListener,PublishContract.View,FileContract.View {
+public class PublishActivity extends BaseActivity<PublishPresenter> implements View.OnClickListener, PublishContract.View, FileContract.View {
     private ImageView mIvHead;
     private ImageView mIvLocation;
     private TextView mTvPublish, mTvOpen;
@@ -72,11 +73,10 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
     private EditText mEditext;
     private RecyclerView mRecycleView;
     private LinearLayout mLocation;
-    private List<Media> mediaList = new ArrayList<>();
+    private ArrayList<Media> mediaList = new ArrayList<>();
     private ChatViewForPublish chatView;
     private PublishMediaGridAdapter gridAdapter;
     private ArrayList<Media> select;
-    private ArrayList<Media> photoList = new ArrayList<>();
     private Message voiceMessage;
     private int voiceDuration;
     private int videoDuration;
@@ -87,6 +87,7 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
     //1：图片，2：视频(第一个文件是视频，第二个是缩略图)，3：语音
     private int type;
     private String city;
+    private UserBean meUserBean;
 
     @Override
     protected int getContentViewId() {
@@ -95,6 +96,8 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
 
     @Override
     protected void init(Bundle savedInstanceState) {
+        StatusBarUtil.setStatusBarColor(this,R.color.white);
+        StatusBarUtil.StatusBarLightMode(this);
         mIvHead = findViewById(R.id.iv_head);
         mTvPublish = findViewById(R.id.tv_publish);
         mTvOpen = findViewById(R.id.tv_open);
@@ -114,17 +117,17 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
         initSoftKeyboard();
         setListener();
         createAdapter();
+        meUserBean = App.getInstance().getUserBean();
 
         filePresenter = new FilePresenter();
         filePresenter.attachView(this);
     }
 
-    private void setListener(){
+    private void setListener() {
         chatView.setOnSendMessageListener(new ChatViewForPublish.OnSendMessageListener() {
             @Override
             public void onSendMessage(Message message) {
                 //只有录音信息会回调这里
-                mTvVoice.setVisibility(View.VISIBLE);
                 voiceMessage = message;
                 FileMessageBody voiceMessageBody = (FileMessageBody) voiceMessage.getBody();
                 String voicePath = "";
@@ -138,6 +141,12 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
                 voiceDuration = FileUtils.getAmrDuration(voicePath);
                 mTvVoice.setText((voiceDuration > 60 ? 60 : voiceDuration - 1) + "\"");
                 type = 3;
+                mediaList.clear();
+                Media media = new Media(voicePath, "", 0, 3, 999, 9999, "");
+                mediaList.add(media);
+                mTvPublish.setTextColor(getColor(R.color.color_30efec));
+                mRecycleView.setVisibility(View.GONE);
+                mTvVoice.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -179,14 +188,14 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
         }
     }
 
-    private void getLocation(){
+    private void getLocation() {
         AMapLocation aMapLocation = App.getInstance().getaMapLocation();
-        if (aMapLocation != null){
+        if (aMapLocation != null) {
             city = aMapLocation.getCity();
             mTvLocation.setText(city);
             mIvLocation.setSelected(true);
         } else {
-            ToastUtils.showShort(this,"获取定位失败");
+            ToastUtils.showShort(this, "获取定位失败");
         }
     }
 
@@ -229,9 +238,9 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
 
     private void publish() {
         if (!checkContentIsEmpty()) {
-            if (type != 0){
+            if (type != 0) {
                 List<File> files = new ArrayList<>();
-                for (Media media : photoList){
+                for (Media media : mediaList) {
                     String path = media.path;
                     files.add(new File(path));
                 }
@@ -243,48 +252,13 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
     }
 
     /**
-     * 网络请求:发布
-     */
-    private void addLocus(){
-        Map<String,String> map = new HashMap<>();
-//            map.put("path",mediaList);
-        //1：图片，2：视频(第一个文件是视频，第二个是缩略图)，3：语音
-        map.put("type",String.valueOf(type));
-        //上传视频/语音时长
-        if (type == 2){
-            map.put("duration", String.valueOf(videoDuration));
-        } else if (type == 3){
-            map.put("duration",String.valueOf(voiceDuration));
-        }
-        map.put("content",mEditext.getText().toString().trim());
-        map.put("address",city);
-        map.put("visible",String.valueOf(visible));
-        mPresenter.addLocus(map);
-    }
-
-    private void upload(){
-        Map<String,String> map = new HashMap<>();
-        map.put("file",String.valueOf(visible));
-//        map.put("Token",token);
-        mPresenter.addLocus(map);
-    }
-
-    /**
      * 校验发布的内容是否为空
+     *
      * @return
      */
     public boolean checkContentIsEmpty() {
-        int count = 0;
-        if (mEditext.getText().toString().trim().isEmpty()) {
-            count++;
-        }
-        if (mediaList.size() > 0) {
-            count++;
-        }
-        if (voiceMessage != null) {
-            count++;
-        }
-        if (count == 0) {
+        if (mEditext.getText().toString().trim().isEmpty() && mediaList.size() <= 0 &&
+                voiceMessage == null) {
             return true;
         }
         return false;
@@ -347,48 +321,64 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
         super.onActivityResult(requestCode, resultCode, data);
         if (data != null) {
             LogUtils.i("huang", "requestCode=" + requestCode + "   resultCode=" + resultCode);
+            //拍照
             if (requestCode == Constants.REQUEST_CODE_CAMERA) {
                 final String path = data.getStringExtra("path");
                 LogUtils.i("huang", "path=" + path);
                 if (path.contains("mp4")) {
-                    photoList.clear();
-                    Media media = new Media(path, "", 0, 3, 999, 9999, "");
-                    photoList.add(media);
+                    mediaList.clear();
+                    Media media = new Media(path, "", 0, 2, 999, 9999, "");
+                    mediaList.add(media);
                     videoDuration = FileUtils.getAmrDuration(path);
                     type = 2;
                 } else {
-                    //视频图片不能同时存在
-                    if (!photoList.isEmpty()){
-                        if (photoList.get(0).mediaType == 3) {
-                            photoList.clear();
+                    //视频、语音、图片不能同时存在
+                    if (!mediaList.isEmpty()) {
+                        if (mediaList.get(0).mediaType == 2 || mediaList.get(0).mediaType == 3) {
+                            mediaList.clear();
                         }
                     }
-                    Media media = new Media(path, "", 0, 2, 999, 9999, "");
-                    photoList.add(media);
+                    Media media = new Media(path, "", 0, 1, 999, 9999, "");
+                    mediaList.add(media);
                     type = 1;
                 }
-                gridAdapter.setData(photoList);
+                gridAdapter.setData(mediaList);
+                mTvPublish.setTextColor(getColor(R.color.color_30efec));
+                mRecycleView.setVisibility(View.VISIBLE);
+                mTvVoice.setVisibility(View.GONE);
             }
+            //相册
             if (requestCode == Constants.REQUEST_CODE_PICKER) {
                 select = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
-                //视频图片不能同时存在
-                if (!photoList.isEmpty()){
-                    if (photoList.get(0).mediaType == 3 && select.size() > 0) {
-                        photoList.clear();
+                if (select != null && !select.isEmpty()){
+                    //视频、语音、图片不能同时存在
+                    if (!mediaList.isEmpty()) {
+                        if ((mediaList.get(0).mediaType == 2 || mediaList.get(0).mediaType == 3) && select.size() > 0) {
+                            mediaList.clear();
+                        }
                     }
+                    //是否原图
+                    Boolean isOrigin = data.getBooleanExtra(PickerConfig.IS_ORIGIN, false);
+                    for (final Media media : select) {
+                        onImageReturn(null, media.path, isOrigin);
+                    }
+                    type = 1;
+                    mTvPublish.setTextColor(getColor(R.color.color_30efec));
+                    mRecycleView.setVisibility(View.VISIBLE);
+                    mTvVoice.setVisibility(View.GONE);
                 }
-
-                Boolean isOrigin = data.getBooleanExtra(PickerConfig.IS_ORIGIN, false);
-                for (final Media media : select) {
-                    onImageReturn(null, media.path, isOrigin);
-                }
-                type = 1;
             }
-
+            //已选图片预览
             if (requestCode == Constants.REQUEST_CODE_PREVIEW) {
-                photoList = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
-                gridAdapter.setData(photoList);
+                mediaList = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
+                if (mediaList.isEmpty()){
+                    mTvPublish.setTextColor(getColor(R.color.color_333333));
+                    mRecycleView.setVisibility(View.GONE);
+                    mTvVoice.setVisibility(View.GONE);
+                }
+                gridAdapter.setData(mediaList);
             }
+            //设置是否可见
             if (requestCode == Constants.REQUEST_CODE_VISIBLE) {
                 visible = data.getIntExtra("visible", 0);
                 if (visible == 0) {
@@ -480,9 +470,9 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
         imgMsg.setStatus(Message.ChatStatus.SENDING);
 
         if (isOrigin) {
-            Media media = new Media(filePath, "", 0, 2, 999, 9999, "");
-            photoList.add(media);
-            gridAdapter.setData(photoList);
+            Media media = new Media(filePath, "", 0, 1, 999, 9999, "");
+            mediaList.add(media);
+            gridAdapter.setData(mediaList);
         } else {
             Observable.create(new ObservableOnSubscribe<Message>() {
                 @Override
@@ -520,12 +510,11 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
 
                         @Override
                         public void onNext(Message message) {
-//                            judeBlackList(message);
                             FileMessageBody imgMessageBody = (FileMessageBody) imgMsg.getBody();
                             String outPath = Constants.LOCAL_IMG_PATH + imgMessageBody.getFileName();
-                            Media media = new Media(outPath, "", 0, 2, 999, 9999, "");
-                            photoList.add(media);
-                            gridAdapter.setData(photoList);
+                            Media media = new Media(outPath, "", 0, 1, 999, 9999, "");
+                            mediaList.add(media);
+                            gridAdapter.setData(mediaList);
                         }
 
                         @Override
@@ -555,20 +544,40 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
         AudioUtils.getInstance().play(voicePath, new AudioUtils.PlayStatusListener() {
             @Override
             public void playEnd() {
-                mTvVoice.setText((voiceDuration > 60 ? 60 : voiceDuration -1) + "\"");
+                mTvVoice.setText((voiceDuration > 60 ? 60 : voiceDuration - 1) + "\"");
             }
 
             @Override
             public void playStart() {
-                startTime = voiceDuration -1;
+                startTime = voiceDuration - 1;
                 handler.sendEmptyMessageDelayed(1, 1000);
             }
         });
     }
 
     @Override
-    public void uploadSuccess(String json) {
+    public void uploadSuccess(ArrayList<String> path) {
+        addLocus(path);
+    }
 
+    /**
+     * 网络请求:发布
+     */
+    private void addLocus(ArrayList<String> paths) {
+        Map<String, String> map = new HashMap<>();
+        map.put("path",paths.toString());
+        //1：图片，2：视频(第一个文件是视频，第二个是缩略图)，3：语音
+        map.put("type", String.valueOf(type));
+        //上传视频/语音时长
+        if (type == 2) {
+            map.put("duration", String.valueOf(videoDuration));
+        } else if (type == 3) {
+            map.put("duration", String.valueOf(voiceDuration));
+        }
+        map.put("content", mEditext.getText().toString().trim());
+        map.put("address", city);
+        map.put("visible", String.valueOf(visible));
+        mPresenter.addLocus(map);
     }
 
     @Override

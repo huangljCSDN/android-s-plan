@@ -1,7 +1,6 @@
 package com.markLove.Xplan.ui.activity;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -10,6 +9,7 @@ import android.widget.RelativeLayout;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseActivity;
+import com.markLove.Xplan.utils.StatusBarUtil;
 
 /**
  * 设置动态可见权限
@@ -28,12 +28,13 @@ public class SetPermissionActivity extends BaseActivity implements View.OnClickL
 
     @Override
     protected void init(Bundle savedInstanceState) {
+        StatusBarUtil.setStatusBarColor(this,R.color.white);
+        StatusBarUtil.StatusBarLightMode(this);
         ivSelectedAll = findViewById(R.id.iv_selected);
         ivSelectedMe = findViewById(R.id.iv_selected2);
 
         findViewById(R.id.rl_all).setOnClickListener(this);
         findViewById(R.id.rl_me).setOnClickListener(this);
-        findViewById(R.id.tv_cancel).setOnClickListener(this);
         findViewById(R.id.fl_back).setOnClickListener(this);
 
         visible = getIntent().getIntExtra("visible",0);

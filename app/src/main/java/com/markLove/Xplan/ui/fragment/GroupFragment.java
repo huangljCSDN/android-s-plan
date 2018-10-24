@@ -6,10 +6,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
-import android.webkit.ValueCallback;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 
 import com.dmcbig.mediapicker.PickerConfig;
@@ -18,13 +16,17 @@ import com.dmcbig.mediapicker.entity.Media;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseFragment;
+import com.markLove.Xplan.bean.ChatBean;
+import com.markLove.Xplan.bean.GoViewBeaan;
+import com.markLove.Xplan.ui.activity.GroupChatActivity;
+import com.markLove.Xplan.ui.activity.WebViewActivity;
+import com.markLove.Xplan.utils.GsonUtils;
+import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.ToastUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
 
-public class TeamFragment extends BaseFragment {
+public class GroupFragment extends BaseFragment {
     private WebView mWebView;
 
     @Override
@@ -77,21 +79,18 @@ public class TeamFragment extends BaseFragment {
     public class JSInterface extends Object {
 
         // 被JS调用的方法必须加入@JavascriptInterface注解
-
-        /**
-         * 获取用户信息
-         *
-         * @param json
-         */
         @JavascriptInterface
-        public void getLoginInfo(String json) {
-            ToastUtils.showLong(getContext(), "getLoginInfo");
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mWebView.loadUrl("javascript:photoFinish(" + "1" + ")");
-                }
-            });
+        public void toChatRoom(String json) {
+            //{"chatType":1,"chatId":1}
+            LogUtils.i("huang", "toChatRoom=" + json);
+            GroupFragment.this.startGroupChatActivity(json);
+
+//            getActivity().runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    mWebView.loadUrl("javascript:photoFinish(" + "1" + ")");
+//                }
+//            });
         }
 
         @JavascriptInterface
@@ -101,8 +100,8 @@ public class TeamFragment extends BaseFragment {
 
         /**
          * 拍照
-         *
-         *  uploadUrl
+         * <p>
+         * uploadUrl
          * sCallback photoFinish
          */
         @JavascriptInterface
@@ -112,9 +111,9 @@ public class TeamFragment extends BaseFragment {
 
         /**
          * 视频
-         *
+         * <p>
          * uploadUrl
-         *  sCallback videoFinish
+         * sCallback videoFinish
          */
         @JavascriptInterface
         public void goVideo(String json) {
@@ -124,7 +123,7 @@ public class TeamFragment extends BaseFragment {
 
         /**
          * 录音
-         *
+         * <p>
          * uploadUrl
          * sCallback videoFinish
          */
@@ -136,9 +135,9 @@ public class TeamFragment extends BaseFragment {
 
         /**
          * 调用相册，视频
-         *
+         * <p>
          * uploadUrl  后端提供的上传接口名
-         *  selectType 选择内容：1-图片、2-视频、3图片和视频
+         * selectType 选择内容：1-图片、2-视频、3图片和视频
          * backType   选择方式-单选（single）、多选(multi) 注：如果是多选，则返回数组
          * sCallback  photoFinish
          */
@@ -165,7 +164,7 @@ public class TeamFragment extends BaseFragment {
 
         /**
          * 定位
-         *
+         * <p>
          * sCallback 成功回调
          * fCallback 失败回调  "{“status”:”error”,”msg”:”出错”}"
          */
@@ -176,10 +175,10 @@ public class TeamFragment extends BaseFragment {
 
         /**
          * 下载
-         *
+         * <p>
          * fileInfo
          * fCallback downLoadFinish
-         *  type      "IMAGE"
+         * type      "IMAGE"
          */
         @JavascriptInterface
         public void goDownload(String json) {
@@ -187,7 +186,6 @@ public class TeamFragment extends BaseFragment {
         }
 
         /**
-         *
          * isTrue     配合goNative的参数callFun一起用，为true：goNative支持返回时调用前端函数
          * urlPort    前端页面路径（路由
          * networkUrl 外网路径
@@ -195,7 +193,16 @@ public class TeamFragment extends BaseFragment {
          */
         @JavascriptInterface
         public void goView(String json) {
-            ToastUtils.showLong(getContext(), "goView");
+            LogUtils.i("json="+json);
+            GoViewBeaan goViewBeaan = GsonUtils.json2Bean(json,GoViewBeaan.class);
+            startWebViewActivity(goViewBeaan.getUrlPort());
+        }
+
+        private void startWebViewActivity(String url) {
+            Intent intent = new Intent(getContext(), WebViewActivity.class);
+            intent.putExtra("url", url);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
         }
 
         /**
@@ -251,47 +258,12 @@ public class TeamFragment extends BaseFragment {
         return null;
     }
 
-    private void setWebViewClient() {
-        // 只需要将第一种方法的loadUrl()换成下面该方法即可
-        mWebView.evaluateJavascript("javascript:callJS()", new ValueCallback<String>() {
-            @Override
-            public void onReceiveValue(String value) {
-                //此处为 js 返回的结果
-            }
-        });
+    private void startGroupChatActivity(final String json) {
 
-        // 复写WebViewClient类的shouldOverrideUrlLoading方法
-        mWebView.setWebViewClient(new WebViewClient() {
-                                      @Override
-                                      public boolean shouldOverrideUrlLoading(WebView view, String url) {
-
-                                          // 步骤2：根据协议的参数，判断是否是所需要的url
-                                          // 一般根据scheme（协议格式） & authority（协议名）判断（前两个参数）
-                                          //假定传入进来的 url = "js://webview?arg1=111&arg2=222"（同时也是约定好的需要拦截的）
-
-                                          Uri uri = Uri.parse(url);
-                                          // 如果url的协议 = 预先约定的 js 协议
-                                          // 就解析往下解析参数
-                                          if (uri.getScheme().equals("js")) {
-
-                                              // 如果 authority  = 预先约定协议里的 webview，即代表都符合约定的协议
-                                              // 所以拦截url,下面JS开始调用Android需要的方法
-                                              if (uri.getAuthority().equals("webview")) {
-
-                                                  //  步骤3：
-                                                  // 执行JS所需要调用的逻辑
-                                                  System.out.println("js调用了Android的方法");
-                                                  // 可以在协议上带有参数并传递到Android上
-                                                  HashMap<String, String> params = new HashMap<>();
-                                                  Set<String> collection = uri.getQueryParameterNames();
-
-                                              }
-
-                                              return true;
-                                          }
-                                          return super.shouldOverrideUrlLoading(view, url);
-                                      }
-                                  }
-        );
+        ChatBean chatBean = GsonUtils.json2Bean(json, ChatBean.class);
+        Intent intent = new Intent(getContext(), GroupChatActivity.class);
+        intent.putExtra("chatId", chatBean.getChatId());
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 }

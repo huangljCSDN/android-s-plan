@@ -84,7 +84,7 @@ public class PublishMediaGridAdapter extends RecyclerView.Adapter<PublishMediaGr
         ImageLoaderUtils.displayLocationRoundImage(context,media.path,holder.media_image);
 //        ImageLoaderUtils.displayRoundImage(context,new File(media.path),holder.media_image,160,160);
 
-        if (media.mediaType == 3) {
+        if (media.mediaType == 2) {
             holder.video_info.setVisibility(View.VISIBLE);
             holder.textView_size.setText(fileUtils.getSizeByUnit(media.size));
         } else {

@@ -12,8 +12,9 @@ import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.utils.StatusBarUtil;
 
-public class RegisterActivity extends BaseActivity {
+public class WebViewActivity extends BaseActivity {
     private WebView mWebView;
+    private String url;
     @Override
     protected int getContentViewId() {
         return R.layout.activity_register;
@@ -21,11 +22,12 @@ public class RegisterActivity extends BaseActivity {
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        StatusBarUtil.StatusBarLightModeAndFullscreen(this);
+        fullScreen(this);
+        StatusBarUtil.StatusBarLightMode(this);
         mWebView = new WebView(this);
         LinearLayout mll = findViewById(R.id.rootView);
         //避免内存泄露，采用动态添加的方式
-
+        url = getIntent().getStringExtra("url");
 //        mWebView = findViewById(R.id.webView);
         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         mWebView.setLayoutParams(layoutParams);
@@ -52,8 +54,7 @@ public class RegisterActivity extends BaseActivity {
         settings.setJavaScriptEnabled(true);
         // 支持缩放
         settings.setSupportZoom(true);
-
-        mWebView.loadUrl("file:///android_asset/package/main/index.html#/login/registration");
+        mWebView.loadUrl("file:///android_asset/"+url);
 
     }
 

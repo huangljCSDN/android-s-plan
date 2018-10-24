@@ -7,6 +7,7 @@ import com.markLove.Xplan.mvp.model.FileModel;
 import com.markLove.Xplan.utils.LogUtils;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -26,17 +27,17 @@ public class FilePresenter extends FileContract.Presenter {
         if (!isAttach()) return;
         getView().showLoading();
 
-        mModel.upload(files, new RequestCallBack<BaseBean>() {
+        mModel.upload(files, new RequestCallBack<BaseBean<Object>>() {
             @Override
-            public void onSuccess(BaseBean json) {
-                LogUtils.i("PublishPresenter",json.toString());
+            public void onSuccess(BaseBean<Object> json) {
+                LogUtils.i("FilePresenter",json.toString());
                 getView().hideLoading();
-                getView().uploadSuccess(json.toString());
+//                getView().uploadSuccess(json.Data);
             }
 
             @Override
             public void onFail(String result) {
-                LogUtils.i("PublishPresenter",result);
+                LogUtils.i("FilePresenter",result);
                 getView().hideLoading();
                 getView().showError(result);
             }
@@ -51,14 +52,14 @@ public class FilePresenter extends FileContract.Presenter {
         mModel.download(map, new RequestCallBack<Object>() {
             @Override
             public void onSuccess(Object json) {
-                LogUtils.i("PublishPresenter",json.toString());
+                LogUtils.i("FilePresenter",json.toString());
                 getView().hideLoading();
                 getView().downloadSuccess(json.toString());
             }
 
             @Override
             public void onFail(String result) {
-                LogUtils.i("PublishPresenter",result);
+                LogUtils.i("FilePresenter",result);
                 getView().hideLoading();
                 getView().showError(result);
             }

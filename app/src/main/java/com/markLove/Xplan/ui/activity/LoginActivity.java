@@ -14,7 +14,6 @@ import android.widget.LinearLayout;
 import com.cjt2325.cameralibrary.util.LogUtil;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.mvp.BasePresenter;
-import com.markLove.Xplan.ui.fragment.TeamFragment;
 import com.markLove.Xplan.utils.PreferencesUtils;
 import com.markLove.Xplan.utils.ToastUtils;
 

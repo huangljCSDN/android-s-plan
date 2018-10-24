@@ -18,15 +18,18 @@ public interface GroupChatContract {
     interface View extends BaseView {
         void onJoinGroup(BaseBean baseBean);
         void onParticipateGroup(BaseBean baseBean);
+        void onApplyGroup(BaseBean baseBean);
     }
 
     abstract class Model extends BaseModel {
         public abstract void joinGroup(@QueryMap Map<String, String> map, RequestCallBack requestCallBack);
         public abstract void participateGroup(@QueryMap Map<String, String> map, RequestCallBack requestCallBack);
+        public abstract void applyGroup(@QueryMap Map<String, String> map, RequestCallBack requestCallBack);
     }
 
     abstract class Presenter extends BasePresenter<View> {
         public abstract void joinGroup(@QueryMap Map<String, String> map);
         public abstract void participateGroup(@QueryMap Map<String, String> map);
+        public abstract void applyGroup(@QueryMap Map<String, String> map);
     }
 }

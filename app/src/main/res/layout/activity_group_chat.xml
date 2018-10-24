@@ -17,7 +17,7 @@
             android:id="@+id/rl_title_bar"
             android:layout_width="match_parent"
             android:layout_height="30dp"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="5dp"
             android:gravity="center_vertical">
 
             <FrameLayout
@@ -86,7 +86,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="91dp"
+            android:layout_marginTop="70dp"
             android:background="@drawable/bg_report_dialog"
             android:orientation="vertical"
             android:paddingLeft="11dp"

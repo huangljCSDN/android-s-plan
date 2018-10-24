@@ -47,6 +47,7 @@ public class PublishPreviewActivity extends FragmentActivity implements View.OnC
         bar_title = (TextView) findViewById(R.id.bar_title);
         tvCount = findViewById(R.id.tv_count);
         viewpager = (ViewPager) findViewById(R.id.viewpager);
+        icDelete = findViewById(R.id.iv_delete);
         preRawList = getIntent().getParcelableArrayListExtra(PickerConfig.PRE_RAW_LIST);
         totalSize = preRawList.size();
         setView(preRawList);
@@ -77,6 +78,7 @@ public class PublishPreviewActivity extends FragmentActivity implements View.OnC
                 tvCount.setText((currentPosition + 1) + "/" + totalSize);
             } else {
                 tvCount.setText(0 + "/" + 0);
+                icDelete.setVisibility(View.GONE);
             }
             adapterFragment.notifyDataSetChanged();
             if (currentPosition < adapterFragment.getCount()) {

@@ -4,7 +4,6 @@ import com.markLove.Xplan.api.RetrofitApiService;
 import com.markLove.Xplan.api.util.RequestCallBack;
 import com.markLove.Xplan.api.util.RetrofitUtil;
 import com.markLove.Xplan.mvp.contract.GroupChatContract;
-import com.markLove.Xplan.mvp.contract.SearchContract;
 
 import java.util.Map;
 
@@ -23,5 +22,10 @@ public class GroupChatModel extends GroupChatContract.Model {
     @Override
     public void participateGroup(Map<String, String> map, RequestCallBack requestCallBack) {
         requestData(retrofitApiService.participateGroup(map),requestCallBack);
+    }
+
+    @Override
+    public void applyGroup(Map<String, String> map, RequestCallBack requestCallBack) {
+        requestData(retrofitApiService.applyGroup(map),requestCallBack);
     }
 }
