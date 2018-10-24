@@ -30,6 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="right"
             android:text="@string/agree"
+            android:maxLength="5"
             android:textColor="@color/white"
             android:textSize="12sp" />
 

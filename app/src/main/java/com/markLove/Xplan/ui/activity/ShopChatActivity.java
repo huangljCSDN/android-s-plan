@@ -35,6 +35,8 @@ import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.App;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.ChatUser;
+import com.markLove.Xplan.bean.MerchantBean;
+import com.markLove.Xplan.bean.MerchantInfoBean;
 import com.markLove.Xplan.bean.UserBean;
 import com.markLove.Xplan.bean.msg.Message;
 import com.markLove.Xplan.bean.msg.body.FileMessageBody;
@@ -43,6 +45,7 @@ import com.markLove.Xplan.config.Constants;
 import com.markLove.Xplan.db.DBDao;
 import com.markLove.Xplan.module.image.IImageCompressor;
 import com.markLove.Xplan.mvp.contract.ChatView;
+import com.markLove.Xplan.mvp.contract.ShopChatContract;
 import com.markLove.Xplan.mvp.presenter.ChatPresenter;
 import com.markLove.Xplan.mvp.presenter.ShopChatPresenter;
 import com.markLove.Xplan.mvp.presenter.impl.ChatPresenterImpl;
@@ -54,6 +57,7 @@ import com.markLove.Xplan.ui.dialog.ResendMsgDialog;
 import com.markLove.Xplan.utils.AudioUtils;
 import com.markLove.Xplan.utils.DataUtils;
 import com.markLove.Xplan.utils.DensityUtils;
+import com.markLove.Xplan.utils.ImageLoaderUtils;
 import com.markLove.Xplan.utils.ImageUtils;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
@@ -61,7 +65,9 @@ import com.markLove.Xplan.utils.StatusBarUtil;
 import com.markLove.Xplan.utils.ToastUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -73,7 +79,7 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * 店铺聊天室
  */
-public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements View.OnClickListener, ChatView {
+public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements View.OnClickListener, ChatView, ShopChatContract.View {
     private ArrayList<Media> select;
 
     private TextView mTvShopName, mTvAllPersonCount;
@@ -110,7 +116,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        StatusBarUtil.setStatusBarColor(this,R.color.color_17204C);
+        StatusBarUtil.setStatusBarColor(this, R.color.color_17204C);
         rlChatMsgList = findViewById(R.id.chat_msg_list);
         mTvShopName = findViewById(R.id.tv_shop_name);
         mTvAllPersonCount = findViewById(R.id.tv_person_count);
@@ -124,18 +130,16 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
         findViewById(R.id.tv_cancel).setOnClickListener(this);
         findViewById(R.id.iv_remove).setOnClickListener(this);
         mLlPersons.setOnClickListener(this);
-        mTvShopName.setText("重庆火锅");
-        mTvAllPersonCount.setText("21314124人");
-        addPersonHeadPhoto();
 
         chatView = findViewById(R.id.chatView);
         chatView.setActivity(this);
         setListener();
         initSoftKeyboard();
         initData();
+        getMerchantInfo();
     }
 
-    private void setListener(){
+    private void setListener() {
         chatView.setOnSendMessageListener(new com.markLove.Xplan.ui.widget.ChatView.OnSendMessageListener() {
             @Override
             public void onSendMessage(Message message) {
@@ -182,9 +186,9 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
         }
     }
 
-    private void startMerchantMemberActivity(){
-        Intent intent = new Intent(ShopChatActivity.this,MerchantMemberActivity.class);
-        intent.putExtra("chatId",to_user_id);
+    private void startMerchantMemberActivity() {
+        Intent intent = new Intent(ShopChatActivity.this, MerchantMemberActivity.class);
+        intent.putExtra("chatId", to_user_id);
         startActivity(intent);
     }
 
@@ -209,14 +213,14 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 //            nickName = bundle.getString("nick_name");
 //            headImgUrl = bundle.getString("head_img_url");
 //        }
-        to_user_id = getIntent().getIntExtra("chatId",0);
-        String meHeadImgUrl="";
+        to_user_id = getIntent().getIntExtra("chatId", 0);
+        String meHeadImgUrl = "";
         UserBean meUserBean = App.getInstance().getUserBean();
-        if (meUserBean != null){
+        if (meUserBean != null) {
             me_user_id = meUserBean.getUserInfo().getUserId();
             //        String meHeadImgUrl = meUserBean.getUserInfo().getNickName()
         }
-        LogUtils.i("me_user_id=" + me_user_id + " to_user_id="+to_user_id);
+        LogUtils.i("me_user_id=" + me_user_id + " to_user_id=" + to_user_id);
 //        tvChatUser.setText(nickName);
         LinearLayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         chatMessageAdapter = new ChatMessageAdapter(this, new ArrayList<Message>());
@@ -285,6 +289,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 
     /**
      * 重新发送消息
+     *
      * @param resendMessage
      */
     private void resendMessage(final Message resendMessage) {
@@ -301,6 +306,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 
     /**
      * 显示历史消息
+     *
      * @param historyMessageList
      */
     @Override
@@ -315,6 +321,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 
     /**
      * 添加一条消息
+     *
      * @param msg
      */
     @Override
@@ -629,18 +636,14 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
         super.onDestroy();
     }
 
-
-    private void addPersonHeadPhoto() {
-        for (int i = 0; i < 10; i++) {
+    private void addPersonHeadPhoto(List<MerchantInfoBean.UserInfoEntity> userInfo) {
+        int size = userInfo.size() > 7 ? 7 : userInfo.size();
+        for (int i = 0; i < size; i++) {
+            MerchantInfoBean.UserInfoEntity userInfoEntity = userInfo.get(i);
             View view = LayoutInflater.from(this).inflate(R.layout.item_min_head, null);
             ImageView imageHead = view.findViewById(R.id.iv_item_head);
-            //显示圆形的imageview
-            RequestOptions mRequestOptions = RequestOptions.circleCropTransform()
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)//不做磁盘缓存
-                    .skipMemoryCache(true);//不做内存缓存
 
-            Glide.with(this).load(R.drawable.icon).apply(mRequestOptions).into(imageHead);
-
+            ImageLoaderUtils.displayCircle(this, userInfoEntity.getHeadImageUrl(), imageHead);
             mLlPersons.addView(view);
         }
     }
@@ -869,5 +872,32 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
                 rlChatMsgList.smoothScrollToPosition(position);
             }
         });
+    }
+
+    private void getMerchantInfo() {
+        Map<String, String> map = new HashMap<>();
+        map.put("merchantId", String.valueOf(to_user_id));
+//        map.put("merchantId", String.valueOf(22554));
+        mPresenter.getMerchantInfo(map);
+    }
+
+    private void getUsersByGroup() {
+        Map<String, String> map = new HashMap<>();
+        map.put("merchantId", String.valueOf(to_user_id));
+        map.put("page", "1");
+        map.put("rows", "10");
+        mPresenter.getUsersByGroup(map);
+    }
+
+    @Override
+    public void refreshUsersByGroup(Object t) {
+
+    }
+
+    @Override
+    public void refreshMerchantInfo(MerchantInfoBean merchantInfoBean) {
+        mTvShopName.setText(merchantInfoBean.getGroupName());
+        mTvAllPersonCount.setText(String.valueOf(merchantInfoBean.getGroupCount()));
+        addPersonHeadPhoto(merchantInfoBean.getUserInfo());
     }
 }

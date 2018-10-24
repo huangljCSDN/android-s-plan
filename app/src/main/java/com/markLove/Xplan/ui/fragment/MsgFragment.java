@@ -90,28 +90,24 @@ public class MsgFragment extends BaseFragment {
     private void startShopChatActivity(int id) {
         Intent intent = new Intent(getContext(), ShopChatActivity.class);
         intent.putExtra("chatId", id);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
 
     private void startGroupChatActivity(int id) {
         Intent intent = new Intent(getContext(), GroupChatActivity.class);
         intent.putExtra("chatId", id);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
 
     private void startSingleChatActivity(int id) {
         Intent intent = new Intent(getContext(), SingleChatActivity.class);
         intent.putExtra("chatId", id);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
 
     private void startCpChatActivity(int id) {
         Intent intent = new Intent(getContext(), CpChatActivity.class);
         intent.putExtra("chatId", id);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
 

@@ -102,9 +102,9 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.MyView
         void onItemClick(View view,int position);
     }
 
-    public MerchantListAdapter.OnItemClickListener onItemClickListener;
+    public OnItemClickListener onItemClickListener;
 
-    public void setOnItemClickListener(MerchantListAdapter.OnItemClickListener onItemClickListener) {
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
 

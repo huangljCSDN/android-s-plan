@@ -4,6 +4,7 @@ import com.markLove.Xplan.api.util.RequestCallBack;
 import com.markLove.Xplan.base.mvp.BaseModel;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.mvp.BaseView;
+import com.markLove.Xplan.bean.MerchantInfoBean;
 import com.markLove.Xplan.bean.PostQueryInfo;
 import com.markLove.Xplan.bean.UserBean;
 
@@ -16,15 +17,18 @@ import retrofit2.http.QueryMap;
  */
 public interface ShopChatContract {
 
-    interface View<T> extends BaseView {
-        void refreshUI(T t);
+    interface View extends BaseView {
+        void refreshUsersByGroup(Object t);
+        void refreshMerchantInfo(MerchantInfoBean merchantInfoBean);
     }
 
     abstract class Model extends BaseModel {
-        public abstract void getMerchantUserList(@QueryMap Map<String, String> map, RequestCallBack requestCallBack);
+        public abstract void getUsersByGroup(@QueryMap Map<String, String> map, RequestCallBack requestCallBack);
+        public abstract void getMerchantInfo(@QueryMap Map<String, String> map, RequestCallBack requestCallBack);
     }
 
-    abstract class Presenter extends BasePresenter<View<UserBean>> {
-        public abstract void getMerchantUserList(@QueryMap Map<String, String> map);
+    abstract class Presenter extends BasePresenter<View> {
+        public abstract void getUsersByGroup(@QueryMap Map<String, String> map);
+        public abstract void getMerchantInfo(@QueryMap Map<String, String> map);
     }
 }

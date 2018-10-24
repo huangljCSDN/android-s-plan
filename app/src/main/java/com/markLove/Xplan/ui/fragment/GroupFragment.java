@@ -17,6 +17,7 @@ import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseFragment;
 import com.markLove.Xplan.bean.ChatBean;
+import com.markLove.Xplan.bean.GoNativeBean;
 import com.markLove.Xplan.bean.GoViewBeaan;
 import com.markLove.Xplan.ui.activity.GroupChatActivity;
 import com.markLove.Xplan.ui.activity.WebViewActivity;
@@ -28,7 +29,7 @@ import java.util.ArrayList;
 
 public class GroupFragment extends BaseFragment {
     private WebView mWebView;
-
+    private GoViewBeaan goViewBeaan;
     @Override
     protected int getContentViewLayoutID() {
         return R.layout.fragment_team;
@@ -148,7 +149,7 @@ public class GroupFragment extends BaseFragment {
             if (1 == Integer.parseInt("111")) {
                 Intent intent = new Intent(getActivity(), SinglePickerActivity.class);
                 intent.putExtra(PickerConfig.SELECT_MODE, PickerConfig.PICKER_IMAGE);
-                getActivity().startActivityForResult(intent, 200);
+                startActivityForResult(intent, 200);
             }
         }
 
@@ -194,15 +195,14 @@ public class GroupFragment extends BaseFragment {
         @JavascriptInterface
         public void goView(String json) {
             LogUtils.i("json="+json);
-            GoViewBeaan goViewBeaan = GsonUtils.json2Bean(json,GoViewBeaan.class);
+            goViewBeaan = GsonUtils.json2Bean(json,GoViewBeaan.class);
             startWebViewActivity(goViewBeaan.getUrlPort());
         }
 
         private void startWebViewActivity(String url) {
             Intent intent = new Intent(getContext(), WebViewActivity.class);
             intent.putExtra("url", url);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
+            startActivityForResult(intent,200);
         }
 
         /**
@@ -220,16 +220,12 @@ public class GroupFragment extends BaseFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        LogUtils.i("huang","onActivityResult---->"+data);
+        if (data == null) return;
         if (requestCode == 200) {
-            ArrayList<Media> select = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
-            Boolean isOrigin = data.getBooleanExtra(PickerConfig.IS_ORIGIN, false);
-            for (final Media media : select) {
-                Log.i("media", media.toString());
-                Uri mediaUri = Uri.parse("file://" + media.path);
-//                Glide.with(this)
-//                        .load(mediaUri)
-//                        .into(imageView);
+            if (goViewBeaan != null && goViewBeaan.isIsTrue()){
+                GoNativeBean goNativeBean = (GoNativeBean) data.getSerializableExtra("goNativeBean");
+                mWebView.loadUrl("javascript:"+goNativeBean.getCallFun()+"(" + goNativeBean.getParam() + ")");
             }
         }
     }
@@ -264,6 +260,7 @@ public class GroupFragment extends BaseFragment {
         Intent intent = new Intent(getContext(), GroupChatActivity.class);
         intent.putExtra("chatId", chatBean.getChatId());
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
+        startActivityForResult(intent,100);
     }
+
 }

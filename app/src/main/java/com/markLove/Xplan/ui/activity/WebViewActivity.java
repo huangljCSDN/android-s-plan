@@ -3,6 +3,7 @@ package com.markLove.Xplan.ui.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.ViewGroup;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.LinearLayout;
@@ -10,6 +11,10 @@ import android.widget.LinearLayout;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseActivity;
+import com.markLove.Xplan.bean.GoNativeBean;
+import com.markLove.Xplan.ui.fragment.GroupFragment;
+import com.markLove.Xplan.utils.GsonUtils;
+import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.StatusBarUtil;
 
 public class WebViewActivity extends BaseActivity {
@@ -54,10 +59,34 @@ public class WebViewActivity extends BaseActivity {
         settings.setJavaScriptEnabled(true);
         // 支持缩放
         settings.setSupportZoom(true);
+        mWebView.addJavascriptInterface(new JSInterface(), "xplanfunc");
         mWebView.loadUrl("file:///android_asset/"+url);
 
     }
 
+    // 继承自Object类
+    public class JSInterface extends Object {
+
+        // 被JS调用的方法必须加入@JavascriptInterface注解
+        @JavascriptInterface
+        public void goNative(String json) {
+            //{"chatType":1,"chatId":1}
+            LogUtils.i("huang", "goNative=" + json);
+            GoNativeBean goNativeBean = GsonUtils.json2Bean(json,GoNativeBean.class);
+            if (goNativeBean == null || goNativeBean.getCallFun().isEmpty()){
+                finish();
+            } else {
+                Intent intent = new Intent();
+                intent.putExtra("goNativeBean",goNativeBean);
+                setResult(RESULT_OK,intent);
+                finish();
+            }
+        }
+    }
+
+    private void finishActivity(){
+
+    }
 
 //    @Override
 //    public void onBackPressed() {

@@ -16,7 +16,12 @@ public class ShopChatModel extends ShopChatContract.Model {
     private RetrofitApiService retrofitApiService = RetrofitUtil.getInstance().getApiServer(RetrofitApiService.class);
 
     @Override
-    public void getMerchantUserList(Map<String, String> map, RequestCallBack requestCallBack) {
-        requestData(retrofitApiService.getMerchantUserList(map),requestCallBack);
+    public void getUsersByGroup(Map<String, String> map, RequestCallBack requestCallBack) {
+        requestData(retrofitApiService.getUsersByGroup(map),requestCallBack);
+    }
+
+    @Override
+    public void getMerchantInfo(Map<String, String> map, RequestCallBack requestCallBack) {
+        requestData(retrofitApiService.getMerchantInfo(map),requestCallBack);
     }
 }

@@ -83,8 +83,8 @@ public class CircleRecyclerView extends RecyclerView implements View.OnClickList
             setClipChildren(false);
         }
 
-        if (mCurrentCenterChildView != null)
-            mCurrentCenterChildView.setOnClickListener(this);
+//        if (mCurrentCenterChildView != null)
+//            mCurrentCenterChildView.setOnClickListener(this);
     }
 
 
@@ -97,8 +97,8 @@ public class CircleRecyclerView extends RecyclerView implements View.OnClickList
             final int count = getChildCount();
             for (int i = 0; i < count; ++i) {
                 View v = getChildAt(i);
-                if (v != mCurrentCenterChildView && mCenterItemClickListener != null)
-                    v.setOnClickListener(null);
+//                if (v != mCurrentCenterChildView && mCenterItemClickListener != null)
+//                    v.setOnClickListener(null);
                 if (v == mCurrentCenterChildView)
                     v.setTag(R.string.tag_is_center, true);
                 else
@@ -120,8 +120,8 @@ public class CircleRecyclerView extends RecyclerView implements View.OnClickList
             int count = getLayoutManager().getChildCount();
             for (int i = 0; i < count; ++i) {
                 View v = getChildAt(i);
-                if (v != mCurrentCenterChildView && mCenterItemClickListener != null)
-                    v.setOnClickListener(null);
+//                if (v != mCurrentCenterChildView && mCenterItemClickListener != null)
+//                    v.setOnClickListener(null);
                 if (v == mCurrentCenterChildView)
                     v.setTag(R.string.tag_is_center, true);
                 else
@@ -164,8 +164,8 @@ public class CircleRecyclerView extends RecyclerView implements View.OnClickList
             if (mNeedCenterForce && !mIsForceCentering) {
                 mIsForceCentering = true;
                 mCurrentCenterChildView = findViewAtCenter();
-                if (mCurrentCenterChildView != null && mCenterItemClickListener != null)
-                    mCurrentCenterChildView.setOnClickListener(this);
+//                if (mCurrentCenterChildView != null && mCenterItemClickListener != null)
+//                    mCurrentCenterChildView.setOnClickListener(this);
                 mCenterRunnable.setView(mCurrentCenterChildView);
                 ViewCompat.postOnAnimation(this, mCenterRunnable);
             }
@@ -208,8 +208,8 @@ public class CircleRecyclerView extends RecyclerView implements View.OnClickList
 
     @Override
     public void onClick(View v) {
-        if (mCenterItemClickListener != null)
-            mCenterItemClickListener.onCenterItemClick(v);
+//        if (mCenterItemClickListener != null)
+//            mCenterItemClickListener.onCenterItemClick(v);
     }
 
     public class CenterRunnable implements Runnable {

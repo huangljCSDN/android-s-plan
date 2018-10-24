@@ -24,6 +24,7 @@ import com.markLove.Xplan.ui.activity.GoodPlayActivity;
 import com.markLove.Xplan.ui.activity.LoverActivity;
 import com.markLove.Xplan.ui.activity.MerchantInfoActivity;
 import com.markLove.Xplan.ui.activity.PlayersActivity;
+import com.markLove.Xplan.ui.activity.ShopChatActivity;
 import com.markLove.Xplan.ui.activity.UserInfoActivity;
 import com.markLove.Xplan.ui.adapter.MerchantListAdapter;
 import com.markLove.Xplan.ui.adapter.UserListAdapter;
@@ -214,7 +215,8 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
             @Override
             public void onItemClick(View view, int position) {
                 MerchantBean merchantBean = merchantBeanList.get(position);
-                Intent intent = new Intent(getContext(), MerchantInfoActivity.class);
+//                Intent intent = new Intent(getContext(), MerchantInfoActivity.class);
+                Intent intent = new Intent(getContext(), ShopChatActivity.class);
                 intent.putExtra("chatId",merchantBean.getMerchantId());
                 startActivity(intent);
             }
@@ -258,7 +260,7 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
             }
         });
 
-        userListAdapter.setOnItemClickListener(new MerchantListAdapter.OnItemClickListener() {
+        userListAdapter.setOnItemClickListener(new UserListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 NearUserBean nearUserBean = userBeanList.get(position);
@@ -347,6 +349,7 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
 
     @Override
     public void refreshMerchantList(ArrayList<MerchantBean> list) {
+        if (list == null || list.isEmpty()) return;
         currentMerchantPage += 1;
         refreshLayoutUser.setEnabled(true);
         refreshLayoutMerchant.setRefreshing(false);
@@ -364,6 +367,7 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
 
     @Override
     public void refreshUserList(ArrayList<NearUserBean> list) {
+        if (list == null || list.isEmpty()) return;
         currentUserPage += 1;
         refreshLayoutMerchant.setEnabled(true);
         refreshLayoutUser.setRefreshing(false);

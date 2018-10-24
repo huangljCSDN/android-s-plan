@@ -2,6 +2,7 @@ package com.markLove.Xplan.api;
 
 import com.markLove.Xplan.bean.BaseBean;
 import com.markLove.Xplan.bean.MerchantBean;
+import com.markLove.Xplan.bean.MerchantInfoBean;
 import com.markLove.Xplan.bean.NearUserBean;
 import com.markLove.Xplan.bean.PostQueryInfo;
 
@@ -127,8 +128,24 @@ public interface RetrofitApiService {
      * @param map
      * @return
      */
-    @POST("/user/group/applyGroup")
+    @POST("user/group/applyGroup")
     Observable<BaseBean<Object>> applyGroup(@QueryMap Map<String, String> map);
+
+    /**
+     * 店铺聊天室里的用户
+     * @param map
+     * @return
+     */
+    @POST("merchant/info/getUsersByGroup")
+    Observable<BaseBean<Object>> getUsersByGroup(@QueryMap Map<String, String> map);
+
+    /**
+     * 店铺详细信息
+     * @param map
+     * @return
+     */
+    @GET("merchant/info/getMerchantInfo")
+    Observable<BaseBean<MerchantInfoBean>> getMerchantInfo(@QueryMap Map<String, String> map);
 
     /**
      * 关注
@@ -143,7 +160,7 @@ public interface RetrofitApiService {
      * @param map
      * @return
      */
-    @POST("/user/operation/cancelFocus")
+    @POST("user/operation/cancelFocus")
     Observable<BaseBean> cancelFocus(@QueryMap Map<String, String> map);
 
 }

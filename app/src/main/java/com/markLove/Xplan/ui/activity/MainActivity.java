@@ -1,6 +1,7 @@
 package com.markLove.Xplan.ui.activity;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,6 +29,7 @@ import com.markLove.Xplan.ui.fragment.MsgFragment;
 import com.markLove.Xplan.ui.fragment.SearchFragment;
 import com.markLove.Xplan.ui.fragment.GroupFragment;
 import com.markLove.Xplan.utils.AMapClient;
+import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.StatusBarUtil;
 
 import java.lang.ref.WeakReference;
@@ -218,4 +220,5 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
     public void onClick(View v) {
 
     }
+
 }
