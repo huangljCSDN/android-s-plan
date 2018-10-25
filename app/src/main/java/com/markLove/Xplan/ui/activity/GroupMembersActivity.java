@@ -3,6 +3,7 @@ package com.markLove.Xplan.ui.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.ViewGroup;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.LinearLayout;
@@ -10,11 +11,15 @@ import android.widget.LinearLayout;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseActivity;
+import com.markLove.Xplan.bean.GoNativeBean;
+import com.markLove.Xplan.utils.GsonUtils;
+import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.StatusBarUtil;
 
 public class GroupMembersActivity extends BaseActivity {
     private WebView mWebView;
     private int id;
+
     @Override
     protected int getContentViewId() {
         return R.layout.activity_register;
@@ -38,7 +43,7 @@ public class GroupMembersActivity extends BaseActivity {
     /**
      * 设置websetting
      */
-    private void initWebSettings(){
+    private void initWebSettings() {
         WebSettings settings = mWebView.getSettings();
         settings.setUseWideViewPort(true);
         settings.setLoadWithOverviewMode(true);
@@ -54,9 +59,24 @@ public class GroupMembersActivity extends BaseActivity {
         settings.setJavaScriptEnabled(true);
         // 支持缩放
         settings.setSupportZoom(true);
-        id = getIntent().getIntExtra("chatId",0);
-        mWebView.loadUrl("file:///android_asset/package/main/index.html#/bureau/member/{"+id+"}");
+        id = getIntent().getIntExtra("chatId", 0);
+        mWebView.addJavascriptInterface(new JSInterface(), "xplanfunc");
+        mWebView.loadUrl("file:///android_asset/package/main/index.html#/bureau/member/" + id + "");
 
+    }
+
+    // 继承自Object类
+    public class JSInterface extends Object {
+
+        // 被JS调用的方法必须加入@JavascriptInterface注解
+        @JavascriptInterface
+        public void exitGroup(String json) {
+            //{"chatType":1,"chatId":1}
+            LogUtils.i("huang", "exitGroup=" + json);
+            Intent intent = new Intent();
+            setResult(RESULT_OK, intent);
+            finish();
+        }
     }
 
 

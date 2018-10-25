@@ -192,15 +192,9 @@ public class GroupFragment extends BaseFragment {
         @JavascriptInterface
         public void goView(String json) {
             LogUtils.i("json="+json);
-//            goViewBeaan = GsonUtils.json2Bean(json,GoViewBeaan.class);
+            goViewBeaan = GsonUtils.json2Bean(json,GoViewBeaan.class);
             startWebViewActivity(goViewBeaan.getUrlPort());
 //            startPublishActivity();
-        }
-
-        private void startWebViewActivity(String url) {
-            Intent intent = new Intent(getContext(), WebViewActivity.class);
-            intent.putExtra("url", url);
-            startActivityForResult(intent,200);
         }
 
         /**
@@ -220,11 +214,16 @@ public class GroupFragment extends BaseFragment {
         super.onActivityResult(requestCode, resultCode, data);
         LogUtils.i("huang","onActivityResult---->"+data);
         if (data == null) return;
-        if (requestCode == 200) {
+        if (requestCode == 200 && resultCode == getActivity().RESULT_OK) {
             if (goViewBeaan != null && goViewBeaan.isIsTrue()){
                 GoNativeBean goNativeBean = (GoNativeBean) data.getSerializableExtra("goNativeBean");
                 mWebView.loadUrl("javascript:"+goNativeBean.getCallFun()+"(" + goNativeBean.getParam() + ")");
             }
+        }
+        //组局聊天室返回
+        if (requestCode == 100 && resultCode == getActivity().RESULT_OK) {
+            //当组局解散，刷新组局
+            mWebView.loadUrl("javascript:refreshBureauList()");
         }
     }
 
@@ -257,6 +256,12 @@ public class GroupFragment extends BaseFragment {
         Intent intent = new Intent(getContext(), GroupChatActivity.class);
         intent.putExtra("chatId", chatBean.getChatId());
         startActivityForResult(intent,100);
+    }
+
+    private void startWebViewActivity(String url) {
+        Intent intent = new Intent(getContext(), WebViewActivity.class);
+        intent.putExtra("url", url);
+        startActivityForResult(intent,200);
     }
 
     private void startPublishActivity() {

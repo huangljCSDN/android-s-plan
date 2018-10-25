@@ -1,7 +1,9 @@
 package com.markLove.Xplan.ui.fragment;
 
+import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.LinearLayout;
@@ -9,6 +11,10 @@ import android.widget.LinearLayout;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseFragment;
+import com.markLove.Xplan.bean.GoNativeBean;
+import com.markLove.Xplan.ui.activity.PublishActivity;
+import com.markLove.Xplan.utils.GsonUtils;
+import com.markLove.Xplan.utils.LogUtils;
 
 public class MineFragment extends BaseFragment {
     private WebView mWebView;
@@ -49,13 +55,39 @@ public class MineFragment extends BaseFragment {
         settings.setJavaScriptEnabled(true);
         // 支持缩放
         settings.setSupportZoom(true);
-
+        mWebView.addJavascriptInterface(new JSInterface(), "xplanfunc");
         mWebView.loadUrl("file:///android_asset/package/main/index.html#/user/native/1");
 
     }
 
+    // 继承自Object类
+    public class JSInterface extends Object {
 
-//    @Override
+        // 被JS调用的方法必须加入@JavascriptInterface注解
+        @JavascriptInterface
+        public void toPublishPage(String json) {
+            //{"chatType":1,"chatId":1}
+            LogUtils.i("huang", "toPublishPage=" + json);
+            startPublishActivity();
+        }
+    }
+
+    private void startPublishActivity(){
+        Intent intent = new Intent(getContext(),PublishActivity.class);
+        startActivityForResult(intent,100);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data == null) return;
+        if (requestCode == 100){
+            //刷新轨迹列表
+            mWebView.loadUrl("javascript:refreshUserLocus()");
+        }
+    }
+
+    //    @Override
 //    public void onBackPressed() {
 //        if (mWebView.canGoBack()){
 //            mWebView.goBack();

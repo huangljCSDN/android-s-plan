@@ -18,4 +18,9 @@ public class UserOperationModel extends UserOperationContract.Model {
     public void focus(Map<String, String> map, RequestCallBack requestCallBack) {
         requestData(retrofitApiService.focus(map),requestCallBack);
     }
+
+    @Override
+    public void isBlackList(Map<String, String> map, RequestCallBack requestCallBack) {
+        requestData(retrofitApiService.isBlackList(map),requestCallBack);
+    }
 }

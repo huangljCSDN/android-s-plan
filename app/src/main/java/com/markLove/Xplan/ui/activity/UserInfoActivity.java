@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseActivity;
+import com.markLove.Xplan.utils.StatusBarUtil;
 
 public class UserInfoActivity extends BaseActivity {
     private WebView mWebView;
@@ -21,6 +22,8 @@ public class UserInfoActivity extends BaseActivity {
 
     @Override
     protected void init(Bundle savedInstanceState) {
+        StatusBarUtil.setStatusBarColor(this,R.color.white);
+        StatusBarUtil.StatusBarLightMode(this);
         mWebView = new WebView(this);
         LinearLayout mll = findViewById(R.id.rootView);
         //避免内存泄露，采用动态添加的方式

@@ -26,6 +26,7 @@ import com.cjt2325.cameralibrary.util.FileUtil;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
 import com.markLove.Xplan.R;
+import com.markLove.Xplan.base.App;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.BaseBean;
 import com.markLove.Xplan.bean.ChatUser;
@@ -37,8 +38,10 @@ import com.markLove.Xplan.db.DBDao;
 import com.markLove.Xplan.module.image.IImageCompressor;
 import com.markLove.Xplan.mvp.contract.ChatView;
 import com.markLove.Xplan.mvp.contract.CpChatContract;
+import com.markLove.Xplan.mvp.contract.UserOperationContract;
 import com.markLove.Xplan.mvp.presenter.ChatPresenter;
 import com.markLove.Xplan.mvp.presenter.CpChatPresenter;
+import com.markLove.Xplan.mvp.presenter.UserOperationPresenter;
 import com.markLove.Xplan.mvp.presenter.impl.ChatPresenterImpl;
 import com.markLove.Xplan.ui.adapter.GroupChatMessageAdapter;
 import com.markLove.Xplan.ui.dialog.MorePopWindow;
@@ -68,10 +71,10 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * 私聊
  */
-public class SingleChatActivity extends BaseActivity<CpChatPresenter> implements View.OnClickListener, ChatView,CpChatContract.View<BaseBean> {
+public class SingleChatActivity extends BaseActivity<UserOperationPresenter> implements View.OnClickListener, ChatView, UserOperationContract.View {
 
     private ArrayList<Media> select;
-    private TextView mTvCare,mTvTitle;
+    private TextView mTvCare, mTvTitle;
     private FrameLayout mFlMore;
     private RecyclerView rlChatMsgList;
     private RelativeLayout mRlTitleBar;
@@ -83,6 +86,7 @@ public class SingleChatActivity extends BaseActivity<CpChatPresenter> implements
     GroupChatMessageAdapter chatMessageAdapter;
     String nickName;
     String headImgUrl;
+    private Message sendMsg;
     //    AutoCameraUtils autoCameraUtils;
     int me_user_id;
     int to_user_id;
@@ -98,8 +102,8 @@ public class SingleChatActivity extends BaseActivity<CpChatPresenter> implements
     }
 
     @Override
-    public CpChatPresenter onCreatePresenter() {
-        return new CpChatPresenter();
+    public UserOperationPresenter onCreatePresenter() {
+        return new UserOperationPresenter();
     }
 
     @Override
@@ -116,6 +120,7 @@ public class SingleChatActivity extends BaseActivity<CpChatPresenter> implements
         findViewById(R.id.tv_cancel).setOnClickListener(this);
         findViewById(R.id.iv_remove).setOnClickListener(this);
         findViewById(R.id.tv_care).setOnClickListener(this);
+        findViewById(R.id.fl_back).setOnClickListener(this);
 
         chatView = findViewById(R.id.chatView);
         chatView.setActivity(this);
@@ -124,7 +129,7 @@ public class SingleChatActivity extends BaseActivity<CpChatPresenter> implements
         initData();
     }
 
-    private void setListener(){
+    private void setListener() {
         chatView.setOnSendMessageListener(new com.markLove.Xplan.ui.widget.ChatView.OnSendMessageListener() {
             @Override
             public void onSendMessage(Message message) {
@@ -170,15 +175,27 @@ public class SingleChatActivity extends BaseActivity<CpChatPresenter> implements
                 break;
             case R.id.iv_more:
                 break;
+            case R.id.fl_back:
+                finish();
+                break;
         }
     }
 
-    private void requestFocus(){
-        Map<String,String> map = new HashMap<>();
-        map.put("userId","");
-        map.put("page","");
-        map.put("rows","");
-        map.put("Token","");
+    private void requestFocus() {
+        Map<String, String> map = new HashMap<>();
+        map.put("userId", "");
+        map.put("page", "");
+        map.put("rows", "");
+        map.put("Token", "");
+        mPresenter.focus(map);
+    }
+
+    /**
+     * 是否被拉黑
+     */
+    private void isBlack() {
+        Map<String, String> map = new HashMap<>();
+        map.put("tarUserId", String.valueOf(to_user_id));
         mPresenter.focus(map);
     }
 
@@ -273,6 +290,7 @@ public class SingleChatActivity extends BaseActivity<CpChatPresenter> implements
 
     /**
      * 重新发送消息
+     *
      * @param resendMessage
      */
     private void resendMessage(final Message resendMessage) {
@@ -289,6 +307,7 @@ public class SingleChatActivity extends BaseActivity<CpChatPresenter> implements
 
     /**
      * 显示历史消息
+     *
      * @param historyMessageList
      */
     @Override
@@ -303,6 +322,7 @@ public class SingleChatActivity extends BaseActivity<CpChatPresenter> implements
 
     /**
      * 添加一条消息
+     *
      * @param msg
      */
     @Override
@@ -366,8 +386,11 @@ public class SingleChatActivity extends BaseActivity<CpChatPresenter> implements
             PreferencesUtils.putInt(this, Constants.SEND_MESSAGE_COUNT + to_user_id, ++sendCount);
             addOneMessage(msg);
         }
+        sendMsg = msg;
         //暂时不判断拉黑逻辑，直接发送
-        sendMessage(msg);
+//        sendMessage(msg);
+        //判断是否被拉黑
+        isBlack();
 
 //        StringBuilder sb = new StringBuilder(Constants.POST_JUDGE_BLACK_LIST);
 //        sb.append("?ToUserId=" + to_user_id);
@@ -844,9 +867,47 @@ public class SingleChatActivity extends BaseActivity<CpChatPresenter> implements
     }
 
     @Override
-    public void refreshUI(BaseBean baseBean) {
+    public void onFocus(BaseBean baseBean) {
         mTvCare.setText(getString(R.string.cared));
         mTvCare.setBackground(getDrawable(R.drawable.ic_cared));
         mTvCare.setTextColor(getResources().getColor(R.color.color_333333));
+    }
+
+    @Override
+    public void isBlackSuccess(BaseBean baseBean) {
+        if (baseBean.Status == 200) {
+//                        double data = (Double) infoResultData.getData();
+            double data = 1;
+            if (data == 1) {
+                //已经被拉黑
+                chatMessageAdapter.setBlack(true);
+                isBlackUser = true;
+                if (null != sendMsg && (sendMsg.getChatType() != Message.ChatType.GIFT || sendMsg.getChatType() != Message.ChatType.SUPERLIKE)) {
+                    sendMsg.setStatus(Message.ChatStatus.REJECTED);
+                    updataMessage(sendMsg.getMsgID(), Message.ChatStatus.REJECTED.ordinal());
+                    int me_user_id = PreferencesUtils.getInt(App.getInstance(), Constants.ME_USER_ID);
+                    DBDao.getDbDao(App.getInstance()).insertMessage(me_user_id, sendMsg);
+                }
+            } else {
+                chatMessageAdapter.setBlack(false);
+                isBlackUser = false;
+                if (null != sendMsg) {
+                    sendMessage(sendMsg);
+                }
+            }
+//                        initBecomeCouple();
+        }
+    }
+
+    @Override
+    public void isBlackError(String baseBean) {
+        if (null != sendMsg) {
+            int sendCount = PreferencesUtils.getInt(SingleChatActivity.this, Constants.SEND_MESSAGE_COUNT + to_user_id, 0);
+            //原计数-1
+            PreferencesUtils.putInt(SingleChatActivity.this, Constants.SEND_MESSAGE_COUNT + to_user_id, --sendCount);
+            updataMessage(sendMsg.getMsgID(), Message.ChatStatus.FAIL.ordinal());
+            int me_user_id = PreferencesUtils.getInt(App.getInstance(), Constants.ME_USER_ID);
+            DBDao.getDbDao(App.getInstance()).insertMessage(me_user_id, sendMsg);
+        }
     }
 }

@@ -21,7 +21,7 @@ public class RegisterActivity extends BaseActivity {
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        StatusBarUtil.StatusBarLightModeAndFullscreen(this);
+        fullScreen(this);
         mWebView = new WebView(this);
         LinearLayout mll = findViewById(R.id.rootView);
         //避免内存泄露，采用动态添加的方式

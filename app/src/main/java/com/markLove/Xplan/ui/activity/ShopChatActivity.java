@@ -50,6 +50,7 @@ import com.markLove.Xplan.mvp.presenter.ChatPresenter;
 import com.markLove.Xplan.mvp.presenter.ShopChatPresenter;
 import com.markLove.Xplan.mvp.presenter.impl.ChatPresenterImpl;
 import com.markLove.Xplan.ui.adapter.ChatMessageAdapter;
+import com.markLove.Xplan.ui.dialog.ExitRoomDialog;
 import com.markLove.Xplan.ui.dialog.MorePopWindow;
 import com.markLove.Xplan.ui.dialog.RemoveMsgDialog;
 import com.markLove.Xplan.ui.dialog.ReportDialog;
@@ -129,6 +130,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
         findViewById(R.id.fl_more).setOnClickListener(this);
         findViewById(R.id.tv_cancel).setOnClickListener(this);
         findViewById(R.id.iv_remove).setOnClickListener(this);
+        findViewById(R.id.fl_back).setOnClickListener(this);
         mLlPersons.setOnClickListener(this);
 
         chatView = findViewById(R.id.chatView);
@@ -182,6 +184,9 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
                 break;
             case R.id.ll_person_count:
                 startMerchantMemberActivity();
+                break;
+            case R.id.fl_back:
+                finish();
                 break;
         }
     }
@@ -385,60 +390,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
             PreferencesUtils.putInt(this, Constants.SEND_MESSAGE_COUNT + to_user_id, ++sendCount);
             addOneMessage(msg);
         }
-        //暂时不判断拉黑逻辑，直接发送
         sendMessage(msg);
-
-//        StringBuilder sb = new StringBuilder(Constants.POST_JUDGE_BLACK_LIST);
-//        sb.append("?ToUserId=" + to_user_id);
-//        sb.append("&Token=" + PreferencesUtils.getString(this, Constants.TOKEN_KEY));
-//        OkGoHttpUtils.post(sb.toString(), new OkGoHttpCallBack() {
-//            @Override
-//            public void onSuccess(String s, Call call, Response response) {
-//                try {
-//                    InfoResultData infoResultData = GsonUtils.json2Bean(s, InfoResultData.class);
-//                    if (infoResultData.getStatus() == 200) {
-//                        double data = (Double) infoResultData.getData();
-//                        if (data == 1) {
-//                            //已经被拉黑
-//                            chatMessageAdapter.setBlack(true);
-//                            isBlackUser = true;
-//                            if (null != msg && (msg.getChatType() != Message.ChatType.GIFT || msg.getChatType() != Message.ChatType.SUPERLIKE)) {
-//                                msg.setStatus(Message.ChatStatus.REJECTED);
-//                                updataMessage(msg.getMsgID(), Message.ChatStatus.REJECTED.ordinal());
-//                                int me_user_id = PreferencesUtils.getInt(App.getInstance(), Constants.ME_USER_ID);
-//                                DBDao.getDbDao(App.getInstance()).insertMessage(me_user_id, msg);
-//                            }
-//                        } else {
-//                            chatMessageAdapter.setBlack(false);
-//                            isBlackUser = false;
-//                            if (null != msg) {
-////                                if (msg.getChatType() == Message.ChatType.SUPERLIKE) {
-////                                    sendSuperLikeDecuctionMoney(msg, 1);
-////                                } else {
-//                                sendMessage(msg);
-////                                }
-//                            }
-//                        }
-////                        initBecomeCouple();
-//                    }
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//            @Override
-//            public void onError(Call call, Response response, Exception e) {
-//                super.onError(call, response, e);
-//                if (null != msg) {
-//                    int sendCount = PreferencesUtils.getInt(ShopChatActivity.this, Constants.SEND_MESSAGE_COUNT + to_user_id, 0);
-//                    //原计数-1
-//                    PreferencesUtils.putInt(ShopChatActivity.this, Constants.SEND_MESSAGE_COUNT + to_user_id, --sendCount);
-//                    updataMessage(msg.getMsgID(), Message.ChatStatus.FAIL.ordinal());
-//                    int me_user_id = PreferencesUtils.getInt(App.getInstance(), Constants.ME_USER_ID);
-//                    DBDao.getDbDao(App.getInstance()).insertMessage(me_user_id, msg);
-//                }
-//            }
-//        });
     }
 
     /**
@@ -759,9 +711,21 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 
             @Override
             public void onExitCallBack() {
+                showExitTipDialog();
+            }
+        });
+    }
+
+    private void showExitTipDialog(){
+        ExitRoomDialog exitRoomDialog = new ExitRoomDialog(this);
+        exitRoomDialog.setTipContent(getString(R.string.exit_shop_chat_room));
+        exitRoomDialog.setOnDialogCallBack(new ExitRoomDialog.OnDialogCallBack() {
+            @Override
+            public void onCallBack(String content) {
                 finish();
             }
         });
+        exitRoomDialog.show();
     }
 
     /**

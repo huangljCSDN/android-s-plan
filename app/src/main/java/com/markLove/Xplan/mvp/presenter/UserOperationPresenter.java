@@ -38,4 +38,25 @@ public class UserOperationPresenter extends UserOperationContract.Presenter {
             }
         });
     }
+
+    @Override
+    public void isBlackList(Map<String, String> map) {
+        if (!isAttach()) return;
+        getView().showLoading();
+
+        mModel.isBlackList(map, new RequestCallBack<BaseBean>() {
+            @Override
+            public void onSuccess(BaseBean o) {
+                getView().hideLoading();
+                getView().isBlackSuccess(o);
+            }
+
+            @Override
+            public void onFail(String result) {
+//                Log.i("ShopChatPresenter",result);
+                getView().hideLoading();
+                getView().isBlackError(result);
+            }
+        });
+    }
 }

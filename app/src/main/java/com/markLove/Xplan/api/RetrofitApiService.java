@@ -173,4 +173,11 @@ public interface RetrofitApiService {
     @POST("user/operation/cancelFocus")
     Observable<BaseBean> cancelFocus(@QueryMap Map<String, String> map);
 
+    /**
+     * 是否处于黑名单
+     * @param map
+     * @return
+     */
+    @POST("user/operation/isBlackList")
+    Observable<BaseBean> isBlackList(@QueryMap Map<String, String> map);
 }

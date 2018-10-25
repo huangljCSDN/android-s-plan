@@ -49,6 +49,7 @@ import com.markLove.Xplan.mvp.presenter.ChatPresenter;
 import com.markLove.Xplan.mvp.presenter.GroupChatPresenter;
 import com.markLove.Xplan.mvp.presenter.impl.ChatPresenterImpl;
 import com.markLove.Xplan.ui.adapter.GroupChatMessageAdapter;
+import com.markLove.Xplan.ui.dialog.ExitRoomDialog;
 import com.markLove.Xplan.ui.dialog.MorePopWindow;
 import com.markLove.Xplan.ui.dialog.RemoveMsgDialog;
 import com.markLove.Xplan.ui.dialog.ReportDialog;
@@ -144,6 +145,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         findViewById(R.id.tv_cancel).setOnClickListener(this);
         findViewById(R.id.iv_remove).setOnClickListener(this);
         findViewById(R.id.btn_enter).setOnClickListener(this);
+        findViewById(R.id.fl_back).setOnClickListener(this);
         mRlHeads.setOnClickListener(this);
 
         chatView = findViewById(R.id.chatView);
@@ -195,7 +197,14 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
                 showRemoveDialog();
                 break;
             case R.id.btn_enter:
-               applyGroup(groupBean.getId());
+                if (groupBean != null){
+                    if (groupBean.getCurrentNum() == groupBean.getMaxNum()){
+                        ToastUtils.showLong(this,"该组局已满员");
+                    } else {
+                        applyGroup(groupBean.getId());
+                    }
+                }
+//               participateGroup(369033,26);
                 break;
             case R.id.rl_heads:
                 startGroupMembersActivity();
@@ -203,13 +212,16 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
             case R.id.tv_invitation:
                 startInvitingFriendsActivity();
                 break;
+            case R.id.fl_back:
+                finish();
+                break;
         }
     }
 
     private void startGroupMembersActivity(){
         Intent intent = new Intent(GroupChatActivity.this,GroupMembersActivity.class);
         intent.putExtra("chatId",to_user_id);
-        startActivity(intent);
+        startActivityForResult(intent,Constants.REQUEST_CODE_CHAT_MEMBER);
     }
 
     /**
@@ -311,8 +323,8 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     private void getGroupDetailData(int groupId) {
         Map<String, String> map = new HashMap<>();
         map.put("groupId", String.valueOf(groupId));
-//        map.put("page", String.valueOf(1));
-//        map.put("rows", String.valueOf(10));
+        map.put("page", String.valueOf(1));
+        map.put("rows", String.valueOf(10));
         mPresenter.groupDetails(map);
     }
 
@@ -482,58 +494,6 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         }
         //暂时不判断拉黑逻辑，直接发送
         sendMessage(msg);
-
-//        StringBuilder sb = new StringBuilder(Constants.POST_JUDGE_BLACK_LIST);
-//        sb.append("?ToUserId=" + to_user_id);
-//        sb.append("&Token=" + PreferencesUtils.getString(this, Constants.TOKEN_KEY));
-//        OkGoHttpUtils.post(sb.toString(), new OkGoHttpCallBack() {
-//            @Override
-//            public void onSuccess(String s, Call call, Response response) {
-//                try {
-//                    InfoResultData infoResultData = GsonUtils.json2Bean(s, InfoResultData.class);
-//                    if (infoResultData.getStatus() == 200) {
-//                        double data = (Double) infoResultData.getData();
-//                        if (data == 1) {
-//                            //已经被拉黑
-//                            chatMessageAdapter.setBlack(true);
-//                            isBlackUser = true;
-//                            if (null != msg && (msg.getChatType() != Message.ChatType.GIFT || msg.getChatType() != Message.ChatType.SUPERLIKE)) {
-//                                msg.setStatus(Message.ChatStatus.REJECTED);
-//                                updataMessage(msg.getMsgID(), Message.ChatStatus.REJECTED.ordinal());
-//                                int me_user_id = PreferencesUtils.getInt(App.getInstance(), Constants.ME_USER_ID);
-//                                DBDao.getDbDao(App.getInstance()).insertMessage(me_user_id, msg);
-//                            }
-//                        } else {
-//                            chatMessageAdapter.setBlack(false);
-//                            isBlackUser = false;
-//                            if (null != msg) {
-////                                if (msg.getChatType() == Message.ChatType.SUPERLIKE) {
-////                                    sendSuperLikeDecuctionMoney(msg, 1);
-////                                } else {
-//                                sendMessage(msg);
-////                                }
-//                            }
-//                        }
-////                        initBecomeCouple();
-//                    }
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//            @Override
-//            public void onError(Call call, Response response, Exception e) {
-//                super.onError(call, response, e);
-//                if (null != msg) {
-//                    int sendCount = PreferencesUtils.getInt(ShopChatActivity.this, Constants.SEND_MESSAGE_COUNT + to_user_id, 0);
-//                    //原计数-1
-//                    PreferencesUtils.putInt(ShopChatActivity.this, Constants.SEND_MESSAGE_COUNT + to_user_id, --sendCount);
-//                    updataMessage(msg.getMsgID(), Message.ChatStatus.FAIL.ordinal());
-//                    int me_user_id = PreferencesUtils.getInt(App.getInstance(), Constants.ME_USER_ID);
-//                    DBDao.getDbDao(App.getInstance()).insertMessage(me_user_id, msg);
-//                }
-//            }
-//        });
     }
 
     /**
@@ -749,6 +709,19 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
                     onImageReturn(null, media.path, isOrigin);
                 }
             }
+
+            if (requestCode == Constants.REQUEST_CODE_CHAT_MEMBER){
+                if (me_user_id == groupBean.getCreateBy()){
+                    Intent intent = new Intent();
+                    setResult(RESULT_OK, intent);
+                    finish();
+                } else {
+                    getGroupDetailData(to_user_id);
+//                    mBtnJoin.setText(getString(R.string.enter));
+//                    mBtnJoin.setTextColor(getColor(R.color.white));
+//                    mBtnJoin.setClickable(true);
+                }
+            }
             if (resultCode == 102) {
                 LogUtils.i("CJT", "video");
                 String path = data.getStringExtra("path");
@@ -832,9 +805,21 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 
             @Override
             public void onExitCallBack() {
+                showExitTipDialog();
+            }
+        });
+    }
+
+    private void showExitTipDialog(){
+        ExitRoomDialog exitRoomDialog = new ExitRoomDialog(this);
+        exitRoomDialog.setTipContent(getString(R.string.exit_group_chat_room));
+        exitRoomDialog.setOnDialogCallBack(new ExitRoomDialog.OnDialogCallBack() {
+            @Override
+            public void onCallBack(String content) {
                 finish();
             }
         });
+        exitRoomDialog.show();
     }
 
     /**
@@ -1044,11 +1029,21 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 
     @Override
     public void onParticipateGroup(BaseBean baseBean) {
-
+        if (baseBean.Status == 200){
+            mBtnJoin.setText(getString(R.string.joined_success));
+            mBtnJoin.setTextColor(getColor(R.color.white));
+            mBtnJoin.setBackgroundResource(R.drawable.bg_enter);
+            mBtnJoin.setClickable(false);
+        }
     }
 
     @Override
     public void onApplyGroup(BaseBean baseBean) {
-
+        if (baseBean.Status == 200){
+            mBtnJoin.setText(getString(R.string.joined));
+            mBtnJoin.setTextColor(getColor(R.color.color_333333));
+            mBtnJoin.setBackgroundResource(R.drawable.bg_joined);
+            mBtnJoin.setClickable(false);
+        }
     }
 }

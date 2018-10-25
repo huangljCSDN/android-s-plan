@@ -17,13 +17,17 @@ public interface UserOperationContract {
 
     interface View extends BaseView {
         void onFocus(BaseBean baseBean);
+        void isBlackSuccess(BaseBean baseBean);
+        void isBlackError(String baseBean);
     }
 
     abstract class Model extends BaseModel {
         public abstract void focus(@QueryMap Map<String, String> map, RequestCallBack requestCallBack);
+        public abstract void isBlackList(@QueryMap Map<String, String> map, RequestCallBack requestCallBack);
     }
 
     abstract class Presenter extends BasePresenter<View> {
         public abstract void focus(@QueryMap Map<String, String> map);
+        public abstract void isBlackList(@QueryMap Map<String, String> map);
     }
 }

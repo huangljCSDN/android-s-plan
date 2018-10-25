@@ -29,6 +29,7 @@ public class LoginActivity extends BaseContractActivity {
 
     @Override
     protected void init(Bundle savedInstanceState) {
+        fullScreen(this);
         mWebView = new WebView(getApplicationContext());
         LinearLayout mll = findViewById(R.id.rootView);
         //避免内存泄露，采用动态添加的方式

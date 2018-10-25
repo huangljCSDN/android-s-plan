@@ -13,7 +13,7 @@ import com.markLove.Xplan.R;
  * 描述：退出聊天室弹窗
  */
 public class ExitRoomDialog extends AlertDialog implements View.OnClickListener{
-
+    private TextView tvTip;
 	public ExitRoomDialog(Context context) {
 		super(context, R.style.AsyncTaskDialog);
 		// TODO Auto-generated constructor stub
@@ -23,8 +23,13 @@ public class ExitRoomDialog extends AlertDialog implements View.OnClickListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_exit_room);
+        tvTip = findViewById(R.id.tv_tip_content);
         findViewById(R.id.tv_sure).setOnClickListener(this);
         findViewById(R.id.tv_cancel).setOnClickListener(this);
+    }
+
+    public void setTipContent(String content){
+	    tvTip.setText(content);
     }
 
     @Override

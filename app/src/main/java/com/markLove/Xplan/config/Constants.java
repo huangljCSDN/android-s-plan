@@ -35,6 +35,7 @@ public class Constants {
     public static final int REQUEST_CODE_PICKER = 102; //相册
     public static final int REQUEST_CODE_PREVIEW = 103; //发布照片预览
     public static final int REQUEST_CODE_VISIBLE = 104; //发布动态权限
+    public static final int REQUEST_CODE_CHAT_MEMBER = 105; //聊天室成员
 
 
     /**

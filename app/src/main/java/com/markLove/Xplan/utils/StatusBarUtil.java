@@ -86,7 +86,7 @@ public class StatusBarUtil {
     public static int StatusBarLightModeAndFullscreen(Activity activity) {
         int result = 0;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            if (MIUISetStatusBarLightMode(activity, true)) {
+            if (MIUISetStatusBarLightModeAndFullScreen(activity, true)) {
                 result = 1;
             } else if (FlymeSetStatusBarLightMode(activity.getWindow(), true)) {
                 result = 2;

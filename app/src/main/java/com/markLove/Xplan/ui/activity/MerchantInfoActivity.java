@@ -27,6 +27,7 @@ public class MerchantInfoActivity extends BaseActivity {
     @Override
     protected void init(Bundle savedInstanceState) {
         fullScreen(this);
+        fullScreen(this);
         StatusBarUtil.StatusBarLightMode(this);
         mWebView = new WebView(this);
         LinearLayout mll = findViewById(R.id.rootView);
@@ -57,17 +58,14 @@ public class MerchantInfoActivity extends BaseActivity {
         settings.setJavaScriptEnabled(true);
         // 支持缩放
         settings.setSupportZoom(true);
+        id = getIntent().getIntExtra("chatId",0);
 
         mWebView.addJavascriptInterface(new JSInterface(), "xplanfunc");
-        id = getIntent().getIntExtra("chatId",0);
-        mWebView.loadUrl("file:///android_asset/package/main/index.html#/find/store/{"+id+"}");
-
+        mWebView.loadUrl("file:///android_asset/package/main/index.html#/find/store/"+id+"");
     }
 
-    // 继承自Object类
-    public class JSInterface extends Object {
+    public class JSInterface {
 
-        // 被JS调用的方法必须加入@JavascriptInterface注解
         @JavascriptInterface
         public void toChatRoom(String json) {
             LogUtils.i("huang", "toChatRoom=" + json);
@@ -79,7 +77,6 @@ public class MerchantInfoActivity extends BaseActivity {
         ChatBean chatBean = GsonUtils.json2Bean(json, ChatBean.class);
         Intent intent = new Intent(this, ShopChatActivity.class);
         intent.putExtra("chatId", chatBean.getChatId());
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
 
