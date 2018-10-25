@@ -263,6 +263,10 @@ public class DataUtils {
         return getFormatDateTime(new Date(microsecond), "yyyy/MM/dd HH:mm:ss");
     }
 
+    public static String getDateTime2(long microsecond) {
+        return getFormatDateTime(new Date(microsecond), "dd/MM HH:mm");
+    }
+
     /**
      * 根据给定的格式与时间(Date类型�?)，返回时间字符串。最为�?�用�?<br>
      *

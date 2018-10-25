@@ -24,12 +24,12 @@ import com.markLove.Xplan.ui.activity.GoodPlayActivity;
 import com.markLove.Xplan.ui.activity.LoverActivity;
 import com.markLove.Xplan.ui.activity.MerchantInfoActivity;
 import com.markLove.Xplan.ui.activity.PlayersActivity;
-import com.markLove.Xplan.ui.activity.ShopChatActivity;
 import com.markLove.Xplan.ui.activity.UserInfoActivity;
 import com.markLove.Xplan.ui.adapter.MerchantListAdapter;
 import com.markLove.Xplan.ui.adapter.UserListAdapter;
 import com.markLove.Xplan.utils.GsonUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
+import com.markLove.Xplan.utils.ToastUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -215,9 +215,9 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
             @Override
             public void onItemClick(View view, int position) {
                 MerchantBean merchantBean = merchantBeanList.get(position);
-//                Intent intent = new Intent(getContext(), MerchantInfoActivity.class);
-                Intent intent = new Intent(getContext(), ShopChatActivity.class);
-                intent.putExtra("chatId",merchantBean.getMerchantId());
+                Intent intent = new Intent(getContext(), MerchantInfoActivity.class);
+//                Intent intent = new Intent(getContext(), ShopChatActivity.class);
+                intent.putExtra("chatId", merchantBean.getMerchantId());
                 startActivity(intent);
             }
         });
@@ -265,7 +265,7 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
             public void onItemClick(View view, int position) {
                 NearUserBean nearUserBean = userBeanList.get(position);
                 Intent intent = new Intent(getContext(), UserInfoActivity.class);
-                intent.putExtra("chatId",nearUserBean.getUserId());
+                intent.putExtra("chatId", nearUserBean.getUserId());
                 startActivity(intent);
             }
         });
@@ -349,36 +349,53 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
 
     @Override
     public void refreshMerchantList(ArrayList<MerchantBean> list) {
-        if (list == null || list.isEmpty()) return;
-        currentMerchantPage += 1;
-        refreshLayoutUser.setEnabled(true);
         refreshLayoutMerchant.setRefreshing(false);
-        merchantListAdapter.setData(merchantBeanList);
-        merchantListAdapter.notifyDataSetChanged();
-        int size = list.size();
-        for (int i = size - 1; i >= 0; i--) {
-            merchantBeanList.add(0, list.get(i));
+        refreshLayoutUser.setEnabled(true);
+        if (list != null && !list.isEmpty()) {
+            currentMerchantPage += 1;
+            int size = list.size();
+            for (int i = size - 1; i >= 0; i--) {
+                merchantBeanList.add(0, list.get(i));
+            }
+            merchantListAdapter.setData(merchantBeanList);
             merchantListAdapter.notifyDataSetChanged();
-        }
-        if (!isRefreshMerchantList){
-            mCircleRecyclerView.scrollToPosition(merchantListAdapter.getItemCount() - 1);
+            if (!isRefreshMerchantList) {
+                mCircleRecyclerView.scrollToPosition(merchantListAdapter.getItemCount() - 1);
+            }
+        } else {
+            if (currentMerchantPage == 1){
+                merchantBeanList.clear();
+                merchantListAdapter.setData(merchantBeanList);
+                merchantListAdapter.notifyDataSetChanged();
+            } else {
+                ToastUtils.showLong(getContext(),"没有更多数据了");
+            }
         }
     }
 
     @Override
     public void refreshUserList(ArrayList<NearUserBean> list) {
-        if (list == null || list.isEmpty()) return;
-        currentUserPage += 1;
-        refreshLayoutMerchant.setEnabled(true);
         refreshLayoutUser.setRefreshing(false);
-        int size = list.size();
-        for (int i = size - 1; i >= 0; i--) {
-            userBeanList.add(0, list.get(i));
-        }
-        userListAdapter.setData(userBeanList);
-        userListAdapter.notifyDataSetChanged();
-        if (!isRefreshUserList){
-            mCircleRecyclerView2.scrollToPosition(userListAdapter.getItemCount() - 1);
+        refreshLayoutMerchant.setEnabled(true);
+        if (list != null && !list.isEmpty()) {
+            currentUserPage += 1;
+            int size = list.size();
+            for (int i = size - 1; i >= 0; i--) {
+                userBeanList.add(0, list.get(i));
+            }
+            userListAdapter.setData(userBeanList);
+            userListAdapter.notifyDataSetChanged();
+            if (!isRefreshUserList) {
+                mCircleRecyclerView2.scrollToPosition(userListAdapter.getItemCount() - 1);
+            }
+        } else {
+            if (currentUserPage == 1) {
+                userBeanList.clear();
+                userListAdapter.setData(userBeanList);
+                userListAdapter.notifyDataSetChanged();
+            } else {
+                ToastUtils.showLong(getContext(),"没有更多数据了");
+            }
         }
     }
 }

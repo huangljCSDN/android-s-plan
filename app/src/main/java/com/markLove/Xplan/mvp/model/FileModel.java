@@ -24,7 +24,7 @@ public class FileModel extends FileContract.Model {
 
     @Override
     public void upload(List<File> files, RequestCallBack requestCallBack) {
-        requestData(retrofitApiService.upload(filesToMultipartBodyParts(files)),requestCallBack);
+        requestData(retrofitApiService.upload(filesToMultipartBody(files)),requestCallBack);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class FileModel extends FileContract.Model {
             // 这里为了简单起见，没有判断file的类型
 //            RequestBody requestBody = RequestBody.create(MediaType.parse("image/png"), file);
             RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
-            builder.addFormDataPart("file", file.getName(), requestBody);
+            builder.addFormDataPart("files", file.getName(), requestBody);
         }
         builder.setType(MultipartBody.FORM);
         MultipartBody multipartBody = builder.build();
@@ -50,7 +50,7 @@ public class FileModel extends FileContract.Model {
         List<MultipartBody.Part> parts = new ArrayList<>(files.size());
         for (File file : files) {
             RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
-            MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
+            MultipartBody.Part part = MultipartBody.Part.createFormData("files", file.getName(), requestBody);
             parts.add(part);
         }
         return parts;

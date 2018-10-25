@@ -2,12 +2,12 @@ package com.markLove.Xplan.mvp.presenter;
 
 import com.markLove.Xplan.api.util.RequestCallBack;
 import com.markLove.Xplan.bean.BaseBean;
+import com.markLove.Xplan.bean.UploadFileBean;
 import com.markLove.Xplan.mvp.contract.FileContract;
 import com.markLove.Xplan.mvp.model.FileModel;
 import com.markLove.Xplan.utils.LogUtils;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,9 +27,9 @@ public class FilePresenter extends FileContract.Presenter {
         if (!isAttach()) return;
         getView().showLoading();
 
-        mModel.upload(files, new RequestCallBack<BaseBean<Object>>() {
+        mModel.upload(files, new RequestCallBack<BaseBean<UploadFileBean>>() {
             @Override
-            public void onSuccess(BaseBean<Object> json) {
+            public void onSuccess(BaseBean<UploadFileBean> json) {
                 LogUtils.i("FilePresenter",json.toString());
                 getView().hideLoading();
 //                getView().uploadSuccess(json.Data);

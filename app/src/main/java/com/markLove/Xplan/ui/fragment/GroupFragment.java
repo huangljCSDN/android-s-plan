@@ -1,8 +1,6 @@
 package com.markLove.Xplan.ui.fragment;
 
 import android.content.Intent;
-import android.net.Uri;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
@@ -12,7 +10,6 @@ import android.widget.LinearLayout;
 
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.SinglePickerActivity;
-import com.dmcbig.mediapicker.entity.Media;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseFragment;
@@ -20,12 +17,11 @@ import com.markLove.Xplan.bean.ChatBean;
 import com.markLove.Xplan.bean.GoNativeBean;
 import com.markLove.Xplan.bean.GoViewBeaan;
 import com.markLove.Xplan.ui.activity.GroupChatActivity;
+import com.markLove.Xplan.ui.activity.PublishActivity;
 import com.markLove.Xplan.ui.activity.WebViewActivity;
 import com.markLove.Xplan.utils.GsonUtils;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.ToastUtils;
-
-import java.util.ArrayList;
 
 public class GroupFragment extends BaseFragment {
     private WebView mWebView;
@@ -96,7 +92,8 @@ public class GroupFragment extends BaseFragment {
 
         @JavascriptInterface
         public void goNative(String callFun) {
-            ToastUtils.showLong(getContext(), "goNative");
+
+//            ToastUtils.showLong(getContext(), "goNative");
         }
 
         /**
@@ -107,7 +104,7 @@ public class GroupFragment extends BaseFragment {
          */
         @JavascriptInterface
         public void goPhoto(String json) {
-            ToastUtils.showLong(getContext(), "goPhoto");
+//            ToastUtils.showLong(getContext(), "goPhoto");
         }
 
         /**
@@ -118,7 +115,7 @@ public class GroupFragment extends BaseFragment {
          */
         @JavascriptInterface
         public void goVideo(String json) {
-            ToastUtils.showLong(getContext(), "goVideo");
+//            ToastUtils.showLong(getContext(), "goVideo");
 
         }
 
@@ -130,7 +127,7 @@ public class GroupFragment extends BaseFragment {
          */
         @JavascriptInterface
         public void goRecord(String json) {
-            ToastUtils.showLong(getContext(), "goRecord");
+//            ToastUtils.showLong(getContext(), "goRecord");
 
         }
 
@@ -144,7 +141,7 @@ public class GroupFragment extends BaseFragment {
          */
         @JavascriptInterface
         public void fromImgLibrary(String json) {
-            ToastUtils.showLong(getContext(), "fromImgLibrary");
+//            ToastUtils.showLong(getContext(), "fromImgLibrary");
 
             if (1 == Integer.parseInt("111")) {
                 Intent intent = new Intent(getActivity(), SinglePickerActivity.class);
@@ -160,7 +157,7 @@ public class GroupFragment extends BaseFragment {
          */
         @JavascriptInterface
         public void openPhone(String phoneNumber) {
-            ToastUtils.showLong(getContext(), "openPhone");
+//            ToastUtils.showLong(getContext(), "openPhone");
         }
 
         /**
@@ -171,7 +168,7 @@ public class GroupFragment extends BaseFragment {
          */
         @JavascriptInterface
         public void getQDLocationInfo(String json) {
-            ToastUtils.showLong(getContext(), "getQDLocationInfo");
+//            ToastUtils.showLong(getContext(), "getQDLocationInfo");
         }
 
         /**
@@ -195,8 +192,9 @@ public class GroupFragment extends BaseFragment {
         @JavascriptInterface
         public void goView(String json) {
             LogUtils.i("json="+json);
-            goViewBeaan = GsonUtils.json2Bean(json,GoViewBeaan.class);
+//            goViewBeaan = GsonUtils.json2Bean(json,GoViewBeaan.class);
             startWebViewActivity(goViewBeaan.getUrlPort());
+//            startPublishActivity();
         }
 
         private void startWebViewActivity(String url) {
@@ -212,7 +210,7 @@ public class GroupFragment extends BaseFragment {
          */
         @JavascriptInterface
         public void updateTintColor(String color) {
-            ToastUtils.showLong(getContext(), "updateTintColor");
+//            ToastUtils.showLong(getContext(), "updateTintColor");
 //            StatusBarUtil.setStatusBarColor(getActivity(),color);
         }
     }
@@ -255,12 +253,15 @@ public class GroupFragment extends BaseFragment {
     }
 
     private void startGroupChatActivity(final String json) {
-
         ChatBean chatBean = GsonUtils.json2Bean(json, ChatBean.class);
         Intent intent = new Intent(getContext(), GroupChatActivity.class);
         intent.putExtra("chatId", chatBean.getChatId());
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivityForResult(intent,100);
+    }
+
+    private void startPublishActivity() {
+        Intent intent = new Intent(getContext(), PublishActivity.class);
+        startActivity(intent);
     }
 
 }

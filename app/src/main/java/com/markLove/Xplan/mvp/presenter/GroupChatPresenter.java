@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.markLove.Xplan.api.util.RequestCallBack;
 import com.markLove.Xplan.bean.BaseBean;
+import com.markLove.Xplan.bean.GroupDetailBean;
 import com.markLove.Xplan.mvp.contract.GroupChatContract;
 import com.markLove.Xplan.mvp.model.GroupChatModel;
 import com.markLove.Xplan.utils.LogUtils;
@@ -75,6 +76,29 @@ public class GroupChatPresenter extends GroupChatContract.Presenter {
             public void onSuccess(BaseBean baseBean) {
                 LogUtils.i("GroupChatPresenter",baseBean.toString());
                 getView().hideLoading();
+//                getView().onParticipateGroup(baseBean);
+            }
+
+            @Override
+            public void onFail(String result) {
+                Log.i("GroupChatPresenter",result);
+                getView().hideLoading();
+                getView().showError(result);
+            }
+        });
+    }
+
+    @Override
+    public void groupDetails(Map<String, String> map) {
+        if (!isAttach()) return;
+        getView().showLoading();
+
+        mModel.groupDetails(map, new RequestCallBack<BaseBean<GroupDetailBean>>() {
+            @Override
+            public void onSuccess(BaseBean<GroupDetailBean> baseBean) {
+                LogUtils.i("GroupChatPresenter",baseBean.toString());
+                getView().hideLoading();
+                getView().onGroupDetail(baseBean.Data);
 //                getView().onParticipateGroup(baseBean);
             }
 

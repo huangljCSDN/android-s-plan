@@ -28,4 +28,9 @@ public class GroupChatModel extends GroupChatContract.Model {
     public void applyGroup(Map<String, String> map, RequestCallBack requestCallBack) {
         requestData(retrofitApiService.applyGroup(map),requestCallBack);
     }
+
+    @Override
+    public void groupDetails(Map<String, String> map, RequestCallBack requestCallBack) {
+        requestData(retrofitApiService.groupDetails(map),requestCallBack);
+    }
 }

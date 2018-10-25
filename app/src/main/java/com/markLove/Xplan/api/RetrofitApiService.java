@@ -1,10 +1,12 @@
 package com.markLove.Xplan.api;
 
 import com.markLove.Xplan.bean.BaseBean;
+import com.markLove.Xplan.bean.GroupDetailBean;
 import com.markLove.Xplan.bean.MerchantBean;
 import com.markLove.Xplan.bean.MerchantInfoBean;
 import com.markLove.Xplan.bean.NearUserBean;
 import com.markLove.Xplan.bean.PostQueryInfo;
+import com.markLove.Xplan.bean.UploadFileBean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,28 +94,36 @@ public interface RetrofitApiService {
 
     /**
      * 文件上传  通过 List<MultipartBody.Part> 传入多个part实现多文件上传
-     * @param parts  每个part代表一个
+     * @param files  每个part代表一个
      * @return
      */
     @Multipart
     @POST("system/dfs/upload")
-    Observable<BaseBean<Object>> upload(@Part() List<MultipartBody.Part> parts);
+    Observable<BaseBean<UploadFileBean>> upload(@Part() List<MultipartBody.Part> files);
 
     /**
      * 文件上传  通过 MultipartBody和@body作为参数来上传
-     * @param multipartBody   MultipartBody包含多个Part
+     * @param files   MultipartBody包含多个Part
      * @return
      */
     @POST("system/dfs/upload")
-    Observable<BaseBean> upload(@Body MultipartBody multipartBody);
+    Observable<BaseBean<UploadFileBean>> upload(@Body MultipartBody files);
 
     /**
-     * 进入组局，组局详情
+     * 进入组局
      * @param map
      * @return
      */
     @POST("user/group/joinGroup")
     Observable<BaseBean<Object>> joinGroup(@QueryMap Map<String, String> map);
+
+    /**
+     * 组局详情
+     * @param map
+     * @return
+     */
+    @POST("user/group/groupDetails")
+    Observable<BaseBean<GroupDetailBean>> groupDetails(@QueryMap Map<String, String> map);
 
     /**
      * 同意报名

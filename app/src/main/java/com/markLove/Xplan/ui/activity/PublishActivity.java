@@ -244,6 +244,7 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
                     String path = media.path;
                     files.add(new File(path));
                 }
+                LogUtils.i("huang",files.toString());
                 filePresenter.upload(files);
             }
         } else {

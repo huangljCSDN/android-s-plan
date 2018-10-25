@@ -36,6 +36,7 @@ import com.markLove.Xplan.base.App;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.BaseBean;
 import com.markLove.Xplan.bean.ChatUser;
+import com.markLove.Xplan.bean.GroupDetailBean;
 import com.markLove.Xplan.bean.msg.Message;
 import com.markLove.Xplan.bean.msg.body.FileMessageBody;
 import com.markLove.Xplan.bean.msg.body.TxtMessageBody;
@@ -57,6 +58,7 @@ import com.markLove.Xplan.utils.AudioUtils;
 import com.markLove.Xplan.utils.ChatUtils;
 import com.markLove.Xplan.utils.DataUtils;
 import com.markLove.Xplan.utils.DensityUtils;
+import com.markLove.Xplan.utils.ImageLoaderUtils;
 import com.markLove.Xplan.utils.ImageUtils;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
@@ -87,7 +89,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     private RelativeLayout mRlRemove;
     private com.markLove.Xplan.ui.widget.ChatView chatView;
 
-    private TextView mTvJoinCount, mTvPlace, mTvTime, mTvRemark;
+    private TextView mTvJoinCount, mTvPlace, mTvTime, mTvRemark,mTvGroupName;
     private Button mBtnJoin;
     private TextView mTvInvitation; //邀请好友
     private ImageView mIvGroupHead;
@@ -97,6 +99,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     GroupChatMessageAdapter chatMessageAdapter;
     String nickName;
     String headImgUrl;
+    GroupDetailBean.GroupBean groupBean;
     //    AutoCameraUtils autoCameraUtils;
     int me_user_id;
     int to_user_id;
@@ -134,16 +137,23 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         mTvInvitation = findViewById(R.id.tv_invitation);
         mRlHeads = findViewById(R.id.rl_heads);
         mIvGroupHead = findViewById(R.id.iv_group_head);
+        mTvGroupName = findViewById(R.id.tv_group_name);
+        mTvInvitation = findViewById(R.id.tv_invitation);
 
         findViewById(R.id.fl_more).setOnClickListener(this);
         findViewById(R.id.tv_cancel).setOnClickListener(this);
         findViewById(R.id.iv_remove).setOnClickListener(this);
         findViewById(R.id.btn_enter).setOnClickListener(this);
         mRlHeads.setOnClickListener(this);
-        addPersonHeadPhoto();
 
         chatView = findViewById(R.id.chatView);
         chatView.setActivity(this);
+        setListener();
+        initSoftKeyboard();
+        initData();
+    }
+
+    private void setListener(){
         chatView.setOnSendMessageListener(new com.markLove.Xplan.ui.widget.ChatView.OnSendMessageListener() {
             @Override
             public void onSendMessage(Message message) {
@@ -170,9 +180,6 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
                 return false;
             }
         });
-        initSoftKeyboard();
-        initData();
-        addGroupPersongHead();
     }
 
     @Override
@@ -188,38 +195,14 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
                 showRemoveDialog();
                 break;
             case R.id.btn_enter:
-//                signUp();
-//                getTestData();
-                startInvitingFriendsActivity();
+               applyGroup(groupBean.getId());
                 break;
             case R.id.rl_heads:
                 startGroupMembersActivity();
                 break;
-        }
-    }
-
-    private void addGroupPersongHead() {
-        for (int i = 0; i < 5; i++) {
-            View view = LayoutInflater.from(this).inflate(R.layout.layout_head_item, null);
-            ImageView imageHead = view.findViewById(R.id.chat_head_img);
-            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT);
-            layoutParams.leftMargin = i * DensityUtils.dip2px(this, 26);
-            view.setLayoutParams(layoutParams);
-
-            //显示圆形的imageview
-            RequestOptions mRequestOptions = RequestOptions.circleCropTransform()
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)//不做磁盘缓存
-                    .skipMemoryCache(true);//不做内存缓存
-            if (i == 4) {
-                Glide.with(this).load(R.drawable.ic_more_head).apply(mRequestOptions).into(imageHead);
-            } else {
-                Glide.with(this).load(R.drawable.icon).apply(mRequestOptions).into(imageHead);
-            }
-
-
-//            mLlPersons.addView(view);
-            mRlHeads.addView(view);
+            case R.id.tv_invitation:
+                startInvitingFriendsActivity();
+                break;
         }
     }
 
@@ -229,6 +212,9 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         startActivity(intent);
     }
 
+    /**
+     * 邀请好友
+     */
     private void startInvitingFriendsActivity(){
         Intent intent = new Intent(GroupChatActivity.this,InvitingFriendsActivity.class);
         intent.putExtra("chatId",to_user_id);
@@ -236,9 +222,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     }
 
     protected void initData() {
-        mTvPlace.setText("市民一路");
-        mTvTime.setText("10:11:22");
-        mTvRemark.setText("代号101");
+
         //显示圆形的imageview
         RequestOptions mRequestOptions = RequestOptions.circleCropTransform()
                 .diskCacheStrategy(DiskCacheStrategy.NONE)//不做磁盘缓存
@@ -289,14 +273,14 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 //        chatPresenter.getHistory(me_user_id, to_user_id);
 //        getGiftList();
         getChatOpen();
-        getGroupDetailInfo(to_user_id);
+        getGroupDetailData(to_user_id);
     }
 
     /**
-     * 获取组局聊天室详情
+     * 进入组局
      * @param groupId
      */
-    private void getGroupDetailInfo(int groupId) {
+    private void joinGroup(int groupId) {
         Map<String, String> map = new HashMap<>();
         map.put("groupId", String.valueOf(groupId));
         mPresenter.joinGroup(map);
@@ -324,45 +308,23 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         mPresenter.participateGroup(map);
     }
 
+    private void getGroupDetailData(int groupId) {
+        Map<String, String> map = new HashMap<>();
+        map.put("groupId", String.valueOf(groupId));
+//        map.put("page", String.valueOf(1));
+//        map.put("rows", String.valueOf(10));
+        mPresenter.groupDetails(map);
+    }
+
     /**
      * 报名
      */
 
     private void signUp() {
-        //已报名
-        mBtnJoin.setText(getString(R.string.joined));
-        mBtnJoin.setTextColor(getColor(R.color.color_333333));
-        mBtnJoin.setBackgroundResource(R.drawable.bg_joined);
-        mBtnJoin.setClickable(false);
 
         SignUpTipDialog signUpTipDialog = new SignUpTipDialog(this);
         signUpTipDialog.setCanceledOnTouchOutside(true);
         signUpTipDialog.show();
-    }
-
-    /**
-     * 设置组局状态
-     *
-     * @param startTime
-     */
-    private void checkTime(long startTime) {
-        long currentTime = System.currentTimeMillis();
-        long goingTime = currentTime - startTime;
-
-        if (goingTime > 0) {
-            long hour = goingTime / 3600000;
-            if (hour > 8) {
-                mBtnJoin.setText(getString(R.string.finished));
-                mBtnJoin.setTextColor(getColor(R.color.white));
-                mBtnJoin.setBackgroundResource(R.drawable.bg_joined);
-                mBtnJoin.setClickable(false);
-            } else {
-                mBtnJoin.setText(getString(R.string.going));
-                mBtnJoin.setTextColor(getColor(R.color.white));
-                mBtnJoin.setBackgroundResource(R.drawable.bg_joined);
-                mBtnJoin.setClickable(false);
-            }
-        }
     }
 
     private void getChatOpen() {
@@ -769,22 +731,6 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         super.onDestroy();
     }
 
-
-    private void addPersonHeadPhoto() {
-//        for (int i = 0; i < 10; i++) {
-//            View view = LayoutInflater.from(this).inflate(R.layout.item_min_head, null);
-//            ImageView imageHead = view.findViewById(R.id.iv_item_head);
-//            //显示圆形的imageview
-//            RequestOptions mRequestOptions = RequestOptions.circleCropTransform()
-//                    .diskCacheStrategy(DiskCacheStrategy.NONE)//不做磁盘缓存
-//                    .skipMemoryCache(true);//不做内存缓存
-//
-//            Glide.with(this).load(R.drawable.icon).apply(mRequestOptions).into(imageHead);
-//
-//            mLlPersons.addView(view);
-//        }
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -792,29 +738,19 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
             Log.i("huang", "requestCode=" + requestCode + "   resultCode=" + resultCode);
             if (requestCode == Constants.REQUEST_CODE_CAMERA) {
                 final String path = data.getStringExtra("path");
-                Log.i("huang", "path=" + path);
-//                Uri mediaUri = Uri.parse("file://" + path);
-//                Glide.with(this)
-//                        .load(mediaUri)
-//                        .into(imageView);
-//                imageView.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        playVideo(path);
-//                    }
-//                });
+                LogUtils.i("huang", "path=" + path);
                 onImageReturn(null, path, true);
             }
             if (requestCode == Constants.REQUEST_CODE_PICKER) {
                 select = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
                 Boolean isOrigin = data.getBooleanExtra(PickerConfig.IS_ORIGIN, false);
                 for (final Media media : select) {
-                    Log.i("media", media.toString());
+                    LogUtils.i("media", media.toString());
                     onImageReturn(null, media.path, isOrigin);
                 }
             }
             if (resultCode == 102) {
-                Log.i("CJT", "video");
+                LogUtils.i("CJT", "video");
                 String path = data.getStringExtra("path");
             }
             if (resultCode == 103) {
@@ -1012,8 +948,98 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     }
 
     @Override
-    public void onJoinGroup(BaseBean baseBean) {
+    public void onGroupDetail(GroupDetailBean detailBean) {
+        addGroupPersonHead(detailBean.getUserList());
+        groupBean = detailBean.getGroup();
+        mTvPlace.setText(groupBean.getAddress());
+        mTvGroupName.setText(groupBean.getTitle());
+        mTvJoinCount.setText(groupBean.getCurrentNum()+ "/"+groupBean.getMaxNum());
+        mTvTime.setText(DataUtils.getDateTime2(groupBean.getStartTime()));
+        String payType= "";
+        if (groupBean.getPaymentType() == 1){
+            payType = "AA制";
+        } else if (groupBean.getPaymentType() == 2){
+            payType = "你买单";
+        } else {
+            payType = "我买单";
+        }
+        String reachType = "";
+        if (groupBean.getReachType() == 1){
+            reachType = "各自抵达";
+        } else if (groupBean.getReachType() == 2){
+            reachType = "需要接送";
+        } else {
+            reachType = "负责接送";
+        }
+        String sex ="";
+        if (groupBean.getSex() == 0){
+            sex = "不限";
+        } else if (groupBean.getSex() == 1){
+            sex = "仅限男生";
+        } else {
+            sex = "仅限女生";
+        }
+        mTvRemark.setText(sex+"、"+payType+"、"+reachType);
+        //未开始
+        if (groupBean.getStatus() == 0){
+            //组局创建人
+            if (me_user_id == groupBean.getId()){
+                mTvInvitation.setVisibility(View.VISIBLE);
+                mBtnJoin.setVisibility(View.GONE);
+            } else {
+                mBtnJoin.setVisibility(View.VISIBLE);
+                mTvInvitation.setVisibility(View.GONE);
+//                //已报名待审核
+//                if (groupBean.getCheckStatus() == 1){
+//                    mBtnJoin.setText(getString(R.string.joined));
+//                    mBtnJoin.setTextColor(getColor(R.color.color_333333));
+//                    mBtnJoin.setBackgroundResource(R.drawable.bg_joined);
+//                    mBtnJoin.setClickable(false);
+//                    //报名成功
+//                } else if (groupBean.getCheckStatus() == 2){
+//                    mBtnJoin.setText(getString(R.string.joined_success));
+//                    mBtnJoin.setClickable(false);
+//                }
+            }
+            //进行中
+        } else if (groupBean.getStatus() == 1){
+            mBtnJoin.setText(getString(R.string.going));
+            setBtnDisplayStatus();
+            //已结束
+        } else if (groupBean.getStatus() == 2){
+            mBtnJoin.setText(getString(R.string.finished));
+            setBtnDisplayStatus();
+            //已解散
+        } else {
+            mBtnJoin.setText(getString(R.string.dissolution));
+            setBtnDisplayStatus();
+        }
+    }
 
+    private void setBtnDisplayStatus(){
+        mBtnJoin.setTextColor(getColor(R.color.white));
+        mBtnJoin.setBackgroundResource(R.drawable.bg_joined);
+        mBtnJoin.setClickable(false);
+    }
+
+    private void addGroupPersonHead(List<GroupDetailBean.UserListBean> userList) {
+        if (userList != null && !userList.isEmpty()){
+            int size = userList.size() > 5 ? 5: userList.size();
+            for (int i = 0; i < size; i++) {
+                View view = LayoutInflater.from(this).inflate(R.layout.layout_head_item, null);
+                ImageView imageHead = view.findViewById(R.id.chat_head_img);
+                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+                        RelativeLayout.LayoutParams.WRAP_CONTENT);
+                layoutParams.leftMargin = i * DensityUtils.dip2px(this, 26);
+                view.setLayoutParams(layoutParams);
+                if (i == size-1) {
+                    Glide.with(this).load(R.drawable.ic_more_head).into(imageHead);
+                } else {
+                    ImageLoaderUtils.displayCircle(this,userList.get(i).getHeadImageUrl(),imageHead);
+                }
+                mRlHeads.addView(view);
+            }
+        }
     }
 
     @Override

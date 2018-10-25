@@ -43,8 +43,10 @@
     <string name="wait_group_sure">等待局长同意</string>
     <string name="wait_confirm">您已提交报名申请。等待局长确认</string>
     <string name="joined">已报名</string>
+    <string name="joined_success">报名成功</string>
     <string name="going">进行中</string>
     <string name="finished">已结束</string>
+    <string name="dissolution">已解散</string>
     <string name="invitation">邀请好友</string>
     <string name="has_requested">已提交报名申请</string>
     <string name="agree">同意</string>
