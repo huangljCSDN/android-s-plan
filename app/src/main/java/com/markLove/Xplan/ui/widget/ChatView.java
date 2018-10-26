@@ -153,6 +153,11 @@ public class ChatView extends FrameLayout implements View.OnClickListener{
         });
     }
 
+    public void setId(int me_user_id,int to_user_id){
+        this.me_user_id = me_user_id;
+        this.to_user_id = to_user_id;
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -274,6 +279,7 @@ public class ChatView extends FrameLayout implements View.OnClickListener{
      */
     public void stopRecordering() {
         isEnd = true;
+        isRecordering = false;
         mTvRecordTime.setVisibility(View.GONE);
         mTvRecordTip.setText(getString(R.string.pressed_say));
     }
@@ -287,6 +293,7 @@ public class ChatView extends FrameLayout implements View.OnClickListener{
      */
     public void cancelRecordring() {
         isEnd = true;
+        isRecordering = false;
         mTvRecordTime.setText("");
         mTvRecordTime.setVisibility(View.GONE);
         mTvRecordTip.setText(getString(R.string.pressed_say));
@@ -421,6 +428,7 @@ public class ChatView extends FrameLayout implements View.OnClickListener{
 
         @Override
         public void recoderEnd() {
+            handler.removeMessages(0);
             stopRecordering();
             //结束录音后发送这条消息
             if (AudioUtils.getInstance().getTimeInterval() < 1000) {
@@ -446,6 +454,7 @@ public class ChatView extends FrameLayout implements View.OnClickListener{
 
         @Override
         public void recoderCancel() {
+            handler.removeMessages(0);
             cancelRecordring();
         }
     };

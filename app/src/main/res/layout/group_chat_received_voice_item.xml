@@ -19,8 +19,7 @@
         android:id="@+id/rl_chat_head_img"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom|left"
         android:layout_marginLeft="16dp"
         android:background="@drawable/bg_circle"
         android:gravity="center">

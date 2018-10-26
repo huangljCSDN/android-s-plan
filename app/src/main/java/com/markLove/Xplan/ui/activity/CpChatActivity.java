@@ -223,6 +223,7 @@ public class CpChatActivity extends BaseActivity<CpChatPresenter> implements Vie
 //            nickName = bundle.getString("nick_name");
 //            headImgUrl = bundle.getString("head_img_url");
 //        }
+        to_user_id = getIntent().getIntExtra("chatId", 0);
         me_user_id = PreferencesUtils.getInt(this, Constants.ME_USER_ID);
         LogUtils.d("me_user_id=" + me_user_id);
 //        tvChatUser.setText(nickName);
@@ -244,6 +245,7 @@ public class CpChatActivity extends BaseActivity<CpChatPresenter> implements Vie
         chatPresenter = new ChatPresenterImpl();
         chatPresenter.setView(this);
         chatMessageAdapter.setBetweenUserSex(2,1);
+        chatView.setId(me_user_id,to_user_id);
 //        tvChatSendPrice.setText(gold + "");
 //        chatPresenter.getHistory(me_user_id, to_user_id);
 //        getGiftList();

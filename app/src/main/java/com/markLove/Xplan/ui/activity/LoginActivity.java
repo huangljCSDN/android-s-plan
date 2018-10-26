@@ -14,6 +14,9 @@ import android.widget.LinearLayout;
 import com.cjt2325.cameralibrary.util.LogUtil;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.mvp.BasePresenter;
+import com.markLove.Xplan.bean.UserBean;
+import com.markLove.Xplan.config.Constants;
+import com.markLove.Xplan.utils.GsonUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
 import com.markLove.Xplan.utils.ToastUtils;
 
@@ -106,6 +109,10 @@ public class LoginActivity extends BaseContractActivity {
             ToastUtils.showLong(LoginActivity.this, "toHomePage");
             LogUtil.i("userInfo= "+userInfo);
             PreferencesUtils.putString(LoginActivity.this,PreferencesUtils.KEY_USER,userInfo);
+            UserBean userBean = GsonUtils.json2Bean(userInfo,UserBean.class);
+            PreferencesUtils.putInt(LoginActivity.this,Constants.ME_USER_ID,userBean.getUserInfo().getUserId());
+            PreferencesUtils.putString(LoginActivity.this,Constants.ME_HEAD_IMG_URL,userBean.getUserInfo().getHeadImageUrl());
+            PreferencesUtils.putString(LoginActivity.this,Constants.TOKEN_KEY,userBean.getToken());
             Intent intent = new Intent(LoginActivity.this,MainActivity.class);
             LoginActivity.this.startActivity(intent);
         }

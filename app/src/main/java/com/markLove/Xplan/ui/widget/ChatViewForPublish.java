@@ -311,6 +311,7 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
      */
     public void stopRecordering() {
         isEnd = true;
+        isRecordering = false;
         circleProgressBar.setVisibility(GONE);
         mTvRecordTip.setText(getString(R.string.recoreding_voice_completed));
         ivDeleteVoice.setVisibility(VISIBLE);
@@ -500,6 +501,7 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
 
         @Override
         public void recoderEnd() {
+            handler.removeMessages(0);
             stopRecordering();
             //结束录音后发送这条消息
             if (AudioUtils.getInstance().getTimeInterval() < 1000) {

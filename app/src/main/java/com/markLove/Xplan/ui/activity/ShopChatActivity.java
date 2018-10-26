@@ -219,12 +219,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 //            headImgUrl = bundle.getString("head_img_url");
 //        }
         to_user_id = getIntent().getIntExtra("chatId", 0);
-        String meHeadImgUrl = "";
-        UserBean meUserBean = App.getInstance().getUserBean();
-        if (meUserBean != null) {
-            me_user_id = meUserBean.getUserInfo().getUserId();
-            //        String meHeadImgUrl = meUserBean.getUserInfo().getNickName()
-        }
+        me_user_id = PreferencesUtils.getInt(this, Constants.ME_USER_ID);
         LogUtils.i("me_user_id=" + me_user_id + " to_user_id=" + to_user_id);
 //        tvChatUser.setText(nickName);
         LinearLayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -233,7 +228,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
         String url = FileUtil.saveBitmap("haha", bitmap);
 //        chatMessageAdapter.setToHeadImgUrl(headImgUrl);
         chatMessageAdapter.setToHeadImgUrl(url);
-        chatMessageAdapter.setFromHeadImgUrl(meHeadImgUrl);
+        chatMessageAdapter.setFromHeadImgUrl(PreferencesUtils.getString(this, Constants.ME_HEAD_IMG_URL));
         chatMessageAdapter.setFailMessageResend(failMessageResend);
         manager.setStackFromEnd(false);
         rlChatMsgList.setLayoutManager(manager);
@@ -244,6 +239,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 
         chatPresenter = new ChatPresenterImpl();
         chatPresenter.setView(this);
+        chatView.setId(me_user_id,to_user_id);
 //        tvChatSendPrice.setText(gold + "");
 //        chatPresenter.getHistory(me_user_id, to_user_id);
 //        getGiftList();
@@ -388,6 +384,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
             int sendCount = PreferencesUtils.getInt(this, Constants.SEND_MESSAGE_COUNT + to_user_id, 0);
             //原计数+1
             PreferencesUtils.putInt(this, Constants.SEND_MESSAGE_COUNT + to_user_id, ++sendCount);
+            msg.setStatus(Message.ChatStatus.SENDING);
             addOneMessage(msg);
         }
         sendMessage(msg);
@@ -412,9 +409,6 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
                 }
             });
         } else {
-            if (message.getChatType() == Message.ChatType.LOVE) {
-                PreferencesUtils.putLong(this, Constants.BECOME_COUPLE_TIME_KEY + to_user_id, 0);
-            }
             ToastUtils.showCenter(this, "该服务正在紧急维护当中，请稍后再试", 0);
             updataMessage(message.getMsgID(), Message.ChatStatus.FAIL.ordinal());
         }
@@ -432,7 +426,6 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
         String fileName = filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length());
         final Message imgMsg = Message.createImageMessage(Message.Type.CHAT, me_user_id, to_user_id, fileName, filePath);
         imgMsg.setStatus(Message.ChatStatus.SENDING);
-
         if (isOrigin) {
             judeBlackList(imgMsg);
         } else {
@@ -860,6 +853,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 
     @Override
     public void refreshMerchantInfo(MerchantInfoBean merchantInfoBean) {
+        if (merchantInfoBean == null) return;
         mTvShopName.setText(merchantInfoBean.getGroupName());
         mTvAllPersonCount.setText(String.valueOf(merchantInfoBean.getGroupCount()));
         addPersonHeadPhoto(merchantInfoBean.getUserInfo());

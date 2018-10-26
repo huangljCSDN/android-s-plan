@@ -181,15 +181,6 @@ public class ChatClient {
     };
 
 
-    private void initLoginTemp() {
-        int me_user_id = PreferencesUtils.getInt(App.getInstance(), Constants.ME_USER_ID);
-        String token = PreferencesUtils.getString(App.getInstance(), Constants.TOKEN_KEY);
-        LogUtils.d(TAG, "initLoginTemp me_user_id=" + me_user_id + ",token=" + token);
-        if (me_user_id != 0 && !TextUtils.isEmpty(token)) {
-            login(me_user_id, token);
-        }
-    }
-
     public void sendMessage(final Message message) {
         for (byte[] b : message.messageToBytes()) {
             sendMessage(b);
@@ -973,6 +964,15 @@ public class ChatClient {
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void initLoginTemp() {
+        int me_user_id = PreferencesUtils.getInt(App.getInstance(), Constants.ME_USER_ID);
+        String token = PreferencesUtils.getString(App.getInstance(), Constants.TOKEN_KEY);
+        LogUtils.d(TAG, "initLoginTemp me_user_id=" + me_user_id + ",token=" + token);
+        if (me_user_id != 0 && !TextUtils.isEmpty(token)) {
+            login(me_user_id, token);
         }
     }
 
