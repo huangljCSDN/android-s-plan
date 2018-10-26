@@ -22,6 +22,13 @@ public class PreferencesUtils {
         return context.getSharedPreferences("config", Context.MODE_PRIVATE);
     }
 
+    public static void clear(Context context){
+        SharedPreferences sharedPreferences = getSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.commit();
+    }
+
     public static void remove(Context context, String key) {
         getSharedPreferences(context).edit().remove(key).commit();
     }

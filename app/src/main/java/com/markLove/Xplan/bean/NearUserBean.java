@@ -15,7 +15,16 @@ public class NearUserBean {
     private String headImageUrl;
     private int sex;
     private String lastOnline;
-    private long userId;
+    private int userId;
+    private int isCertification;  //0-不是,1-是,默认为0-不是认证大玩家
+
+    public int getIsCertification() {
+        return isCertification;
+    }
+
+    public void setIsCertification(int isCertification) {
+        this.isCertification = isCertification;
+    }
 
     public void setDistance(double distance) {
         this.distance = distance;
@@ -74,6 +83,7 @@ public class NearUserBean {
                 ", sex=" + sex +
                 ", lastOnline='" + lastOnline + '\'' +
                 ", userId=" + userId +
+                ", isCertification=" + userId +
                 '}';
     }
 }

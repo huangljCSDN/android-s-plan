@@ -26,8 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
 import com.cjt2325.cameralibrary.util.FileUtil;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
@@ -234,23 +232,6 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     }
 
     protected void initData() {
-
-        //显示圆形的imageview
-        RequestOptions mRequestOptions = RequestOptions.circleCropTransform()
-                .diskCacheStrategy(DiskCacheStrategy.NONE)//不做磁盘缓存
-                .skipMemoryCache(true);//不做内存缓存
-        Glide.with(this).load(R.drawable.icon).apply(mRequestOptions).into(mIvGroupHead);
-
-        boolean isLove = PreferencesUtils.getBoolean(this, Constants.USER_IS_LOVES_INFO_KEY);
-        if (isLove) {
-            int femaleID = PreferencesUtils.getInt(this, Constants.FEMALE_USER_ID, 0);
-            int maleID = PreferencesUtils.getInt(this, Constants.MALE_USER_ID, 0);
-            if (femaleID != 0 && maleID != 0) {
-                if ((femaleID == me_user_id && maleID == to_user_id) || (femaleID == to_user_id && maleID == me_user_id)) {
-                    isLikeAndUser = true;
-                }
-            }
-        }
         Intent intent = getIntent();
 //        Bundle bundle = intent.getBundleExtra("data");
 //        if (null == bundle) {
@@ -323,8 +304,8 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     private void getGroupDetailData(int groupId) {
         Map<String, String> map = new HashMap<>();
         map.put("groupId", String.valueOf(groupId));
-        map.put("page", String.valueOf(1));
-        map.put("rows", String.valueOf(10));
+//        map.put("page", String.valueOf(1));
+//        map.put("rows", String.valueOf(10));
         mPresenter.groupDetails(map);
     }
 
@@ -974,17 +955,28 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
             } else {
                 mBtnJoin.setVisibility(View.VISIBLE);
                 mTvInvitation.setVisibility(View.GONE);
-//                //已报名待审核
-//                if (groupBean.getCheckStatus() == 1){
-//                    mBtnJoin.setText(getString(R.string.joined));
-//                    mBtnJoin.setTextColor(getColor(R.color.color_333333));
-//                    mBtnJoin.setBackgroundResource(R.drawable.bg_joined);
-//                    mBtnJoin.setClickable(false);
-//                    //报名成功
-//                } else if (groupBean.getCheckStatus() == 2){
-//                    mBtnJoin.setText(getString(R.string.joined_success));
-//                    mBtnJoin.setClickable(false);
-//                }
+//                //已报名
+                if (groupBean.getUserStatus() == 1){
+                    mBtnJoin.setText(getString(R.string.joined));
+                    mBtnJoin.setTextColor(getColor(R.color.color_333333));
+                    mBtnJoin.setBackgroundResource(R.drawable.bg_joined);
+                    mBtnJoin.setClickable(false);
+                    //报名成功
+                } else if (groupBean.getUserStatus() == 2){
+                    mBtnJoin.setText(getString(R.string.joined_success));
+                    mBtnJoin.setTextColor(getColor(R.color.white));
+                    mBtnJoin.setBackgroundResource(R.drawable.bg_enter);
+                    mBtnJoin.setClickable(false);
+                    //自己退出组局
+                } else if (groupBean.getUserStatus() == 3){
+                    mBtnJoin.setText(getString(R.string.enter));
+                    mBtnJoin.setTextColor(getColor(R.color.white));
+                    mBtnJoin.setBackgroundResource(R.drawable.bg_enter);
+                    mBtnJoin.setClickable(false);
+                } else if (groupBean.getUserStatus() == 4){ //被踢出
+                    mBtnJoin.setText("被踢出");
+                    mBtnJoin.setClickable(false);
+                }
             }
             //进行中
         } else if (groupBean.getStatus() == 1){
@@ -999,6 +991,8 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
             mBtnJoin.setText(getString(R.string.dissolution));
             setBtnDisplayStatus();
         }
+        String urlHead = detailBean.getUserList().get(0).getHeadImageUrl();
+        ImageLoaderUtils.displayCircle(this,urlHead,mIvGroupHead);
     }
 
     private void setBtnDisplayStatus(){

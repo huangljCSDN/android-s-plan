@@ -3,6 +3,7 @@ package com.markLove.Xplan.ui.activity;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import com.dmcbig.mediapicker.entity.Media;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.App;
 import com.markLove.Xplan.base.ui.BaseActivity;
+import com.markLove.Xplan.bean.UploadFileBean;
 import com.markLove.Xplan.bean.UserBean;
 import com.markLove.Xplan.bean.msg.Message;
 import com.markLove.Xplan.bean.msg.body.FileMessageBody;
@@ -41,6 +43,7 @@ import com.markLove.Xplan.ui.dialog.ExitEditDialog;
 import com.markLove.Xplan.ui.widget.ChatViewForPublish;
 import com.markLove.Xplan.utils.AudioUtils;
 import com.markLove.Xplan.utils.FileUtils;
+import com.markLove.Xplan.utils.ImageLoaderUtils;
 import com.markLove.Xplan.utils.ImageUtils;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.StatusBarUtil;
@@ -86,7 +89,7 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
     private int visible;
     //1：图片，2：视频(第一个文件是视频，第二个是缩略图)，3：语音
     private int type;
-    private String city;
+    private String city = "";
     private UserBean meUserBean;
 
     @Override
@@ -96,7 +99,7 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        StatusBarUtil.setStatusBarColor(this,R.color.white);
+        StatusBarUtil.setStatusBarColor(this, R.color.white);
         StatusBarUtil.StatusBarLightMode(this);
         mIvHead = findViewById(R.id.iv_head);
         mTvPublish = findViewById(R.id.tv_publish);
@@ -121,6 +124,10 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
 
         filePresenter = new FilePresenter();
         filePresenter.attachView(this);
+
+        UserBean userBean = App.getInstance().getUserBean();
+        String urlHead = userBean.getUserInfo().getHeadImageUrl();
+        ImageLoaderUtils.displayCircle(this,urlHead,mIvHead);
     }
 
     private void setListener() {
@@ -169,7 +176,7 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.tv_publish:
-                publish();
+                uploadFile();
                 break;
             case R.id.tv_open:
                 startSetPermissionActivity();
@@ -180,6 +187,8 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
             case R.id.fl_back:
                 if (!checkContentIsEmpty()) {
                     showExitEditDialog();
+                } else {
+                    finish();
                 }
                 break;
             case R.id.tv_voice:
@@ -193,6 +202,7 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
         if (aMapLocation != null) {
             city = aMapLocation.getCity();
             mTvLocation.setText(city);
+            mTvLocation.setTextColor(getColor(R.color.color_30efec));
             mIvLocation.setSelected(true);
         } else {
             ToastUtils.showShort(this, "获取定位失败");
@@ -234,22 +244,6 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
         intent.putExtra(PickerConfig.MAX_SELECT_COUNT, 9);
         intent.putExtra(PickerConfig.PRE_RAW_LIST, selects);
         this.startActivityForResult(intent, Constants.REQUEST_CODE_PREVIEW);
-    }
-
-    private void publish() {
-        if (!checkContentIsEmpty()) {
-            if (type != 0) {
-                List<File> files = new ArrayList<>();
-                for (Media media : mediaList) {
-                    String path = media.path;
-                    files.add(new File(path));
-                }
-                LogUtils.i("huang",files.toString());
-                filePresenter.upload(files);
-            }
-        } else {
-            showContentEmptyDialog();
-        }
     }
 
     /**
@@ -351,7 +345,7 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
             //相册
             if (requestCode == Constants.REQUEST_CODE_PICKER) {
                 select = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
-                if (select != null && !select.isEmpty()){
+                if (select != null && !select.isEmpty()) {
                     //视频、语音、图片不能同时存在
                     if (!mediaList.isEmpty()) {
                         if ((mediaList.get(0).mediaType == 2 || mediaList.get(0).mediaType == 3) && select.size() > 0) {
@@ -372,7 +366,7 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
             //已选图片预览
             if (requestCode == Constants.REQUEST_CODE_PREVIEW) {
                 mediaList = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
-                if (mediaList.isEmpty()){
+                if (mediaList.isEmpty()) {
                     mTvPublish.setTextColor(getColor(R.color.color_333333));
                     mRecycleView.setVisibility(View.GONE);
                     mTvVoice.setVisibility(View.GONE);
@@ -480,6 +474,7 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
                 public void subscribe(final ObservableEmitter<Message> emitter) throws Exception {
                     final FileMessageBody imgMessageBody = (FileMessageBody) imgMsg.getBody();
                     final String outPath = Constants.LOCAL_IMG_PATH + imgMessageBody.getFileName();
+                    LogUtils.i("huang","outPath="+outPath);
                     ImageUtils.compressImageInPath(imgMessageBody.getFilePath(), Constants.LOCAL_IMG_PATH, new IImageCompressor.OnImageCompressListener() {
                         @Override
                         public void onCompressStart(String msg) {
@@ -489,6 +484,7 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
                         @Override
                         public void onCompressComplete(List<String> destFilePaths) {
                             if (destFilePaths != null && destFilePaths.size() > 0) {
+                                LogUtils.i("huang","destFilePaths="+destFilePaths.get(0));
                                 imgMessageBody.setFilePath(outPath);
                                 emitter.onNext(imgMsg);
                                 emitter.onComplete();
@@ -512,8 +508,8 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
                         @Override
                         public void onNext(Message message) {
                             FileMessageBody imgMessageBody = (FileMessageBody) imgMsg.getBody();
-                            String outPath = Constants.LOCAL_IMG_PATH + imgMessageBody.getFileName();
-                            Media media = new Media(outPath, "", 0, 1, 999, 9999, "");
+//                            String outPath = Constants.LOCAL_IMG_PATH + imgMessageBody.getFileName();
+                            Media media = new Media(imgMessageBody.getFilePath(), "", 0, 1, 999, 9999, "");
                             mediaList.add(media);
                             gridAdapter.setData(mediaList);
                         }
@@ -557,16 +553,57 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
     }
 
     @Override
-    public void uploadSuccess(ArrayList<String> path) {
-        addLocus(path);
+    public void uploadSuccess(UploadFileBean bean) {
+        addLocus(bean.getList());
+    }
+
+    /**
+     * 上传文件
+     */
+    private void uploadFile() {
+        if (!checkContentIsEmpty()) {
+            List<File> files = new ArrayList<>();
+            if (type != 2) {
+                for (Media media : mediaList) {
+                    String path = media.path;
+                    File file = new File(path);
+                    if (!file.exists()){
+                        try {
+                            file.createNewFile();
+                            files.add(file);
+                        } catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    } else {
+                        files.add(new File(path));
+                    }
+                }
+            } else {
+                Media media = mediaList.get(0);
+                String path = media.path;
+                Bitmap bitmap = FileUtils.getVideoThumb2(path);
+                File videoFile = new File(path);
+                String videoImagPath = FileUtils.bitmap2File(bitmap, "VIDEO_IMG_" + System.currentTimeMillis());
+                files.add(videoFile);
+                files.add(new File(videoImagPath));
+            }
+            LogUtils.i("huang", files.toString());
+            filePresenter.upload(files);
+        } else {
+            showContentEmptyDialog();
+        }
     }
 
     /**
      * 网络请求:发布
      */
-    private void addLocus(ArrayList<String> paths) {
+    private void addLocus(ArrayList<UploadFileBean.FileBean> fileBeanArrayList) {
+        ArrayList<String> paths = new ArrayList<>();
+        for (UploadFileBean.FileBean fileBean : fileBeanArrayList) {
+            paths.add(fileBean.getPath());
+        }
         Map<String, String> map = new HashMap<>();
-        map.put("path",paths.toString());
+        map.put("path", paths.toString());
         //1：图片，2：视频(第一个文件是视频，第二个是缩略图)，3：语音
         map.put("type", String.valueOf(type));
         //上传视频/语音时长
@@ -588,7 +625,9 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
 
     @Override
     public void refreshUI(String json) {
-
+        Intent intent = new Intent();
+        setResult(RESULT_OK,intent);
+        finish();
     }
 
 

@@ -13,9 +13,11 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.markLove.Xplan.R;
+import com.markLove.Xplan.base.App;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.mvp.BaseView;
 import com.markLove.Xplan.utils.AppManager;
+import com.markLove.Xplan.utils.MsgUtil;
 import com.markLove.Xplan.utils.StatusBarUtil;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
@@ -188,12 +190,17 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
 
     @Override
     public void showLoading() {
-
+        MsgUtil.showDialog(this);
     }
 
     @Override
     public void hideLoading() {
+        MsgUtil.closeDialog();
+    }
 
+    @Override
+    public void showTokenExpiredDialog() {
+        App.getInstance().onTokenExpires();
     }
 
     @Override

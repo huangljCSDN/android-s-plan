@@ -398,4 +398,11 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
             }
         }
     }
+
+    @Override
+    public void showError(String error) {
+        super.showError(error);
+        refreshLayoutUser.setRefreshing(false);
+        refreshLayoutMerchant.setRefreshing(false);
+    }
 }

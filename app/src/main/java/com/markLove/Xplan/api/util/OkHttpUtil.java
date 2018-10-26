@@ -38,9 +38,9 @@ public class OkHttpUtil {
         if (null == mOkHttpClient) {
             mOkHttpClient = new OkHttpClient.Builder()
 //                    .cookieJar(CookieJar.NO_COOKIES)
-                    .connectTimeout(1000L, TimeUnit.MILLISECONDS)
-                    .readTimeout(1000L,TimeUnit.MILLISECONDS)
-                    .writeTimeout(10000L,TimeUnit.MILLISECONDS)
+                    .connectTimeout(60, TimeUnit.SECONDS)
+                    .readTimeout(60,TimeUnit.SECONDS)
+                    .writeTimeout(2*60,TimeUnit.SECONDS)
                     .addInterceptor(new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
                         @Override
                         public void log(String message) {

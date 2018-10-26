@@ -74,7 +74,7 @@ public interface RetrofitApiService {
      * @return
      */
     @POST("user/locus/addLocus")
-    Observable<Object> addLocus(@QueryMap Map<String, String> map);
+    Observable<BaseBean<Object>> addLocus(@QueryMap Map<String, String> map);
 
     /**
      * 更新定位

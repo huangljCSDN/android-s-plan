@@ -1,5 +1,9 @@
 package com.markLove.Xplan.api.util;
 
+import com.markLove.Xplan.base.App;
+import com.markLove.Xplan.bean.BaseBean;
+import com.markLove.Xplan.config.Constants;
+
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
@@ -51,8 +55,16 @@ public class RxObserver<T> implements Observer<T> {
     @Override
     public void onNext(T t) {
         if(requestCallBack == null) return;
-        checkIsSuccess(t);
-        requestCallBack.onSuccess(t);
+        if(t instanceof BaseBean){
+            BaseBean baseBean = (BaseBean)t;
+            if (baseBean.Status == Constants.TOKEN_EXPIRED_CODE){
+                App.getInstance().onTokenExpires();
+            } else {
+                requestCallBack.onSuccess(t);
+            }
+        } else {
+            requestCallBack.onSuccess(t);
+        }
     }
 
     private void checkIsSuccess(T o) {
@@ -80,7 +92,6 @@ public class RxObserver<T> implements Observer<T> {
 //                    break;
 //            }
 //        }
-
     }
 
     private RequestCallBack requestCallBack;

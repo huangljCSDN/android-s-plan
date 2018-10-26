@@ -11,9 +11,7 @@ import android.widget.LinearLayout;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseFragment;
-import com.markLove.Xplan.bean.GoNativeBean;
 import com.markLove.Xplan.ui.activity.PublishActivity;
-import com.markLove.Xplan.utils.GsonUtils;
 import com.markLove.Xplan.utils.LogUtils;
 
 public class MineFragment extends BaseFragment {
@@ -81,6 +79,7 @@ public class MineFragment extends BaseFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (data == null) return;
+        LogUtils.i("huang","requestCode="+requestCode);
         if (requestCode == 100){
             //刷新轨迹列表
             mWebView.loadUrl("javascript:refreshUserLocus()");

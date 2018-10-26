@@ -2,11 +2,17 @@ package com.markLove.Xplan.utils;
 
 import android.Manifest;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.media.MediaMetadataRetriever;
+import android.media.ThumbnailUtils;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.StatFs;
+import android.provider.MediaStore;
+
+import com.markLove.Xplan.config.Constants;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -643,5 +649,53 @@ public class FileUtils {
         }
         //如果不执行下面这句，目录下所有文件都删除了，但是还剩下子目录空文件夹
         delFile.delete();
+    }
+
+    /**
+     * 获取视频文件截图
+     *
+     * @param path 视频文件的路径
+     * @return Bitmap 返回获取的Bitmap
+     */
+    public static Bitmap getVideoThumb(String path) {
+        MediaMetadataRetriever media = new MediaMetadataRetriever();
+        media.setDataSource(path);
+        return media.getFrameAtTime();
+    }
+    /**
+     * 获取视频文件缩略图 API>=8(2.2)
+     *
+     * @param path 视频文件的路径
+     * @param kind 缩略图的分辨率：MINI_KIND、MICRO_KIND、FULL_SCREEN_KIND
+     * @return Bitmap 返回获取的Bitmap
+     */
+    public static Bitmap getVideoThumb2(String path, int kind) {
+        return ThumbnailUtils.createVideoThumbnail(path, kind);
+    }
+
+    public static Bitmap getVideoThumb2(String path) {
+        return getVideoThumb2(path, MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
+    }
+
+    /**
+     * Bitmap保存成File
+     *
+     * @param bitmap input bitmap
+     * @param name output file's name
+     * @return String output file's path
+     */
+    public static String bitmap2File(Bitmap bitmap, String name) {
+        File f = new File(Constants.LOCAL_IMG_PATH + name + ".jpg");
+        if (f.exists()) f.delete();
+        FileOutputStream fOut = null;
+        try {
+            fOut = new FileOutputStream(f);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+            fOut.flush();
+            fOut.close();
+        } catch (IOException e) {
+            return null;
+        }
+        return f.getAbsolutePath();
     }
 }

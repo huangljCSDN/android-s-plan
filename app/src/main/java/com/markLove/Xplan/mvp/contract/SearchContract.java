@@ -6,8 +6,6 @@ import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.mvp.BaseView;
 import com.markLove.Xplan.bean.MerchantBean;
 import com.markLove.Xplan.bean.NearUserBean;
-import com.markLove.Xplan.bean.PostQueryInfo;
-import com.markLove.Xplan.bean.UserBean;
 
 import java.util.ArrayList;
 import java.util.Map;

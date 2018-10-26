@@ -16,6 +16,15 @@ public class MerchantBean {
     private double distance;
     private int merchantId;
     private String shopName;
+    private String logoUrl;
+
+    public String getLogoUrl() {
+        return logoUrl;
+    }
+
+    public void setLogoUrl(String logoUrl) {
+        this.logoUrl = logoUrl;
+    }
 
     public void setGroupCount(int groupCount) {
         this.groupCount = groupCount;
@@ -56,6 +65,7 @@ public class MerchantBean {
                 ", distance=" + distance +
                 ", merchantId=" + merchantId +
                 ", shopName='" + shopName + '\'' +
+                ", logoUrl='" + logoUrl + '\'' +
                 '}';
     }
 }

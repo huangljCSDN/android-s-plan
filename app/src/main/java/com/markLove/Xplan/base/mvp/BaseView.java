@@ -7,5 +7,6 @@ package com.markLove.Xplan.base.mvp;
 public interface BaseView {
     void showLoading();
     void hideLoading();
+    void showTokenExpiredDialog();
     void showError(String error);
 }

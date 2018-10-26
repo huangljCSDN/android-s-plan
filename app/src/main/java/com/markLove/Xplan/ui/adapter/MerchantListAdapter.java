@@ -52,13 +52,13 @@ public class MerchantListAdapter extends RecyclerView.Adapter<MerchantListAdapte
             holder.contentView.setVisibility(View.INVISIBLE);
         } else {
             holder.contentView.setVisibility(View.VISIBLE);
-            MerchantBean MerchantBean = list.get(position);
-            holder.tvShopName.setText(MerchantBean.getShopName());
-            holder.tvShopCount.setText(MerchantBean.getGroupCount()+"");
+            MerchantBean merchantBean = list.get(position);
+            holder.tvShopName.setText(merchantBean.getShopName());
+            holder.tvShopCount.setText(merchantBean.getGroupCount()+"");
 
-            Glide.with(context).load(R.drawable.icon)
-                    .apply(RequestOptions.placeholderOf(R.drawable.icon_loading_default))
-                    .apply(RequestOptions.errorOf(R.drawable.icon_loading_default))
+            Glide.with(context).load(merchantBean.getLogoUrl())
+                    .apply(RequestOptions.placeholderOf(R.drawable.bg_merchant))
+                    .apply(RequestOptions.errorOf(R.drawable.bg_merchant))
                     .apply(RequestOptions.bitmapTransform(new GlideRoundImage(context)))
                     .into(holder.ivBg);
 

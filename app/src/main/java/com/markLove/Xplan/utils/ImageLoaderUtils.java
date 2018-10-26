@@ -146,8 +146,8 @@ public class ImageLoaderUtils {
         }
 
         Glide.with(context).load(picUrl)
-                .apply(RequestOptions.placeholderOf(R.drawable.bg_circle))
-                .apply(RequestOptions.errorOf(R.drawable.bg_circle))
+                .apply(RequestOptions.placeholderOf(R.drawable.bg_head))
+                .apply(RequestOptions.errorOf(R.drawable.bg_head))
                 .apply(RequestOptions.circleCropTransform())
                 .into(imageView);
     }

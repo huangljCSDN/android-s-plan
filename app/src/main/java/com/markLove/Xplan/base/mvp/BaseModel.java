@@ -20,7 +20,7 @@ public class BaseModel {
      * @param requestCallBack
      */
     public void requestData(Observable observable , RequestCallBack requestCallBack){
-        observable.timeout(50, TimeUnit.SECONDS)
+        observable.timeout(60, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new RxObserver(requestCallBack));

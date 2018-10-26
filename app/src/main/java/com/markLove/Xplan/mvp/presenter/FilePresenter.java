@@ -29,10 +29,10 @@ public class FilePresenter extends FileContract.Presenter {
 
         mModel.upload(files, new RequestCallBack<BaseBean<UploadFileBean>>() {
             @Override
-            public void onSuccess(BaseBean<UploadFileBean> json) {
-                LogUtils.i("FilePresenter",json.toString());
-                getView().hideLoading();
-//                getView().uploadSuccess(json.Data);
+            public void onSuccess(BaseBean<UploadFileBean> baseBean) {
+                LogUtils.i("FilePresenter",baseBean.toString());
+//                getView().hideLoading();
+                getView().uploadSuccess(baseBean.Data);
             }
 
             @Override

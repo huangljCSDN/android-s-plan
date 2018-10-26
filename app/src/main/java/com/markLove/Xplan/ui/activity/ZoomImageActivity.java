@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -20,10 +19,9 @@ import android.widget.PopupWindow;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseActivity;
+import com.markLove.Xplan.config.Constants;
 import com.markLove.Xplan.utils.FileUtils;
 import com.markLove.Xplan.utils.ToastUtils;
-
-import java.io.File;
 
 
 /**
@@ -79,9 +77,10 @@ public class ZoomImageActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
 
-                String destPath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "markmylove" + File.separator + "img" + File.separator;
+//                String destPath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "xplan" + File.separator + "img" + File.separator;
+                String destPath = Constants.LOCAL_IMG_PATH;
                 FileUtils.copyFileToDir(imgPath, destPath);
-                ToastUtils.show(ZoomImageActivity.this, "图片已保存至markmylove/img/文件夹", 0);
+                ToastUtils.show(ZoomImageActivity.this, "保存成功", 0);
                 sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + destPath)));
                 popupWindow.dismiss();
             }

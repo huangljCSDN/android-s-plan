@@ -13,7 +13,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.bean.NearUserBean;
-import com.markLove.Xplan.bean.UserBean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,9 +60,15 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.MyView
                 holder.ivSex.setImageResource(R.drawable.ic_woman);
             }
 
+            if (peopleBean.getIsCertification() == 1){
+                holder.ivCertification.setVisibility(View.VISIBLE);
+            } else {
+                holder.ivCertification.setVisibility(View.GONE);
+            }
+
             Glide.with(context).load(peopleBean.getHeadImageUrl())
-                    .apply(RequestOptions.placeholderOf(R.drawable.bg_circle))
-                    .apply(RequestOptions.errorOf(R.drawable.bg_circle))
+                    .apply(RequestOptions.placeholderOf(R.drawable.bg_head))
+                    .apply(RequestOptions.errorOf(R.drawable.bg_head))
                     .apply(RequestOptions.circleCropTransform())
                     .into(holder.ivHead);
 
@@ -86,7 +91,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.MyView
     class MyViewHolder extends RecyclerView.ViewHolder {
         View contentView;
         TextView tvTime,nickName;
-        ImageView ivSex,ivHead;
+        ImageView ivSex,ivHead,ivCertification;
 
         public MyViewHolder(View itemView) {
             super(itemView);
@@ -95,6 +100,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.MyView
             nickName = (TextView) itemView.findViewById(R.id.tv_nick_name);
             ivSex = (ImageView) itemView.findViewById(R.id.iv_sex);
             ivHead = (ImageView) itemView.findViewById(R.id.iv_head);
+            ivCertification = itemView.findViewById(R.id.iv_certification);
         }
     }
 

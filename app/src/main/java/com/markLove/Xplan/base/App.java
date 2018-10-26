@@ -1,12 +1,17 @@
 package com.markLove.Xplan.base;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.os.StrictMode;
 
 import com.amap.api.location.AMapLocation;
 import com.markLove.Xplan.bean.UserBean;
+import com.markLove.Xplan.ui.activity.LoginActivity;
+import com.markLove.Xplan.ui.dialog.TokenTipDialog;
+import com.markLove.Xplan.utils.AppManager;
 import com.markLove.Xplan.utils.GsonUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
 
@@ -68,21 +73,25 @@ public class App extends Application {
         return null;
     }
 
-//    void onTokenExpires() {
-//        // 清空缓存信息
-//        User.removeLastJSONStr();
-//        App.getInstance().setUserCache(null);
-//        SharePreferenceConfigHelper.getInstance().putToken("");
-//
-//        Ln.i("#onTokenExpires token过期   重新登录");
-//        Activity lastActivity = ActivityManager.getInstance().currentActivity();
-//        Intent intent = new Intent(lastActivity, LoginActivity.class);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//        startActivity(intent);
-//        lastActivity.finish();
-//        Toast.makeText(App.getInstance(), getString(R.string.token_expires), Toast.LENGTH_SHORT).show();
-//    }
+    public void onTokenExpires() {
+        final Activity lastActivity = AppManager.getAppManager().currentActivity();
+        TokenTipDialog tokenTipDialog = new TokenTipDialog(lastActivity);
+        tokenTipDialog.setOnDialogCallBack(new TokenTipDialog.OnDialogCallBack() {
+            @Override
+            public void onCallBack(String content) {
+                // 清空缓存信息
+                PreferencesUtils.clear(getApplicationContext());
+
+                Intent intent = new Intent(lastActivity, LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                startActivity(intent);
+                lastActivity.finish();
+            }
+        });
+        tokenTipDialog.setCanceledOnTouchOutside(false);
+        tokenTipDialog.show();
+    }
 
     public String getToken(){
         String token = "";

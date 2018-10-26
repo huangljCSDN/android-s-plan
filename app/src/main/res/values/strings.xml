@@ -83,4 +83,6 @@
     <string name="playing_voice_end">播放完成</string>
     <string name="all_see">所有人可见</string>
     <string name="only_me_see">仅自己可见</string>
+    <string name="login_again">账号已在其他设备登录</string>
+    <string name="login_again2">如非本人操作，请联系客服小姐姐~</string>
 </resources>

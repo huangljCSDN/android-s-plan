@@ -4,9 +4,9 @@ import com.markLove.Xplan.api.util.RequestCallBack;
 import com.markLove.Xplan.base.mvp.BaseModel;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.mvp.BaseView;
+import com.markLove.Xplan.bean.UploadFileBean;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +18,7 @@ import retrofit2.http.QueryMap;
 public interface FileContract {
 
     interface View extends BaseView {
-        void uploadSuccess(ArrayList<String> path);
+        void uploadSuccess(UploadFileBean bean);
         void downloadSuccess(String json);
     }
 

@@ -7,16 +7,30 @@
     android:orientation="horizontal">
 
     <RelativeLayout
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        android:background="@drawable/bg_circle"
-        android:gravity="center">
+        android:layout_width="48dp"
+        android:layout_height="45dp">
+        <RelativeLayout
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:background="@drawable/bg_circle"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/iv_head"
+                android:layout_width="43dp"
+                android:layout_height="43dp" />
+
+        </RelativeLayout>
 
         <ImageView
-            android:id="@+id/iv_head"
-            android:layout_width="43dp"
-            android:layout_height="43dp" />
-
+            android:id="@+id/iv_certification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_certification"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="3dp"
+            android:visibility="gone"/>
     </RelativeLayout>
 
     <RelativeLayout
@@ -50,6 +64,8 @@
             android:layout_below="@id/tv_nick_name"
             android:layout_marginTop="6dp"
             android:textColor="@color/white"
+            android:background="@drawable/bg_tv_time"
+            android:gravity="center"
             android:textSize="9sp" />
     </RelativeLayout>
 

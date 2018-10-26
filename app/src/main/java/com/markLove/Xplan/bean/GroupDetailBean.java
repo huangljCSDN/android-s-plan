@@ -88,7 +88,17 @@ public class GroupDetailBean {
         //0、未开始 1、进行中 2、已结束 3、已解散
         private int status;
         private String title;
+        // 0、已加入 1、已报名 2、报名成功 3、已退出 4、强制踢出
+        private int userStatus;
         private int typeId;
+
+        public int getUserStatus() {
+            return userStatus;
+        }
+
+        public void setUserStatus(int userStatus) {
+            this.userStatus = userStatus;
+        }
 
         public String getAddress() {
             return address;
@@ -246,6 +256,7 @@ public class GroupDetailBean {
                     ", status=" + status +
                     ", title='" + title + '\'' +
                     ", typeId=" + typeId +
+                    ", userStatus=" + userStatus +
                     '}';
         }
     }

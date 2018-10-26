@@ -17,6 +17,7 @@
         <RelativeLayout
             android:id="@+id/rl_title_bar"
             android:layout_width="match_parent"
+            android:layout_marginTop="5dp"
             android:layout_height="35dp"
             android:gravity="center_vertical">
 
@@ -54,7 +55,8 @@
                 android:textSize="13sp" />
         </RelativeLayout>
 
-        <View style="@style/DividerHorizontal" />
+        <View style="@style/DividerHorizontal"
+            android:layout_marginTop="5dp"/>
 
         <EditText
             android:id="@+id/et_content"

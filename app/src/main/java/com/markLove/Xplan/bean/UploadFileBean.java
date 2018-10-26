@@ -10,6 +10,14 @@ public class UploadFileBean {
 
     private ArrayList<FileBean> list;
 
+    public ArrayList<FileBean> getList() {
+        return list;
+    }
+
+    public void setList(ArrayList<FileBean> list) {
+        this.list = list;
+    }
+
     public class FileBean {
         String fullPath;
         String path;

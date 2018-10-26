@@ -1,6 +1,7 @@
 package com.markLove.Xplan.mvp.presenter;
 
 import com.markLove.Xplan.api.util.RequestCallBack;
+import com.markLove.Xplan.bean.BaseBean;
 import com.markLove.Xplan.mvp.contract.PublishContract;
 import com.markLove.Xplan.mvp.model.PublishModel;
 import com.markLove.Xplan.utils.LogUtils;
@@ -23,12 +24,12 @@ public class PublishPresenter extends PublishContract.Presenter {
         if (!isAttach()) return;
         getView().showLoading();
 
-        mModel.addLocus(map, new RequestCallBack<Object>() {
+        mModel.addLocus(map, new RequestCallBack<BaseBean<Object>>() {
             @Override
-            public void onSuccess(Object json) {
-                LogUtils.i("PublishPresenter",json.toString());
+            public void onSuccess(BaseBean<Object> baseBean) {
+                LogUtils.i("PublishPresenter",baseBean.toString());
                 getView().hideLoading();
-                getView().refreshUI(json.toString());
+                getView().refreshUI(baseBean.toString());
             }
 
             @Override

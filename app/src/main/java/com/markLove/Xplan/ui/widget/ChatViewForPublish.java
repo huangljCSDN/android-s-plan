@@ -561,7 +561,7 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
         intent.putExtra(PickerConfig.SELECT_MODE, PickerConfig.PICKER_IMAGE);//default image and video (Optional)
         long maxSize = 188743680L;//long long long
         intent.putExtra(PickerConfig.MAX_SELECT_SIZE, maxSize); //default 180MB (Optional)
-        intent.putExtra(PickerConfig.MAX_SELECT_COUNT, 15);  //default 40 (Optional)
+        intent.putExtra(PickerConfig.MAX_SELECT_COUNT, 9);  //default 40 (Optional)
         intent.putExtra(PickerConfig.DEFAULT_SELECTED_LIST, select); // (Optional)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
