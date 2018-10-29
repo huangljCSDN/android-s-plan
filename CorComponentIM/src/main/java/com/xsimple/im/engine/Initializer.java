@@ -222,7 +222,6 @@ public class Initializer {
             if (group == null) {
                 continue;
             }
-
             mLogicEngine.getMqttService().subscribeToTopic("group/" + group.getId());
 
         }

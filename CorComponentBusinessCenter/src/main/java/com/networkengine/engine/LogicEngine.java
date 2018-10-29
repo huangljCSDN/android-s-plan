@@ -174,12 +174,12 @@ public class LogicEngine {
     }
 
     public static String getMchlUrl() {
-        String gwHost = ConfigUtil.getGwHost();
-        if (TextUtils.isEmpty(gwHost)) {
-            return String.format("%s://%s:%s%s", PubConstant.MCHL_PROT, PubConstant.MCHL_HOST, PubConstant.MCHL_PORT, PubConstant.MCHL_BASE_URL);
-        }
-        return gwHost + "/mchl/jsse/";
-
+//        String gwHost = ConfigUtil.getGwHost();
+//        if (TextUtils.isEmpty(gwHost)) {
+//            return String.format("%s://%s:%s%s", PubConstant.MCHL_PROT, PubConstant.MCHL_HOST, PubConstant.MCHL_PORT, PubConstant.MCHL_BASE_URL);
+//        }
+//        return gwHost + "/mchl/jsse/";
+        return "http://120.79.244.243:18000/unwed-im/mchl/jsse/";
     }
 
     public static String getFileTransBaseUrl() {
@@ -188,6 +188,7 @@ public class LogicEngine {
 
 
     public static String getMqttUrl() {
+//        return String.format("%s://%s:%s", PubConstant.MQTT_PROT, PubConstant.MQTT_HOST, PubConstant.MQTT_PORT);
         return String.format("%s://%s:%s", PubConstant.MQTT_PROT, PubConstant.MQTT_HOST, PubConstant.MQTT_PORT);
     }
 
@@ -444,8 +445,8 @@ public class LogicEngine {
         this.mUser = mUser;
     }
 
-//    public Member updateUser() {
-//        Member oldUser = getUser();
+    public Member updateUser() {
+        Member oldUser = getUser();
 //        Member newUser = getContactController()
 //                .getMember(oldUser.getId());
 //        if (newUser != null) {
@@ -454,7 +455,8 @@ public class LogicEngine {
 //        } else {
 //            return oldUser;
 //        }
-//    }
+        return oldUser;
+    }
 
     //获取头像地址的前缀，拼接规则是前缀+用户id.jpg
     public static String getImgPrefix() {

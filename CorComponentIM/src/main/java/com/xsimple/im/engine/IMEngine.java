@@ -138,13 +138,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-//import com.cor.router.CorRouter;
-//import com.cor.router.RouterCallback;
-//import com.cor.router.uri.CorUri;
-//import com.networkengine.AsyncUtil.Marker;
-//import com.networkengine.widget.ProgressDialog;
-//import xsimple.moduleExpression.utils.AtUtil;
-
 /**
  * Created by pengpeng on 17/3/27.
  * IM引擎
@@ -805,6 +798,7 @@ public class IMEngine implements Handler.Callback {
                     try {
                         clientMaxMsgId = Long.parseLong(params[0]);
                     } catch (Exception e) {
+
 
                     }
                     RequestGetMsgsParam requestGetMsgsParam = new RequestGetMsgsParam(100, clientMaxMsgId);

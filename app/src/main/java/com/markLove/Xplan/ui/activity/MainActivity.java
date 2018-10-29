@@ -20,6 +20,7 @@ import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.App;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.BaseBean;
+import com.markLove.Xplan.bean.UserBean;
 import com.markLove.Xplan.config.Constants;
 import com.markLove.Xplan.mvp.contract.MainContract;
 import com.markLove.Xplan.mvp.presenter.MainPresenter;
@@ -31,6 +32,10 @@ import com.markLove.Xplan.ui.fragment.GroupFragment;
 import com.markLove.Xplan.utils.AMapClient;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.StatusBarUtil;
+import com.networkengine.controller.callback.ErrorResult;
+import com.networkengine.controller.callback.XCallback;
+import com.networkengine.database.table.Member;
+import com.xsimple.im.engine.LoginLogic;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -70,6 +75,8 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
         initMapClient();
         myHandler = new MyHandler(this);
         myHandler.sendEmptyMessageDelayed(1,1000*40);
+
+        login();
     }
 
     private void initMapClient(){
@@ -219,6 +226,24 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
     @Override
     public void onClick(View v) {
 
+    }
+
+    /**
+     * 登录mchl平台
+     */
+    private void login() {
+        UserBean userBean = App.getInstance().getUserBean();
+        new LoginLogic(this).init(userBean.getUserInfo().getPhone(), "123456", new XCallback<Member, ErrorResult>() {
+            @Override
+            public void onSuccess(Member result) {
+
+            }
+
+            @Override
+            public void onFail(ErrorResult result) {
+                Toast.makeText(MainActivity.this, result.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 }

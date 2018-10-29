@@ -195,7 +195,7 @@ public class MqttChannel implements MqttCallbackExtended {
             // 挤下线
             mClient.subscribe(TOPIC_PUSH + mParameter.appKey + "/" + mParameter.imei, 0);
             // PC端上下线
-            mClient.subscribe(TOPIC_PUSH + mParameter.appKey + "/pcStatus/" + mParameter.imei, 0);
+//            mClient.subscribe(TOPIC_PUSH + mParameter.appKey + "/pcStatus/" + mParameter.imei, 0);
 
             LogUtil.d("订阅成功");
         } catch (Exception e) {

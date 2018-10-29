@@ -10,6 +10,7 @@ import com.networkengine.entity.LoginInfo;
 import com.networkengine.entity.LoginResult;
 import com.networkengine.entity.RequestLoginParam;
 import com.networkengine.httpApi.Api;
+import com.networkengine.util.LogUtil;
 import com.networkengine.util.PhoneUtil;
 
 import retrofit2.Call;
@@ -139,6 +140,7 @@ public class InitController extends BusinessController {
         mMchlApiService.login(params).enqueue(new Callback<LoginResult>() {
             @Override
             public void onResponse(Call<LoginResult> call, Response<LoginResult> response) {
+                LogUtil.i("LoginResult="+response);
                 if (callback == null) {
                     return;
                 }

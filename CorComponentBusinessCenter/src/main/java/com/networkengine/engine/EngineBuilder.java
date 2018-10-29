@@ -32,7 +32,7 @@ public abstract class EngineBuilder extends LogicEngine.Builder {
 
 	@Override
 	public String setAppVersion() {
-		return "2.13.20161010.1";
+		return PhoneUtil.getAppVersionName(mContext);
 	}
 
 	@Override
@@ -57,7 +57,8 @@ public abstract class EngineBuilder extends LogicEngine.Builder {
 
 	@Override
 	public String setAppKey() {
-		return PubConstant.APP_KEY;
+//		return PubConstant.APP_KEY;
+		return "com.markLove.Xplan";
 	}
 
 	@Override
