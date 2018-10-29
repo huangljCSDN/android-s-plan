@@ -6,6 +6,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.os.StrictMode;
+import android.text.TextUtils;
 
 import com.amap.api.location.AMapLocation;
 import com.markLove.Xplan.bean.UserBean;
@@ -79,18 +80,21 @@ public class App extends Application {
         tokenTipDialog.setOnDialogCallBack(new TokenTipDialog.OnDialogCallBack() {
             @Override
             public void onCallBack(String content) {
-                // 清空缓存信息
-                PreferencesUtils.clear(getApplicationContext());
-
-                Intent intent = new Intent(lastActivity, LoginActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                startActivity(intent);
-                lastActivity.finish();
+                outLogin(lastActivity);
             }
         });
         tokenTipDialog.setCanceledOnTouchOutside(false);
         tokenTipDialog.show();
+    }
+
+    public void outLogin(Activity lastActivity){
+        PreferencesUtils.clear(getApplicationContext());
+
+        Intent intent = new Intent(lastActivity, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        startActivity(intent);
+        lastActivity.finish();
     }
 
     public String getToken(){
@@ -109,6 +113,13 @@ public class App extends Application {
             userId = String.valueOf(userBean.getUserInfo().getUserId());
         }
         return userId;
+    }
+
+    public boolean isLogin(){
+       if (!TextUtils.isEmpty(PreferencesUtils.getString(this,PreferencesUtils.KEY_USER))){
+           return true;
+       }
+       return false;
     }
 
     public UserBean getUserBean(){

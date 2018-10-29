@@ -87,7 +87,7 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
     private FilePresenter filePresenter;
     private int startTime;
     private int visible;
-    //1：图片，2：视频(第一个文件是视频，第二个是缩略图)，3：语音
+    //0:文字 1：图片，2：视频(第一个文件是视频，第二个是缩略图)，3：语音
     private int type;
     private String city = "";
     private UserBean meUserBean;
@@ -127,7 +127,7 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
 
         UserBean userBean = App.getInstance().getUserBean();
         String urlHead = userBean.getUserInfo().getHeadImageUrl();
-        ImageLoaderUtils.displayCircle(this,urlHead,mIvHead);
+        ImageLoaderUtils.displayCircle(this, urlHead, mIvHead);
     }
 
     private void setListener() {
@@ -474,7 +474,7 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
                 public void subscribe(final ObservableEmitter<Message> emitter) throws Exception {
                     final FileMessageBody imgMessageBody = (FileMessageBody) imgMsg.getBody();
                     final String outPath = Constants.LOCAL_IMG_PATH + imgMessageBody.getFileName();
-                    LogUtils.i("huang","outPath="+outPath);
+                    LogUtils.i("huang", "outPath=" + outPath);
                     ImageUtils.compressImageInPath(imgMessageBody.getFilePath(), Constants.LOCAL_IMG_PATH, new IImageCompressor.OnImageCompressListener() {
                         @Override
                         public void onCompressStart(String msg) {
@@ -484,7 +484,7 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
                         @Override
                         public void onCompressComplete(List<String> destFilePaths) {
                             if (destFilePaths != null && destFilePaths.size() > 0) {
-                                LogUtils.i("huang","destFilePaths="+destFilePaths.get(0));
+                                LogUtils.i("huang", "destFilePaths=" + destFilePaths.get(0));
                                 imgMessageBody.setFilePath(outPath);
                                 emitter.onNext(imgMsg);
                                 emitter.onComplete();
@@ -562,33 +562,37 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
      */
     private void uploadFile() {
         if (!checkContentIsEmpty()) {
-            List<File> files = new ArrayList<>();
-            if (type != 2) {
-                for (Media media : mediaList) {
-                    String path = media.path;
-                    File file = new File(path);
-                    if (!file.exists()){
-                        try {
-                            file.createNewFile();
-                            files.add(file);
-                        } catch (Exception e){
-                            e.printStackTrace();
+            if (type != 0) {
+                List<File> files = new ArrayList<>();
+                if (type != 2) {
+                    for (Media media : mediaList) {
+                        String path = media.path;
+                        File file = new File(path);
+                        if (!file.exists()) {
+                            try {
+                                file.createNewFile();
+                                files.add(file);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            files.add(new File(path));
                         }
-                    } else {
-                        files.add(new File(path));
                     }
+                } else {
+                    Media media = mediaList.get(0);
+                    String path = media.path;
+                    Bitmap bitmap = FileUtils.getVideoThumb2(path);
+                    File videoFile = new File(path);
+                    String videoImagPath = FileUtils.bitmap2File(bitmap, "VIDEO_IMG_" + System.currentTimeMillis());
+                    files.add(videoFile);
+                    files.add(new File(videoImagPath));
                 }
+                LogUtils.i("huang", files.toString());
+                filePresenter.upload(files);
             } else {
-                Media media = mediaList.get(0);
-                String path = media.path;
-                Bitmap bitmap = FileUtils.getVideoThumb2(path);
-                File videoFile = new File(path);
-                String videoImagPath = FileUtils.bitmap2File(bitmap, "VIDEO_IMG_" + System.currentTimeMillis());
-                files.add(videoFile);
-                files.add(new File(videoImagPath));
+                addLocus(null);
             }
-            LogUtils.i("huang", files.toString());
-            filePresenter.upload(files);
         } else {
             showContentEmptyDialog();
         }
@@ -599,8 +603,10 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
      */
     private void addLocus(ArrayList<UploadFileBean.FileBean> fileBeanArrayList) {
         ArrayList<String> paths = new ArrayList<>();
-        for (UploadFileBean.FileBean fileBean : fileBeanArrayList) {
-            paths.add(fileBean.getPath());
+        if (fileBeanArrayList != null && !fileBeanArrayList.isEmpty()){
+            for (UploadFileBean.FileBean fileBean : fileBeanArrayList) {
+                paths.add(fileBean.getPath());
+            }
         }
         Map<String, String> map = new HashMap<>();
         map.put("path", paths.toString());
@@ -611,6 +617,8 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
             map.put("duration", String.valueOf(videoDuration));
         } else if (type == 3) {
             map.put("duration", String.valueOf(voiceDuration));
+        } else {
+            map.put("duration", "0");
         }
         map.put("content", mEditext.getText().toString().trim());
         map.put("address", city);
@@ -626,7 +634,7 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
     @Override
     public void refreshUI(String json) {
         Intent intent = new Intent();
-        setResult(RESULT_OK,intent);
+        setResult(RESULT_OK, intent);
         finish();
     }
 

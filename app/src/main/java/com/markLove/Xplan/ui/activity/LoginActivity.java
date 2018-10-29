@@ -3,6 +3,7 @@ package com.markLove.Xplan.ui.activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
@@ -16,12 +17,13 @@ import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.bean.UserBean;
 import com.markLove.Xplan.config.Constants;
+import com.markLove.Xplan.ui.widget.MyWebView;
 import com.markLove.Xplan.utils.GsonUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
 import com.markLove.Xplan.utils.ToastUtils;
 
 public class LoginActivity extends BaseContractActivity {
-    private WebView mWebView;
+    private MyWebView mWebView;
     private ValueCallback<Uri> mUploadMessage;
     private ValueCallback<Uri[]> mUploadCallbackAboveL;
 
@@ -33,36 +35,19 @@ public class LoginActivity extends BaseContractActivity {
     @Override
     protected void init(Bundle savedInstanceState) {
         fullScreen(this);
-        mWebView = new WebView(getApplicationContext());
-        LinearLayout mll = findViewById(R.id.rootView);
-        //避免内存泄露，采用动态添加的方式
+        mWebView = new MyWebView(this);
 
-//        mWebView = findViewById(R.id.webView);
-        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        mWebView.setLayoutParams(layoutParams);
+        LinearLayout mll = findViewById(R.id.rootView);
         mll.addView(mWebView);
         initWebSettings();
+
+        mWebView.requestFocus(View.FOCUS_DOWN);
     }
 
     /**
      * 设置websetting
      */
     private void initWebSettings(){
-        WebSettings settings = mWebView.getSettings();
-        settings.setUseWideViewPort(true);
-        settings.setLoadWithOverviewMode(true);
-        settings.setDomStorageEnabled(true);
-        settings.setDefaultTextEncodingName("UTF-8");
-        settings.setAllowContentAccess(true); // 是否可访问Content Provider的资源，默认值 true
-        settings.setAllowFileAccess(true);    // 是否可访问本地文件，默认值 true
-        // 是否允许通过file url加载的Javascript读取本地文件，默认值 false
-        settings.setAllowFileAccessFromFileURLs(false);
-        // 是否允许通过file url加载的Javascript读取全部资源(包括文件,http,https)，默认值 false
-        settings.setAllowUniversalAccessFromFileURLs(false);
-        //开启JavaScript支持
-        settings.setJavaScriptEnabled(true);
-        // 支持缩放
-        settings.setSupportZoom(true);
 
         mWebView.setWebChromeClient(new WebChromeClient(){
             // For Android 3.0-
@@ -131,11 +116,7 @@ public class LoginActivity extends BaseContractActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mWebView.removeAllViews();
-        mWebView.stopLoading();
-        mWebView.clearHistory();
-        mWebView.clearCache(true);
-        mWebView.destroy();
+        mWebView.onDestroy();
     }
 
     @Override

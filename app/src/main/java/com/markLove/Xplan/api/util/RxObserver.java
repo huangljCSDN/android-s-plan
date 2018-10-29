@@ -58,7 +58,9 @@ public class RxObserver<T> implements Observer<T> {
         if(t instanceof BaseBean){
             BaseBean baseBean = (BaseBean)t;
             if (baseBean.Status == Constants.TOKEN_EXPIRED_CODE){
-                App.getInstance().onTokenExpires();
+                if (App.getInstance().isLogin()){
+                    App.getInstance().onTokenExpires();
+                }
             } else {
                 requestCallBack.onSuccess(t);
             }

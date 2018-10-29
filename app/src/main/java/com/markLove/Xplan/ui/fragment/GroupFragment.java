@@ -19,12 +19,13 @@ import com.markLove.Xplan.bean.GoViewBeaan;
 import com.markLove.Xplan.ui.activity.GroupChatActivity;
 import com.markLove.Xplan.ui.activity.PublishActivity;
 import com.markLove.Xplan.ui.activity.WebViewActivity;
+import com.markLove.Xplan.ui.widget.MyWebView;
 import com.markLove.Xplan.utils.GsonUtils;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.ToastUtils;
 
 public class GroupFragment extends BaseFragment {
-    private WebView mWebView;
+    private MyWebView mWebView;
     private GoViewBeaan goViewBeaan;
     @Override
     protected int getContentViewLayoutID() {
@@ -33,13 +34,9 @@ public class GroupFragment extends BaseFragment {
 
     @Override
     protected void init(View view) {
-        mWebView = new WebView(getContext());
+        mWebView = new MyWebView(getContext());
         LinearLayout mll = view.findViewById(R.id.rootView);
         //避免内存泄露，采用动态添加的方式
-
-//        mWebView = findViewById(R.id.webView);
-        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        mWebView.setLayoutParams(layoutParams);
         mll.addView(mWebView);
         initWebSettings();
     }
@@ -48,24 +45,6 @@ public class GroupFragment extends BaseFragment {
      * 设置websetting
      */
     private void initWebSettings() {
-        WebSettings settings = mWebView.getSettings();
-        settings.setUseWideViewPort(true);
-        settings.setLoadWithOverviewMode(true);
-        settings.setDomStorageEnabled(true);
-        settings.setDefaultTextEncodingName("UTF-8");
-        settings.setAllowContentAccess(true); // 是否可访问Content Provider的资源，默认值 true
-        settings.setAllowFileAccess(true);    // 是否可访问本地文件，默认值 true
-        // 是否允许通过file url加载的Javascript读取本地文件，默认值 false
-        settings.setAllowFileAccessFromFileURLs(false);
-        // 是否允许通过file url加载的Javascript读取全部资源(包括文件,http,https)，默认值 false
-        settings.setAllowUniversalAccessFromFileURLs(false);
-        //开启JavaScript支持
-        settings.setJavaScriptEnabled(true);
-        // 设置允许JS弹窗
-        settings.setJavaScriptCanOpenWindowsAutomatically(true);
-        // 支持缩放
-        settings.setSupportZoom(false);
-
         mWebView.addJavascriptInterface(new JSInterface(), "xplanfunc");
 
         mWebView.loadUrl("file:///android_asset/package/main/index.html#/bureau/native/1");
@@ -239,11 +218,7 @@ public class GroupFragment extends BaseFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mWebView.removeAllViews();
-        mWebView.stopLoading();
-        mWebView.clearHistory();
-        mWebView.clearCache(true);
-        mWebView.destroy();
+        mWebView.onDestroy();
     }
 
     @Override
