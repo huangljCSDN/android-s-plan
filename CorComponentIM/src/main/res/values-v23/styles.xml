@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--状态栏字体深色-->
+    <style name="DarkText" parent="@android:style/Theme.Translucent.NoTitleBar">
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>

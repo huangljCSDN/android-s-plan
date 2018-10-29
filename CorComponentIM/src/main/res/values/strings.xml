@@ -1,0 +1,99 @@
+<resources>
+    <!-- PDF -->
+
+    <!--以下为涉及KIM的字符集-->
+
+    <!-- IM -->
+
+    <!-- 录音 -->
+    <!-- 语音识别 -->
+
+
+    <!-- 二维码/条形码 -->
+
+    <!-- xListView -->
+
+    <!-- 群图片、群文件 -->
+
+    <!-- 转发 -->
+
+
+    <string name="im_str_expression">[表情]</string>
+
+    <string name="im_collect_successfully">已收藏</string>
+    <string name="im_collect_failed">收藏失败</string>
+    <string name="im_over_two_minute">超过两分钟,不能撤回</string>
+    <string name="im_recall_failed">撤回失败</string>
+    <string name="im_preview_failed">预览失败</string>
+
+    <string name="im_str_group_remark">[有新公告]</string>
+
+
+    <string name="im_wait">等</string>
+    <string name="im_exit_failed">退出失败，请稍后重试</string>
+    <string name="im_image">[图片] </string>
+    <string name="im_image_gif">[动画表情] </string>
+    <string name="im_file">[文件] </string>
+    <string name="im_video">[视频] </string>
+    <string name="im_voice">[语音] </string>
+    <string name="im_location">[位置] </string>
+    <string name="im_reply_message">[回复消息]</string>
+    <string name="im_record_message">[聊天记录]</string>
+    <string name="im_fun_message">[轻应用]</string>
+    <string name="im_expression_success">表情添加成功</string>
+    <string name="im_login_again">登录失效，请重新登录</string>
+    <string name="im_you">你</string>
+    <string name="im_you_scan_join_group">您扫描二维码加入群组</string>
+    <string name="im_scan_code_join_group">扫描二维码加入群组</string>
+    <string name="im_invite_join_group">%1$s邀请%2$s加入群组</string>
+    <string name="im_through_join_group">%1$s通过%2$s的群组申请</string>
+    <string name="im_apply_join_group">%1$s申请加入群组</string>
+    <string name="im_permission_cancel">您的管理员权限已被取消</string>
+    <string name="im_your_group_is_dissolved">系统管理员解散了群组</string>
+    <string name="im_discussion_group_dissolved">%1$s解散了讨论组</string>
+    <string name="im_group_disabled">"您所在的%1$s群组被禁用了"</string>
+    <string name="im_group_rejected">"群组申请被拒绝"</string>
+    <string name="im_remove_group">"%1$s将%2$s移出群组"</string>
+    <string name="im_mend_group_name">"%1$s修改了群组名称：%2$s"</string>
+    <string name="im_change_group_name">"%1$s修改了群组名称：%2$s"</string>
+    <string name="im_you_scan_join_discussion_group">您扫描二维码加入讨论组</string>
+    <string name="im_scan_code_join_discussion_group">扫描二维码加入讨论组</string>
+    <string name="im_invite_join_discussion_group">%1$s邀请%2$s加入讨论组</string>
+    <string name="im_set_admin">%1$s已被设置为管理员</string>
+    <string name="im_pass_invite_join_group">%1$s通过%2$s的邀请加入讨论组</string>
+    <string name="im_exit_have_discussion_group">%1$s已退出讨论组</string>
+    <string name="im_rejected_discussion_group">%1$s 拒绝加入讨论组</string>
+    <string name="im_change_affiche">%1$s修改了群公告</string>
+    <string name="im_remove_discussion_group">%1$s将%2$s移出讨论组</string>
+    <string name="im_change_discussion_group_name">%1$s修改了讨论组名称：%2$s</string>
+    <string name="im_changed_group_name">%1$s已将讨论组名字修改为%2$s</string>
+    <string name="im_you_recall_message">你撤回一条消息</string>
+    <string name="im_recall_message">%1$s撤回一条消息</string>
+    <string name="im_message_failed_check_network">网络异常，请检查您的网络</string>
+    <string name="im_pull_group_list_failed">拉取群组列表失败</string>
+    <string name="im_create_discussion_group_fail">创建讨论组失败</string>
+    <string name="im_search_failure">搜索失败</string>
+    <string name="im_join_failure">加入失败</string>
+    <string name="im_apply_submit">申请已提交</string>
+    <string name="im_join_success">加入成功</string>
+    <string name="im_delete_failure">删除失败</string>
+    <string name="im_delete_success">删除成功</string>
+    <string name="im_complete_empty">已经完成清空</string>
+    <string name="im_set_failure">设置失败</string>
+    <string name="im_set_success">设置成功</string>
+    <string name="im_query_failure_check_network">查询失败，请检查网络</string>
+    <string name="im_failed_load_group">加载群组信息失败</string>
+    <string name="im_retrieve_member_failed">获取成员失败</string>
+    <string name="im_change_group_name_failure">修改群组名称失败</string>
+    <string name="im_invite_failure">邀请失败</string>
+    <string name="im_invite_success">邀请成功</string>
+    <string name="im_group_manager_transfer_failed">群主转让失败</string>
+    <string name="im_group_manager_transfer_success">群主转让成功</string>
+    <string name="im_exit_success">退出成功</string>
+    <string name="im_dissolve_success">解散成功</string>
+    <string name="im_operate_success">操作成功</string>
+    <string name="im_operate_failure">操作失败</string>
+    <string name="im_obtain_group_info_fail">获取群组信息失败</string>
+    <string name="im_enable_group">您所在的%1$s群组被启用了</string>
+
+</resources>

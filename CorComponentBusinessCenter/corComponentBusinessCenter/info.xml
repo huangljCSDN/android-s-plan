@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<corplugins>
+    <plugin build="21" corName="corComponentBusinessCenter" desc="移动门户基础组件" type="component"
+            version="4.0.0.21"
+    >
+        <info>21:基础模块</info>
+        <build>6:基础模块</build>
+        <build>1:基础模块</build>
+        <build>3:基础模块</build>
+        <build>2:基础模块</build>
+        <build>1:基础模块</build>
+        <build>0:基础模块</build>
+        <build>2:基础模块</build>
+        <build>1:基础模块</build>
+        <build>0:基础模块</build>
+    </plugin>
+
+</corplugins>

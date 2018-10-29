@@ -30,7 +30,6 @@ import com.cjt2325.cameralibrary.util.FileUtil;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
 import com.markLove.Xplan.R;
-import com.markLove.Xplan.base.App;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.BaseBean;
 import com.markLove.Xplan.bean.ChatUser;
@@ -517,7 +516,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         String fileName = filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length());
         final Message imgMsg = Message.createImageMessage(Message.Type.CHAT, me_user_id, to_user_id, fileName, filePath);
         imgMsg.setStatus(Message.ChatStatus.SENDING);
-
+        isOrigin = true;
         if (isOrigin) {
             judeBlackList(imgMsg);
         } else {

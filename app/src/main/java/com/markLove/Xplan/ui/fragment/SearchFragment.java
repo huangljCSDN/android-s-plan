@@ -109,22 +109,32 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
         refreshLayoutMerchant.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                isRefreshMerchantList = true;
-                refreshLayoutUser.setEnabled(false);
-                getMerchantList(centerUser.getUserId() + "");
+                if (centerUser != null){
+                    isRefreshMerchantList = true;
+                    refreshLayoutUser.setEnabled(false);
+                    getMerchantList(centerUser.getUserId() + "");
+                } else {
+//                    Toast.makeText(getContext(),"请选中")
+                    refreshLayoutMerchant.setRefreshing(false);
+                }
             }
         });
 
         refreshLayoutUser.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                isRefreshUserList = true;
-                refreshLayoutMerchant.setEnabled(false);
-                if (isSearchMeNearUser) {
-                    getNearUser(meUserBean.getUserInfo());
+                if (centerMerchant != null){
+                    isRefreshUserList = true;
+                    refreshLayoutMerchant.setEnabled(false);
+                    if (isSearchMeNearUser) {
+                        getNearUser(meUserBean.getUserInfo());
+                    } else {
+                        getMerchantUserList(centerMerchant);
+                    }
                 } else {
-                    getMerchantUserList(centerMerchant);
+                    refreshLayoutUser.setRefreshing(false);
                 }
+
             }
         });
     }

@@ -82,4 +82,7 @@ dependencies {
 
     implementation project(':mediapicker')
     implementation project(':camera')
+    implementation project(':CorComponentBusinessCenter')
+    implementation project(':CorComponentIM')
+
 }

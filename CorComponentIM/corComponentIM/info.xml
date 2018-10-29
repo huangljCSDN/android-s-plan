@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<corplugins>
+    <plugin build="0" corName="corComponentIM" desc="移动门户即时通讯"
+            type="component"
+            version="4.0.0.0">
+        <info>0:移动门户即时通讯</info>
+        <build>0:移动门户即时通讯</build>
+
+    </plugin>
+
+</corplugins>
