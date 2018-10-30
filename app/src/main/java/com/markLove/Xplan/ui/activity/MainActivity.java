@@ -1,7 +1,6 @@
 package com.markLove.Xplan.ui.activity;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,16 +24,17 @@ import com.markLove.Xplan.config.Constants;
 import com.markLove.Xplan.mvp.contract.MainContract;
 import com.markLove.Xplan.mvp.presenter.MainPresenter;
 import com.markLove.Xplan.ui.adapter.FragmentTabAdapter;
+import com.markLove.Xplan.ui.fragment.GroupFragment;
 import com.markLove.Xplan.ui.fragment.MineFragment;
 import com.markLove.Xplan.ui.fragment.MsgFragment;
 import com.markLove.Xplan.ui.fragment.SearchFragment;
-import com.markLove.Xplan.ui.fragment.GroupFragment;
 import com.markLove.Xplan.utils.AMapClient;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.StatusBarUtil;
 import com.networkengine.controller.callback.ErrorResult;
 import com.networkengine.controller.callback.XCallback;
 import com.networkengine.database.table.Member;
+import com.networkengine.util.CoracleSdk;
 import com.xsimple.im.engine.LoginLogic;
 
 import java.lang.ref.WeakReference;
@@ -233,14 +233,16 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
      */
     private void login() {
         UserBean userBean = App.getInstance().getUserBean();
-        new LoginLogic(this).init(userBean.getUserInfo().getPhone(), "123456", new XCallback<Member, ErrorResult>() {
+        CoracleSdk.init(this);
+        new LoginLogic(this).init(userBean.getUserInfo().getPhone(), "123456",String.valueOf(userBean.getUserInfo().getUserId()), new XCallback<Member, ErrorResult>() {
             @Override
             public void onSuccess(Member result) {
-
+                LogUtils.i("MainActivity","登录mchl成功");
             }
 
             @Override
             public void onFail(ErrorResult result) {
+                LogUtils.i("MainActivity","登录mchl失败"+result.toString());
                 Toast.makeText(MainActivity.this, result.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

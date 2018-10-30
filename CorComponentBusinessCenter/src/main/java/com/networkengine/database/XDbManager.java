@@ -4,7 +4,6 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
-import com.networkengine.PubConstant;
 import com.networkengine.database.greendao.DaoMaster;
 import com.networkengine.database.greendao.DaoSession;
 import com.networkengine.database.greendao.FileRecordDao;
@@ -16,7 +15,6 @@ import com.networkengine.engine.LogicEngine;
 import org.greenrobot.greendao.identityscope.IdentityScopeType;
 import org.greenrobot.greendao.query.Query;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -43,9 +41,9 @@ public class XDbManager {
     private XDbManager(Context context) {
         XDBHelper xsimple_base = new XDBHelper(context, "xsimple_base_e", null);
 
-        // mDaoMaster = new DaoMaster(xsimple_base.getWritableDatabase());
+         mDaoMaster = new DaoMaster(xsimple_base.getWritableDatabase());
         //加密数据库getEncryptedReadableDb
-        mDaoMaster = new DaoMaster(xsimple_base.getEncryptedWritableDb(PubConstant.datebase.DATEBASE_PASSWORD));
+//        mDaoMaster = new DaoMaster(xsimple_base.getEncryptedWritableDb(PubConstant.datebase.DATEBASE_PASSWORD));
         mDaoSession = mDaoMaster.newSession(IdentityScopeType.None);
 
         mFileRecordDao = mDaoSession.getFileRecordDao();
@@ -57,9 +55,10 @@ public class XDbManager {
         if (member == null)
             return true;
 
-        mMemberDao.insertOrReplace(member);
-
-        return mMemberDao.load(member.getId()) != null;
+//        mMemberDao.insertOrReplace(member);
+//
+//        return mMemberDao.load(member.getId()) != null;
+        return false;
     }
 
     public boolean insertMemberList(List<Member> memberList) {

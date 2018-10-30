@@ -18,6 +18,7 @@ import com.networkengine.entity.LoginInfo;
 import com.networkengine.exception.NetworkException;
 import com.networkengine.httpApi.MchlApiService;
 import com.networkengine.mqtt.MqttService;
+import com.networkengine.util.LogUtil;
 
 public class LogicEngine {
     /**
@@ -179,7 +180,7 @@ public class LogicEngine {
 //            return String.format("%s://%s:%s%s", PubConstant.MCHL_PROT, PubConstant.MCHL_HOST, PubConstant.MCHL_PORT, PubConstant.MCHL_BASE_URL);
 //        }
 //        return gwHost + "/mchl/jsse/";
-        return "http://120.79.244.243:18000/unwed-im/mchl/jsse/";
+        return "http://120.79.244.243:18000/uneed-im/jsse/";
     }
 
     public static String getFileTransBaseUrl() {
@@ -189,7 +190,7 @@ public class LogicEngine {
 
     public static String getMqttUrl() {
 //        return String.format("%s://%s:%s", PubConstant.MQTT_PROT, PubConstant.MQTT_HOST, PubConstant.MQTT_PORT);
-        return String.format("%s://%s:%s", PubConstant.MQTT_PROT, PubConstant.MQTT_HOST, PubConstant.MQTT_PORT);
+        return "tcp://120.79.244.243:1883";
     }
 
     public static String getRazorUrl() {
@@ -233,6 +234,7 @@ public class LogicEngine {
             parameter.imServiceBaseUrl = setImServiceBaseUrl();
             parameter.mxmServiceBaseUrl = setMxmServiceBaseUrl();
             parameter.fileTransBaseUrl = setFileTransBaseUrl();
+//            parameter.appKey = setAppKey();
             parameter.appKey = setAppKey();
             parameter.imei = setIMEI();
             parameter.os = setOS();
@@ -300,11 +302,11 @@ public class LogicEngine {
         if (TextUtils.isEmpty(parameter.appKey)) {
             throw new NetworkException("appKey == null");
         }
-
         mLogicEngine = getInstance();
 
         mLogicEngine.mParameter = parameter;
 
+        LogUtil.i("mLogicEngine.mParameter=="+mLogicEngine.mParameter);
         mLogicEngine.mBusinessController = BusinessController
                 .init(context, parameter, new XCallback<LoginInfo, ErrorResult>() {
                     @Override
@@ -438,7 +440,8 @@ public class LogicEngine {
 //    }
 
     public Member getUser() {
-        return (Member) mUser.clone();
+//        return (Member) mUser.clone();
+        return mUser;
     }
 
     public void setUser(Member mUser) {

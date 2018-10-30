@@ -3,7 +3,6 @@ package com.xsimple.im.db;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.networkengine.PubConstant;
 import com.xsimple.im.db.datatable.IMBHelper;
 import com.xsimple.im.db.datatable.IMCallInfo;
 import com.xsimple.im.db.datatable.IMChat;
@@ -92,8 +91,8 @@ public class DbManager {
         //   DaoMaster.DevOpenHelper imbHelper = new DaoMaster.DevOpenHelper(context, "xsimple_im_e", null);
         IMBHelper imbHelper = new IMBHelper(context, "xsimple_im_e", null);
         //加密数据库 后面是密码
-        mDaoMaster = new DaoMaster(imbHelper.getEncryptedWritableDb(PubConstant.datebase.DATEBASE_PASSWORD));
-        // mDaoMaster = new DaoMaster(imbHelper.getWritableDatabase());
+//        mDaoMaster = new DaoMaster(imbHelper.getEncryptedWritableDb(PubConstant.datebase.DATEBASE_PASSWORD));
+         mDaoMaster = new DaoMaster(imbHelper.getWritableDatabase());
 
         mDaoSession = mDaoMaster.newSession(IdentityScopeType.None);
 

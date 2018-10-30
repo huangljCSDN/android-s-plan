@@ -60,6 +60,9 @@ public class LoginInfo {
 //    }
 
     public Member getUser() {
+        if(this.user == null){
+            user = new Member();
+        }
         return user;
     }
 

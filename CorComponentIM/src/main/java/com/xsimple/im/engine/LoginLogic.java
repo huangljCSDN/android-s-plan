@@ -5,13 +5,13 @@ import android.os.Handler;
 import android.os.Message;
 
 import com.networkengine.controller.callback.ErrorResult;
-import com.networkengine.controller.callback.RouterCallback;
 import com.networkengine.controller.callback.XCallback;
 import com.networkengine.database.table.Member;
 import com.networkengine.engine.EngineBuilder;
 import com.networkengine.engine.LogicEngine;
 import com.networkengine.mqtt.MqttChannel;
 import com.networkengine.mqtt.MqttService;
+import com.networkengine.util.LogUtil;
 import com.xsimple.im.db.datatable.IMUser;
 import com.xsimple.im.engine.adapter.IMUserAdapter;
 
@@ -22,13 +22,15 @@ public class LoginLogic {
     private String mUsername;
 
     private String mPassword;
+    private String mUserId;
 
-    public void init(String userName, String userPwd
+    public void init(String userName, String userPwd, final String userId
             , final XCallback<Member, ErrorResult> callback) {
 
         mUsername = userName;
 
         mPassword = userPwd;
+        mUserId = userId;
 
         LogicEngine.Builder builder = new EngineBuilder(mContext) {
             @Override
@@ -48,6 +50,7 @@ public class LoginLogic {
                     // 1. 建立 MQTT 连接
                     // 2. 更新联系人信息
                     // 3. 获取群组信息并订阅群组消息
+                    result.getUser().setUserId(mUserId);
                     connectMQTT(result, callback);
                 }
             }
@@ -83,7 +86,7 @@ public class LoginLogic {
                     case MqttChannel.MQTT_ACTION_CONNECTION_COMPLETE:
                         // 把用户存进数据库
                         // dbManager.addOrUpdate(new Account(mUsername, mPassword, System.currentTimeMillis(), true));
-                        initCorComponentIM(null);
+                        initCorComponentIM(callback);
                         callback.onSuccess(logicEngine.updateUser());
                         logicEngine.unregistMqttObserver("LoginLogic");
                         break;
@@ -128,7 +131,7 @@ public class LoginLogic {
      *
      * @param callback 回调
      */
-    public void initCorComponentIM(final RouterCallback callback) {
+    public void initCorComponentIM(final XCallback<Member, ErrorResult> callback) {
 
         try {
             IMUserAdapter<Member> imUserConverter = getIMUserConverter();
@@ -142,14 +145,17 @@ public class LoginLogic {
 //                        // 通过 IM 用户信息
 //                        syncAllMemberToIM(callback, imUserAdapter);
 //                    } else {
-                    callback.callback(new RouterCallback.Result(RouterCallback.Result.SUCCESS, "", ""));
+//                    callback.callback(new RouterCallback.Result(RouterCallback.Result.SUCCESS, "", ""));
                     //}
+//                    callback.onSuccess(null);
+                    LogUtil.i("拉取群组信息成功  imProvider="+imProvider.toString());
                 }
 
                 @Override
                 public void fail(String failInfo) {
-                    RouterCallback.Result result = new RouterCallback.Result(ErrorResult.ERROR_UNKNOWN, failInfo, failInfo);
-                    callback.callback(result);
+//                    RouterCallback.Result result = new RouterCallback.Result(ErrorResult.ERROR_UNKNOWN, failInfo, failInfo);
+//                    callback.callback(result);
+//                    callback.onFail(ErrorResult.error(ErrorResult.ERROR_CONNECT));
                 }
             });
         } catch (Exception e) {

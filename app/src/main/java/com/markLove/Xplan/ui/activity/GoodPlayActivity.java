@@ -1,7 +1,9 @@
 package com.markLove.Xplan.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.ViewGroup;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.LinearLayout;
@@ -9,6 +11,9 @@ import android.widget.LinearLayout;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseActivity;
+import com.markLove.Xplan.bean.ChatBean;
+import com.markLove.Xplan.utils.GsonUtils;
+import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.StatusBarUtil;
 
 /**
@@ -55,9 +60,26 @@ public class GoodPlayActivity extends BaseActivity {
         settings.setJavaScriptEnabled(true);
         // 支持缩放
         settings.setSupportZoom(true);
-
+        mWebView.addJavascriptInterface(new GoodPlayActivity.JSInterface(), "xplanfunc");
         mWebView.loadUrl("file:///android_asset/package/main/index.html#/find/interesting");
 
+    }
+
+    public class JSInterface {
+
+        @JavascriptInterface
+        public void toChatRoom(String json) {
+            LogUtils.i("huang", "toChatRoom=" + json);
+            startShopChatActivity(json);
+        }
+    }
+
+    private void startShopChatActivity(final String json) {
+        ChatBean chatBean = GsonUtils.json2Bean(json, ChatBean.class);
+//        Intent intent = new Intent(this, ShopChatActivity.class);
+        Intent intent = new Intent(this, ShopChatTestActivity.class);
+        intent.putExtra("chatId", chatBean.getChatId());
+        startActivity(intent);
     }
 
 

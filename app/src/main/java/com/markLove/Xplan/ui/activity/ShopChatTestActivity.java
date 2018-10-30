@@ -43,6 +43,7 @@ import com.markLove.Xplan.mvp.presenter.ChatPresenter;
 import com.markLove.Xplan.mvp.presenter.ShopChatPresenter;
 import com.markLove.Xplan.mvp.presenter.impl.ChatPresenterImpl;
 import com.markLove.Xplan.ui.adapter.ChatMessageAdapter;
+import com.markLove.Xplan.ui.adapter.TestChatMessageAdapter;
 import com.markLove.Xplan.ui.dialog.ExitRoomDialog;
 import com.markLove.Xplan.ui.dialog.MorePopWindow;
 import com.markLove.Xplan.ui.dialog.RemoveMsgDialog;
@@ -56,17 +57,26 @@ import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
 import com.markLove.Xplan.utils.StatusBarUtil;
 import com.markLove.Xplan.utils.ToastUtils;
+import com.networkengine.controller.callback.ErrorResult;
 import com.networkengine.controller.callback.RouterCallback;
+import com.networkengine.controller.callback.XCacheCallback;
+import com.networkengine.database.table.Member;
+import com.networkengine.engine.LogicEngine;
+import com.networkengine.entity.IMSendResult;
 import com.networkengine.entity.MemEntity;
 import com.xsimple.im.control.IMChatLogic;
+import com.xsimple.im.control.MessagerLoader;
 import com.xsimple.im.control.iable.IIMChatLogic;
 import com.xsimple.im.control.listener.IMChatCallBack;
-import com.xsimple.im.db.datatable.IMGroup;
+import com.xsimple.im.db.datatable.IMChat;
 import com.xsimple.im.db.datatable.IMGroupRemark;
 import com.xsimple.im.db.datatable.IMMessage;
 import com.xsimple.im.engine.IMEngine;
+import com.xsimple.im.event.ExitGroupEvent;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -94,10 +104,11 @@ public class ShopChatTestActivity extends BaseActivity<ShopChatPresenter> implem
     private RelativeLayout mRlTitleBar;
     private RelativeLayout mRlCancel;
     private RelativeLayout mRlRemove;
-    private com.markLove.Xplan.ui.widget.ChatView chatView;
+    private com.markLove.Xplan.ui.widget.ChatTestView chatView;
 
     ChatPresenter chatPresenter;
-    ChatMessageAdapter chatMessageAdapter;
+//    ChatMessageAdapter chatMessageAdapter;
+    TestChatMessageAdapter chatMessageAdapter;
     String nickName;
     String headImgUrl;
     //    AutoCameraUtils autoCameraUtils;
@@ -146,7 +157,7 @@ public class ShopChatTestActivity extends BaseActivity<ShopChatPresenter> implem
     }
 
     private void setListener() {
-        chatView.setOnSendMessageListener(new com.markLove.Xplan.ui.widget.ChatView.OnSendMessageListener() {
+        chatView.setOnSendMessageListener(new com.markLove.Xplan.ui.widget.ChatTestView.OnSendMessageListener() {
             @Override
             public void onSendMessage(Message message) {
 //                judeBlackList(message);
@@ -228,13 +239,13 @@ public class ShopChatTestActivity extends BaseActivity<ShopChatPresenter> implem
         LogUtils.i("me_user_id=" + me_user_id + " to_user_id=" + to_user_id);
 //        tvChatUser.setText(nickName);
         LinearLayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        chatMessageAdapter = new ChatMessageAdapter(this, new ArrayList<Message>());
+        chatMessageAdapter = new TestChatMessageAdapter(this, new ArrayList<Message>());
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.icon);
         String url = FileUtil.saveBitmap("haha", bitmap);
 //        chatMessageAdapter.setToHeadImgUrl(headImgUrl);
         chatMessageAdapter.setToHeadImgUrl(url);
         chatMessageAdapter.setFromHeadImgUrl(PreferencesUtils.getString(this, Constants.ME_HEAD_IMG_URL));
-        chatMessageAdapter.setFailMessageResend(failMessageResend);
+//        chatMessageAdapter.setFailMessageResend(failMessageResend);
         manager.setStackFromEnd(false);
         rlChatMsgList.setLayoutManager(manager);
         rlChatMsgList.setAdapter(chatMessageAdapter);
@@ -248,7 +259,7 @@ public class ShopChatTestActivity extends BaseActivity<ShopChatPresenter> implem
 //        tvChatSendPrice.setText(gold + "");
 //        chatPresenter.getHistory(me_user_id, to_user_id);
 //        getGiftList();
-        getChatOpen();
+        initIm();
     }
 
     private void getChatOpen() {
@@ -867,6 +878,12 @@ public class ShopChatTestActivity extends BaseActivity<ShopChatPresenter> implem
      * Im　消息引擎
      */
     private IMEngine mImEngine;
+    private MessagerLoader mMessagerLoader;
+    /**
+     * 会话
+     */
+    private IMChat mImChat;
+    private List<IMMessage> mMessagesList;
 
     private static final String EXTRA_TARGET = "EXTRA_TARGET";
     private static final String EXTRA_SCROLL_TO_MESSAGE = "EXTRA_SCROLL_TO_MESSAGE";
@@ -906,13 +923,18 @@ public class ShopChatTestActivity extends BaseActivity<ShopChatPresenter> implem
 
     private void initIm(){
         EventBus.getDefault().register(this);
-
+        Member member = new Member();
+        member.setId("369033");
+        member.setUserId("369033");
+        member.setUserName("huang");
+        LogicEngine.getInstance().setUser(member);
         mImEngine = IMEngine.getInstance(this);
         //聊天对象
 //        IMGroup group = mIMEngine.getIMGroup(id);
 //        IMChatActivity.startMe(getContext(), new MemEntity(group.getId(), group.getName(), group.getType()), null, null);
 
-        final MemEntity memEntity = (MemEntity) getIntent().getSerializableExtra(EXTRA_TARGET);
+//        final MemEntity memEntity = (MemEntity) getIntent().getSerializableExtra(EXTRA_TARGET);
+        final MemEntity memEntity = new MemEntity("1","测试",0);
         mImChatControl = new IMChatLogic.Build() {
             @Override
             public MemEntity setTargetMem() {
@@ -949,19 +971,82 @@ public class ShopChatTestActivity extends BaseActivity<ShopChatPresenter> implem
             return;
         }
 
-        if (memEntity.getType() != 0) {
-            IMGroup imGroup = mImChatControl.getIMGroup();
-            if (imGroup == null) {
-                finish();
-                return;
-            }
-        }
-
+//        if (memEntity.getType() != 0) {
+//            IMGroup imGroup = mImChatControl.getIMGroup();
+//            if (imGroup == null) {
+//                LogUtils.e("启动聊天页面失败>>>>群主为空---->");
+//                finish();
+//                return;
+//            }
+//        }
         //设置草稿
 //        IMChat imChat = mChatControl.getIMChat();
 //        if (imChat != null) {
 //            mImChatViewHolder.setDrafts(imChat.getDrafts());
 //        }
+
+        mImChat = mImChatControl.getIMChat();
+        mMessagerLoader = new MessagerLoader(this, mImChat, mImChatControl);
+        //未读数量
+//        mUnReadCount = mImChat.getUnReadCount();
+//        //获取未读和＠我的消息的本地id的集合
+//        unReadOrAitMeIdlist = mMessagerLoader.getUnReadOrAitMeIdlist();
+//        //修改消息的阅读状态 发送服务器请求
+//        mImChatControl.updataUnReadCount(mMessagerLoader.getCacheMessage());
+        //添加第一次加载的数据
+        mMessagerLoader.getFirstLoadMessager();
+        this.mMessagesList = mMessagerLoader.getShowMessage();
+        //刷新布局
+        chatMessageAdapter.setImData(mMessagesList);
+        chatMessageAdapter.notifyDataSetChanged();
+        chatView.initEvent(mImChatControl,mImEngine,mMessagerLoader);
+        joinChatRoom();
+    }
+
+    /**
+     * 加入聊天室，并订阅聊天室消息
+     */
+    private void joinChatRoom(){
+        mImEngine.getIMController().joinChatRoom(to_user_id+"", new XCacheCallback<IMSendResult>() {
+            @Override
+            public void onLoaderCache(IMSendResult imSendResult) {
+
+            }
+
+            @Override
+            public void onSuccess(IMSendResult result) {
+                LogUtils.i("ShopChatTestActivity","加入聊天室成功");
+                mImEngine.subscribeToTopic(to_user_id+"");
+            }
+
+            @Override
+            public void onFail(ErrorResult error) {
+                LogUtils.i("ShopChatTestActivity","加入聊天室失败");
+            }
+        });
+    }
+
+    /**
+     * 加入聊天室，并取消订阅聊天室消息
+     */
+    private void exitChatRoom(){
+        mImEngine.getIMController().ownQuitChatRoom(to_user_id+"", new XCacheCallback<IMSendResult>() {
+            @Override
+            public void onLoaderCache(IMSendResult imSendResult) {
+
+            }
+
+            @Override
+            public void onSuccess(IMSendResult result) {
+                LogUtils.i("ShopChatTestActivity","退出聊天室成功");
+                mImEngine.unsubscribeToTopic(to_user_id+"");
+            }
+
+            @Override
+            public void onFail(ErrorResult error) {
+                LogUtils.i("ShopChatTestActivity","退出聊天室失败");
+            }
+        });
     }
 
 
@@ -1084,12 +1169,14 @@ public class ShopChatTestActivity extends BaseActivity<ShopChatPresenter> implem
 
     @Override
     public void onAddMessagerCallBack(List<IMMessage> msgs) {
-
+        LogUtils.i("huang","onAddMessagerCallBack="+msgs.toString());
+        chatMessageAdapter.setImData(msgs);
     }
 
     @Override
     public void onAddMessagerCallBack(IMMessage message) {
-
+        LogUtils.i("huang","onAddMessagerCallBack2="+message.toString());
+        chatMessageAdapter.setImData(message);
     }
 
     @Override
@@ -1107,5 +1194,25 @@ public class ShopChatTestActivity extends BaseActivity<ShopChatPresenter> implem
 
     }
 
+//    @Subscribe(threadMode = ThreadMode.MAIN)
+//    public void onTranspondMsgToCurrent(TranspondToCurrentEvent transpondToCurrentEvent) {
+//        //mProcessorFactory.processorAddMsg(transpondToCurrentEvent.getMessage());
+//        mImChatViewHolder.onRefresfItemAdd(transpondToCurrentEvent.getMessage());
+//    }
+//
+//    @Subscribe(threadMode = ThreadMode.MAIN)
+//    public void onTranspondMsgToCurrentSuccess(TranspondToCurrentSuccessEvent event) {
+//        // mProcessorFactory.processorUpdateMsg(event.getOld(), event.getNew());
+//        mImChatViewHolder.onRefreshItem(event.getOld().getLocalId());
+//    }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void exitGroup(ExitGroupEvent e) {
+        //删除会话
+        IMChat imChat = mImChatControl.getIMChat();
+        if (imChat != null) {
+            imChat.delete();
+        }
+        finish();
+    }
 }

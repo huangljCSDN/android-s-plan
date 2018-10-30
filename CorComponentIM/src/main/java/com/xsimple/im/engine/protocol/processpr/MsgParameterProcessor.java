@@ -9,6 +9,7 @@ import com.networkengine.entity.CallInfo;
 import com.networkengine.entity.FileInfo;
 import com.networkengine.entity.LocalInfo;
 import com.networkengine.entity.RequestMessageEntity;
+import com.networkengine.util.LogUtil;
 import com.xsimple.im.db.DbManager;
 import com.xsimple.im.db.datatable.IMCallInfo;
 import com.xsimple.im.db.datatable.IMChatRecordInfo;
@@ -70,6 +71,7 @@ public class MsgParameterProcessor extends Processor<IMMsgRequestEntity, IMMessa
      * @return
      */
     private boolean opinion(IMMsgRequestEntity imMsgRequestEntity) {
+        LogUtil.i("IMMsgRequestEntity======"+imMsgRequestEntity.toString());
         if (imMsgRequestEntity == null)
             return false;
         RequestMessageEntity msgContent = imMsgRequestEntity.getMsgContent();

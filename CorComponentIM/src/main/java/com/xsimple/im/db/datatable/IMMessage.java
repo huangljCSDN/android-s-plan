@@ -1101,5 +1101,25 @@ public class IMMessage {
         myDao = daoSession != null ? daoSession.getIMMessageDao() : null;
     }
 
-
+    @Override
+    public String toString() {
+        return "IMMessage{" +
+                "localId=" + localId +
+                ", msgID='" + msgID + '\'' +
+                ", receiverName='" + receiverName + '\'' +
+                ", vId='" + vId + '\'' +
+                ", cId=" + cId +
+                ", tagertId='" + tagertId + '\'' +
+                ", sendOrReceive=" + sendOrReceive +
+                ", groupName='" + groupName + '\'' +
+                ", senderId='" + senderId + '\'' +
+                ", senderName='" + senderName + '\'' +
+                ", time=" + time +
+                ", type=" + type +
+                ", contentType='" + contentType + '\'' +
+                ", content='" + content + '\'' +
+                ", status=" + status +
+                ", IMFileInfo=" + IMFileInfo +
+                '}';
+    }
 }

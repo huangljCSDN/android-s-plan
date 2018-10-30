@@ -20,6 +20,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     def STRING = "String"
     def APP_HOST = "APP_HOST"
@@ -84,5 +85,6 @@ dependencies {
     implementation project(':camera')
     implementation project(':CorComponentBusinessCenter')
     implementation project(':CorComponentIM')
+    implementation 'com.android.support:multidex:1.0.1'
 
 }

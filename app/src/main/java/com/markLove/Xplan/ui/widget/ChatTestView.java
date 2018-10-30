@@ -189,7 +189,8 @@ public class ChatTestView extends FrameLayout implements View.OnClickListener{
                 showEmojiView();
                 break;
             case R.id.btn_send:
-                send();
+//                send();
+                sendTextMessage();
                 break;
         }
     }
@@ -716,10 +717,7 @@ public class ChatTestView extends FrameLayout implements View.OnClickListener{
     private IMEngine mImEngine;
 
     private MessagerLoader mMessagerLoader;
-    /**
-     * 会话
-     */
-    private IMChat mImChat;
+
 
     public void setmChatControl(IIMChatLogic mChatControl) {
         this.mImChatControl = mChatControl;
@@ -733,15 +731,10 @@ public class ChatTestView extends FrameLayout implements View.OnClickListener{
         this.mMessagerLoader = mMessagerLoader;
     }
 
-    public void initEvent(View rootView) {
-        
-        mImChat = mImChatControl.getIMChat();
-
-        mMessagerLoader = new MessagerLoader(getContext(), mImChat, mImChatControl);
-        //添加第一次加载的数据
-        mMessagerLoader.getFirstLoadMessager();
-        //刷新布局
-//        mMsgAdapter.notifyDataSetChanged();
+    public void initEvent(IIMChatLogic mChatControl,IMEngine mImEngine,MessagerLoader mMessagerLoader) {
+        this.mImChatControl = mChatControl;
+        this.mImEngine = mImEngine;
+        this.mMessagerLoader = mMessagerLoader;
     }
 
     /**

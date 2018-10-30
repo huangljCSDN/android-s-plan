@@ -7,8 +7,9 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
-import com.networkengine.engine.EngineParameter;
 import com.networkengine.database.table.Member;
+import com.networkengine.engine.EngineParameter;
+import com.networkengine.util.LogUtil;
 
 import java.util.ArrayList;
 
@@ -55,7 +56,7 @@ public class MqttService extends Thread implements Handler.Callback {
     }
 
     public boolean start(Context context, EngineParameter parameter, Member member) {
-
+        LogUtil.i("member=="+member.toString());
         mMqttChannel = new MqttChannel(context, parameter
                 , member, new Handler(this));
 

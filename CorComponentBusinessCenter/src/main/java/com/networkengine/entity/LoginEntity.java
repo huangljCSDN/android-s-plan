@@ -76,4 +76,17 @@ public class LoginEntity {
         this.userId = userId;
     }
 
+    @Override
+    public String toString() {
+        return "LoginEntity{" +
+                "authToken='" + authToken + '\'' +
+                ", loginName='" + loginName + '\'' +
+                ", id='" + id + '\'' +
+                ", userName='" + userName + '\'' +
+                ", imageAddress='" + imageAddress + '\'' +
+                ", level='" + level + '\'' +
+                ", userId='" + userId + '\'' +
+                ", userSystem='" + userSystem + '\'' +
+                '}';
+    }
 }

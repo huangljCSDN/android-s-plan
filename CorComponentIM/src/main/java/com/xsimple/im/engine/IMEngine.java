@@ -309,7 +309,9 @@ public class IMEngine implements Handler.Callback {
 
     private IMEngine(Context ct) {
         mLogicEngine = LogicEngine.getInstance();
-        mLogicEngine.getMqttService().registMqttObserver(MQTT_KEY, this);
+        if (mLogicEngine.getMqttService() != null){
+            mLogicEngine.getMqttService().registMqttObserver(MQTT_KEY, this);
+        }
         mDbManager = DbManager.getInstance(ct);
         mContext = ct;
     }

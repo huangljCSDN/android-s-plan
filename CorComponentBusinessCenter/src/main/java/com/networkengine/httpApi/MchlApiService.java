@@ -111,6 +111,29 @@ public interface MchlApiService {
     @POST(PubConstant.API_SEND_MESSAGES)
     Call<IMSendMultipleResult> sendMultipleMsg(@Body MsgRequestMultipleEntity msgRequestMultipleEntity);
 
+    /**
+     * 加入聊天室
+     * @param groupId
+     * @return
+     */
+    @POST("api/v4/chatRoom/joinChatRoom")
+    Call<MchlBaseResult<IMSendResult>> joinChatRoom(@Body String groupId);
+    /**
+     * 退出聊天室
+     * @param groupId
+     * @return
+     */
+    @POST("api/v4/chatRoom/ownQuitChatRoom")
+    Call<MchlBaseResult<IMSendResult>> ownQuitChatRoom(@Body String groupId);
+
+
+
+
+
+
+
+
+
 
     /**
      * 消息回撤 api/msgWithdraw

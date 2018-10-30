@@ -2,16 +2,11 @@ package com.networkengine.database.table;
 
 import android.support.annotation.NonNull;
 
-import com.networkengine.database.greendao.DaoSession;
-
-import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
-import org.greenrobot.greendao.annotation.JoinEntity;
 import org.greenrobot.greendao.annotation.Keep;
 import org.greenrobot.greendao.annotation.Property;
-import org.greenrobot.greendao.annotation.ToMany;
 import org.greenrobot.greendao.annotation.Transient;
 
 import java.util.List;
@@ -491,4 +486,25 @@ public class Member implements Comparable<Member>, Cloneable {
     }
 
 
+    @Override
+    public String toString() {
+        return "Member{" +
+                "id='" + id + '\'' +
+                ", loginName='" + loginName + '\'' +
+                ", userId='" + userId + '\'' +
+                ", userName='" + userName + '\'' +
+                ", userType='" + userType + '\'' +
+                ", userSystem='" + userSystem + '\'' +
+                ", imageAddress='" + imageAddress + '\'' +
+                ", companyName='" + companyName + '\'' +
+                ", email='" + email + '\'' +
+                ", address='" + address + '\'' +
+                ", phone='" + phone + '\'' +
+                ", telephone='" + telephone + '\'' +
+                ", orgName='" + orgName + '\'' +
+                ", sex='" + sex + '\'' +
+                ", updateTime='" + updateTime + '\'' +
+                ", positionName='" + positionName + '\'' +
+                '}';
+    }
 }

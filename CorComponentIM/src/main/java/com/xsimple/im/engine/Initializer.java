@@ -50,10 +50,8 @@ public class Initializer {
 //            }
 //        });
 
-        IMEngine.getInstance(mCt).initMessages();
-        // 先获取PC端在线状态后再拉消息
-//        IMEngine.getInstance(mCt).getPCOnlineStatus();
-
+        //暂时不拉消息，这里很重要，拉取后台消息
+//        IMEngine.getInstance(mCt).initMessages();
 
         loadGroup(initializerCallback);
     }

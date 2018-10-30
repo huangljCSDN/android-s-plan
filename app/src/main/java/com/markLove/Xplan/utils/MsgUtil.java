@@ -63,7 +63,9 @@ public class MsgUtil {
             // baDialog.setOnKeyListener(keylistener);
         }
         try {
-            baDialog.show();
+            if (!baDialog.isShowing()){
+                baDialog.show();
+            }
         } catch (Exception e) {
             MsgUtil.showLog("aaaaaa", "----wait.show()失败-----" + e.toString());
         }

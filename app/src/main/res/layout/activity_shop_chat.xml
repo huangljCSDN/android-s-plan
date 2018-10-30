@@ -119,13 +119,13 @@
 
     <!--<include layout="@layout/layout_msg_edit_view"/>-->
 
-    <com.markLove.Xplan.ui.widget.ChatView
+    <com.markLove.Xplan.ui.widget.ChatTestView
         android:id="@+id/chatView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="80dp">
 
-    </com.markLove.Xplan.ui.widget.ChatView>
+    </com.markLove.Xplan.ui.widget.ChatTestView>
 
     <RelativeLayout
         android:id="@+id/rl_remove"

@@ -3,8 +3,6 @@ package com.networkengine.engine;
 
 import android.content.Context;
 
-import com.networkengine.PubConstant;
-
 import com.networkengine.util.PhoneUtil;
 
 public abstract class EngineBuilder extends LogicEngine.Builder {
@@ -58,7 +56,7 @@ public abstract class EngineBuilder extends LogicEngine.Builder {
 	@Override
 	public String setAppKey() {
 //		return PubConstant.APP_KEY;
-		return "com.markLove.Xplan";
+		return "455a832089944a5bb7e7381fe808b4df";
 	}
 
 	@Override

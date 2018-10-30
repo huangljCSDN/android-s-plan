@@ -9,10 +9,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.bean.NearUserBean;
+import com.markLove.Xplan.utils.ImageLoaderUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,11 +65,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.MyView
                 holder.ivCertification.setVisibility(View.GONE);
             }
 
-            Glide.with(context).load(peopleBean.getHeadImageUrl())
-                    .apply(RequestOptions.placeholderOf(R.drawable.bg_head))
-                    .apply(RequestOptions.errorOf(R.drawable.bg_head))
-                    .apply(RequestOptions.circleCropTransform())
-                    .into(holder.ivHead);
+            ImageLoaderUtils.displayCircle(context,peopleBean.getHeadImageUrl(),holder.ivHead);
 
             holder.contentView.setOnClickListener(new View.OnClickListener() {
                 @Override

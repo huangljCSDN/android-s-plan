@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.networkengine.entity.MsgRequestEntity;
+import com.networkengine.util.LogUtil;
 import com.xsimple.im.db.DbManager;
 import com.xsimple.im.db.datatable.IMMessage;
 import com.xsimple.im.engine.protocol.Factory.CmdProcessorFactory;
@@ -54,7 +55,7 @@ public class ProtocolStack {
      * @throws Exception
      */
     public IMMessage proceessMessage(MsgEntity parameter) throws Exception {
-
+        LogUtil.i("MsgEntity====="+parameter.toString());
         if (parameter == null) {
             return null;
         }

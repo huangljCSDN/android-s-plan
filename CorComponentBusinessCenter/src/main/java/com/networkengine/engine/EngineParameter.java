@@ -18,4 +18,27 @@ public class EngineParameter{
 	public String pwd;
 	public String userAgent;
 	public String gwAgent;
+
+	@Override
+	public String toString() {
+		return "EngineParameter{" +
+				"appKey='" + appKey + '\'' +
+				", imServiceBaseUrl='" + imServiceBaseUrl + '\'' +
+				", mxmServiceBaseUrl='" + mxmServiceBaseUrl + '\'' +
+				", fileTransBaseUrl='" + fileTransBaseUrl + '\'' +
+				", imei='" + imei + '\'' +
+				", device='" + device + '\'' +
+				", appVersion='" + appVersion + '\'' +
+				", versionType='" + versionType + '\'' +
+				", os='" + os + '\'' +
+				", osVersion='" + osVersion + '\'' +
+				", mqttServer='" + mqttServer + '\'' +
+				", uploadFileServerHost='" + uploadFileServerHost + '\'' +
+				", downloadFileServerHost='" + downloadFileServerHost + '\'' +
+				", userName='" + userName + '\'' +
+				", pwd='" + pwd + '\'' +
+				", userAgent='" + userAgent + '\'' +
+				", gwAgent='" + gwAgent + '\'' +
+				'}';
+	}
 }

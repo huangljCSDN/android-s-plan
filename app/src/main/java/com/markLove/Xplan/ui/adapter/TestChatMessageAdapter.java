@@ -1261,6 +1261,16 @@ public class TestChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHol
         mListener = listener;
     }
 
+    //---------------------------新IM方法---------------------------//
+
+    public void setImData(List<IMMessage> imMessageList){
+        mDatas = changeListIMMessageToListMessage(imMessageList);
+    }
+
+    public void setImData(IMMessage imMessage){
+        mDatas.add(changeIMMessageToMessage(imMessage));
+    }
+
     public List<Message> changeListIMMessageToListMessage(List<IMMessage> imMessageList){
         List<Message> list = new ArrayList<>();
         for (IMMessage imMessage : imMessageList){
@@ -1272,11 +1282,14 @@ public class TestChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHol
 
     public Message changeIMMessageToMessage(IMMessage imMessage){
         Message message = null;
-        if (imMessage.getContentType() == IMMessage.CONTENT_TYPE_SHORT_VOICE
-                || imMessage.getContentType() == IMMessage.CONTENT_TYPE_VOICE_CHAT){
+        if (IMMessage.CONTENT_TYPE_SHORT_VOICE.equals(imMessage.getContentType()) ||
+                IMMessage.CONTENT_TYPE_VOICE_CHAT.equals(imMessage.getContentType())){
             message = Message.createVoiceMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()), "", imMessage.getContent());
         } else if (imMessage.getContentType() == IMMessage.CONTENT_TYPE_IMG){
-            message = Message.createImageMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()), "", imMessage.getContent());
+            if (imMessage.getFileInfo() != null){
+                String path = imMessage.getFileInfo().getPath();
+                message = Message.createImageMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()), "", imMessage.getContent());
+            }
         } else {
            message = Message.createTxtMessage(Message.Type.CHAT,Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()),imMessage.getContent());
         }

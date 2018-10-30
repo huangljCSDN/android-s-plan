@@ -4,16 +4,14 @@ import android.text.TextUtils;
 
 import com.google.gson.JsonParseException;
 import com.google.gson.stream.MalformedJsonException;
-import com.networkengine.entity.BaseResult;
 import com.networkengine.R;
+import com.networkengine.entity.BaseResult;
 import com.networkengine.entity.Result;
 import com.networkengine.util.CoracleSdk;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-
-import retrofit2.adapter.rxjava.HttpException;
 
 /**
  * Not Found 404
@@ -49,10 +47,7 @@ public class ErrorResult {
     }
 
     public static ErrorResult error(Throwable t) {
-        if (t instanceof HttpException) {
-            HttpException e = ((HttpException) t);
-            return error(e.code(), e.message());
-        } else if (t instanceof SocketTimeoutException) {
+        if (t instanceof SocketTimeoutException) {
             return error(ERROR_TIMEOUT);
         } else if (t instanceof ConnectException) {
             return error(ERROR_CONNECT);

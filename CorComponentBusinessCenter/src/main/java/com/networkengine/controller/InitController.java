@@ -92,7 +92,6 @@ public class InitController extends BusinessController {
 //                callback.onFail(errorResult);
 //            }
 //        });
-//
 //    }
 //
 //    /**
@@ -140,7 +139,7 @@ public class InitController extends BusinessController {
         mMchlApiService.login(params).enqueue(new Callback<LoginResult>() {
             @Override
             public void onResponse(Call<LoginResult> call, Response<LoginResult> response) {
-                LogUtil.i("LoginResult="+response);
+                LogUtil.i("LoginResult="+response.toString());
                 if (callback == null) {
                     return;
                 }

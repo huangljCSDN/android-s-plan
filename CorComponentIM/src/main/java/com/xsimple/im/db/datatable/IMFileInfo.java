@@ -456,4 +456,31 @@ public class IMFileInfo {
     }
 
 
+    @Override
+    public String toString() {
+        return "IMFileInfo{" +
+                "fId=" + fId +
+                ", name='" + name + '\'' +
+                ", path='" + path + '\'' +
+                ", mPath='" + mPath + '\'' +
+                ", lPath='" + lPath + '\'' +
+                ", status=" + status +
+                ", size=" + size +
+                ", pos=" + pos +
+                ", type='" + type + '\'' +
+                ", sha='" + sha + '\'' +
+                ", breakPoint='" + breakPoint + '\'' +
+                ", time='" + time + '\'' +
+                ", thumbnail='" + thumbnail + '\'' +
+                ", isPlay=" + isPlay +
+                ", clientSid='" + clientSid + '\'' +
+                ", sendId='" + sendId + '\'' +
+                ", senderName='" + senderName + '\'' +
+                ", se_ReTime=" + se_ReTime +
+                ", url='" + url + '\'' +
+                ", receiverName='" + receiverName + '\'' +
+                ", width=" + width +
+                ", height=" + height +
+                '}';
+    }
 }

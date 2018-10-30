@@ -117,6 +117,64 @@ public class IMController extends BusinessController {
         getSendMsgTask(msgRequestEntity, sendMsgHandler).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
+    /**
+     * 加入聊天室
+     * @param groupId
+     * @param callback
+     */
+    public void joinChatRoom(String groupId, final XCallback<IMSendResult, ErrorResult> callback) {
+
+        mMchlApiService.joinChatRoom(groupId).enqueue(new MchlCoracleCallback<IMSendResult>() {
+            @Override
+            public void onSuccess(IMSendResult resultGroupMembers, ErrorResult errorResult) {
+                if (callback == null) {
+                    return;
+                }
+                if (resultGroupMembers == null) {
+                    callback.onFail(errorResult);
+                    return;
+                }
+                callback.onSuccess(resultGroupMembers);
+            }
+
+            @Override
+            public void onFailed(ErrorResult errorResult) {
+                if (callback != null) {
+                    callback.onFail(errorResult);
+                }
+            }
+        });
+    }
+
+    /**
+     * 退出聊天室
+     * @param groupId
+     * @param callback
+     */
+    public void ownQuitChatRoom(String groupId, final XCallback<IMSendResult, ErrorResult> callback) {
+
+        mMchlApiService.ownQuitChatRoom(groupId).enqueue(new MchlCoracleCallback<IMSendResult>() {
+            @Override
+            public void onSuccess(IMSendResult resultGroupMembers, ErrorResult errorResult) {
+                if (callback == null) {
+                    return;
+                }
+                if (resultGroupMembers == null) {
+                    callback.onFail(errorResult);
+                    return;
+                }
+                callback.onSuccess(resultGroupMembers);
+            }
+
+            @Override
+            public void onFailed(ErrorResult errorResult) {
+                if (callback != null) {
+                    callback.onFail(errorResult);
+                }
+            }
+        });
+    }
+
 
     public boolean isSending(String localId) {
         return null != mSendingMap.get(localId);
