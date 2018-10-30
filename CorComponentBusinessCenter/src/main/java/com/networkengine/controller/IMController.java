@@ -119,12 +119,12 @@ public class IMController extends BusinessController {
 
     /**
      * 加入聊天室
-     * @param groupId
+     * @param requestGetMembersParam
      * @param callback
      */
-    public void joinChatRoom(String groupId, final XCallback<IMSendResult, ErrorResult> callback) {
+    public void joinChatRoom(final RequestGetMembersParam requestGetMembersParam, final XCallback<IMSendResult, ErrorResult> callback) {
 
-        mMchlApiService.joinChatRoom(groupId).enqueue(new MchlCoracleCallback<IMSendResult>() {
+        mMchlApiService.joinChatRoom(requestGetMembersParam).enqueue(new MchlCoracleCallback<IMSendResult>() {
             @Override
             public void onSuccess(IMSendResult resultGroupMembers, ErrorResult errorResult) {
                 if (callback == null) {
@@ -148,12 +148,12 @@ public class IMController extends BusinessController {
 
     /**
      * 退出聊天室
-     * @param groupId
+     * @param requestGetMembersParam
      * @param callback
      */
-    public void ownQuitChatRoom(String groupId, final XCallback<IMSendResult, ErrorResult> callback) {
+    public void ownQuitChatRoom(final RequestGetMembersParam requestGetMembersParam, final XCallback<IMSendResult, ErrorResult> callback) {
 
-        mMchlApiService.ownQuitChatRoom(groupId).enqueue(new MchlCoracleCallback<IMSendResult>() {
+        mMchlApiService.ownQuitChatRoom(requestGetMembersParam).enqueue(new MchlCoracleCallback<IMSendResult>() {
             @Override
             public void onSuccess(IMSendResult resultGroupMembers, ErrorResult errorResult) {
                 if (callback == null) {

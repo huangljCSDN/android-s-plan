@@ -441,7 +441,7 @@ public class TestChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHol
         @Override
         public void setChatContent(Message msg) {
             MessageBody body = msg.getBody();
-            LogUtils.i("huang","boody ="+ body);
+            LogUtils.i("huang","img_boody ="+ body);
             if (body instanceof FileMessageBody) {
                 final Context context = rootView.getContext();
                 final FileMessageBody imgMessageBody = (FileMessageBody) body;
@@ -723,6 +723,7 @@ public class TestChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHol
         @Override
         public void setChatContent(Message msg) {
             MessageBody body = msg.getBody();
+            LogUtils.i("huang","voice_boody ="+ body);
             if (body instanceof FileMessageBody) {
                 final FileMessageBody voiceMessageBody = (FileMessageBody) msg.getBody();
                 final Context context = rootView.getContext();
@@ -1265,17 +1266,26 @@ public class TestChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHol
 
     public void setImData(List<IMMessage> imMessageList){
         mDatas = changeListIMMessageToListMessage(imMessageList);
+        notifyDataSetChanged();
     }
 
-    public void setImData(IMMessage imMessage){
+    public void addListImData(List<IMMessage> imMessageList){
+        mDatas = changeListIMMessageToListMessage(imMessageList);
+        notifyDataSetChanged();
+    }
+
+    public void addOneImData(IMMessage imMessage){
         mDatas.add(changeIMMessageToMessage(imMessage));
+        notifyDataSetChanged();
     }
 
     public List<Message> changeListIMMessageToListMessage(List<IMMessage> imMessageList){
         List<Message> list = new ArrayList<>();
-        for (IMMessage imMessage : imMessageList){
-             Message message = changeIMMessageToMessage(imMessage);
-             list.add(message);
+        if (imMessageList != null || !imMessageList.isEmpty()){
+            for (IMMessage imMessage : imMessageList){
+                Message message = changeIMMessageToMessage(imMessage);
+                list.add(message);
+            }
         }
         return list;
     }
@@ -1284,12 +1294,21 @@ public class TestChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHol
         Message message = null;
         if (IMMessage.CONTENT_TYPE_SHORT_VOICE.equals(imMessage.getContentType()) ||
                 IMMessage.CONTENT_TYPE_VOICE_CHAT.equals(imMessage.getContentType())){
-            message = Message.createVoiceMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()), "", imMessage.getContent());
-        } else if (imMessage.getContentType() == IMMessage.CONTENT_TYPE_IMG){
+            String path="";
+            String fileName = "";
             if (imMessage.getFileInfo() != null){
-                String path = imMessage.getFileInfo().getPath();
-                message = Message.createImageMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()), "", imMessage.getContent());
+                path = imMessage.getFileInfo().getPath();
+                fileName = imMessage.getFileInfo().getName();
             }
+            message = Message.createVoiceMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()), fileName, path);
+        } else if (IMMessage.CONTENT_TYPE_IMG.equals(imMessage.getContentType())){
+            String path="";
+            String fileName = "";
+            if (imMessage.getFileInfo() != null){
+                path = imMessage.getFileInfo().getPath();
+                fileName = imMessage.getFileInfo().getName();
+            }
+            message = Message.createImageMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()), fileName, path);
         } else {
            message = Message.createTxtMessage(Message.Type.CHAT,Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()),imMessage.getContent());
         }

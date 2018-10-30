@@ -79,18 +79,17 @@ public class Initializer{
         return appLifecycle;
     }
 
-//    @Override
-//    public void onCreate(Application application) {
-//        sAppContext = application;
-//        if (sInstance == null) {
-//            synchronized (Initializer.class) {
-//                if (sInstance == null) {
-//                    sInstance = new Initializer();
-//                    sInstance.setmAppLifecycle(registerLifecycleCallbacks(application));
-////                    mAppLifecycle = registerLifecycleCallbacks(sAppContext);
-//                }
-//            }
-//        }
+    public void onCreate(Application application) {
+        sAppContext = application;
+        if (sInstance == null) {
+            synchronized (Initializer.class) {
+                if (sInstance == null) {
+                    sInstance = new Initializer();
+                    sInstance.setmAppLifecycle(registerLifecycleCallbacks(application));
+//                    mAppLifecycle = registerLifecycleCallbacks(sAppContext);
+                }
+            }
+        }
 //        CorRouter.getCorRouter().regist(new ServiceStub<IMRouterService>() {
 //            @Override
 //            public String initModule() {
@@ -98,5 +97,5 @@ public class Initializer{
 //                return getId(Initializer.class);
 //            }
 //        });
-//    }
+    }
 }

@@ -27,7 +27,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public final class Api {
 
     //超时时间
-    private static final int DEFAULT_TIMEOUT = 30;
+    private static final int DEFAULT_TIMEOUT = 60;
 
     //默认的CookieStore
     private static InMemoryCookieStore mInMeoryCookieStore = null;

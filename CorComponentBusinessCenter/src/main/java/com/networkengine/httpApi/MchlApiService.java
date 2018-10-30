@@ -61,6 +61,7 @@ import retrofit2.http.Body;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
+import retrofit2.http.Query;
 
 public interface MchlApiService {
 
@@ -113,20 +114,26 @@ public interface MchlApiService {
 
     /**
      * 加入聊天室
-     * @param groupId
+     * @param requestGetMembersParam
      * @return
      */
     @POST("api/v4/chatRoom/joinChatRoom")
-    Call<MchlBaseResult<IMSendResult>> joinChatRoom(@Body String groupId);
+    Call<MchlBaseResult<IMSendResult>> joinChatRoom(@Body RequestGetMembersParam requestGetMembersParam);
     /**
      * 退出聊天室
-     * @param groupId
+     * @param requestGetMembersParam
      * @return
      */
     @POST("api/v4/chatRoom/ownQuitChatRoom")
-    Call<MchlBaseResult<IMSendResult>> ownQuitChatRoom(@Body String groupId);
+    Call<MchlBaseResult<IMSendResult>> ownQuitChatRoom(@Body RequestGetMembersParam requestGetMembersParam);
 
-
+    /**
+     * 创建一个聊天室
+     * @param requestGetMembersParam
+     * @return
+     */
+    @POST("api/v4/chatRoom/create")
+    Call<MchlBaseResult<IMSendResult>> createChatRoom(@Body RequestGetMembersParam requestGetMembersParam);
 
 
 

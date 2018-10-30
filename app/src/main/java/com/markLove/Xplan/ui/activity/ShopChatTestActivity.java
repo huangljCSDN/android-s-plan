@@ -64,6 +64,7 @@ import com.networkengine.database.table.Member;
 import com.networkengine.engine.LogicEngine;
 import com.networkengine.entity.IMSendResult;
 import com.networkengine.entity.MemEntity;
+import com.networkengine.entity.RequestGetMembersParam;
 import com.xsimple.im.control.IMChatLogic;
 import com.xsimple.im.control.MessagerLoader;
 import com.xsimple.im.control.iable.IIMChatLogic;
@@ -80,6 +81,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -934,7 +936,7 @@ public class ShopChatTestActivity extends BaseActivity<ShopChatPresenter> implem
 //        IMChatActivity.startMe(getContext(), new MemEntity(group.getId(), group.getName(), group.getType()), null, null);
 
 //        final MemEntity memEntity = (MemEntity) getIntent().getSerializableExtra(EXTRA_TARGET);
-        final MemEntity memEntity = new MemEntity("1","测试",0);
+        final MemEntity memEntity = new MemEntity(to_user_id+"","测试",0);
         mImChatControl = new IMChatLogic.Build() {
             @Override
             public MemEntity setTargetMem() {
@@ -1007,7 +1009,8 @@ public class ShopChatTestActivity extends BaseActivity<ShopChatPresenter> implem
      * 加入聊天室，并订阅聊天室消息
      */
     private void joinChatRoom(){
-        mImEngine.getIMController().joinChatRoom(to_user_id+"", new XCacheCallback<IMSendResult>() {
+        RequestGetMembersParam requestGetMembersParam = new RequestGetMembersParam(to_user_id+"");
+        mImEngine.getIMController().joinChatRoom(requestGetMembersParam, new XCacheCallback<IMSendResult>() {
             @Override
             public void onLoaderCache(IMSendResult imSendResult) {
 
@@ -1021,16 +1024,17 @@ public class ShopChatTestActivity extends BaseActivity<ShopChatPresenter> implem
 
             @Override
             public void onFail(ErrorResult error) {
-                LogUtils.i("ShopChatTestActivity","加入聊天室失败");
+                LogUtils.i("ShopChatTestActivity","加入聊天室失败="+error.toString());
             }
         });
     }
 
     /**
-     * 加入聊天室，并取消订阅聊天室消息
+     * 退出聊天室，并取消订阅聊天室消息
      */
     private void exitChatRoom(){
-        mImEngine.getIMController().ownQuitChatRoom(to_user_id+"", new XCacheCallback<IMSendResult>() {
+        RequestGetMembersParam requestGetMembersParam = new RequestGetMembersParam(to_user_id+"");
+        mImEngine.getIMController().ownQuitChatRoom(requestGetMembersParam, new XCacheCallback<IMSendResult>() {
             @Override
             public void onLoaderCache(IMSendResult imSendResult) {
 
@@ -1139,12 +1143,12 @@ public class ShopChatTestActivity extends BaseActivity<ShopChatPresenter> implem
 
     @Override
     public void onFileTransferSuccess(long localId) {
-
+        LogUtils.i("huang","onFileTransferSuccess=");
     }
 
     @Override
     public void onFileTransferFailed(long localId) {
-
+        LogUtils.i("huang","onFileTransferFailed=");
     }
 
     @Override
@@ -1159,24 +1163,27 @@ public class ShopChatTestActivity extends BaseActivity<ShopChatPresenter> implem
 
     @Override
     public void onSendMessageSuccessCallBack(long localId) {
-
+        LogUtils.i("huang","onSendMessageSuccessCallBack=");
     }
 
     @Override
     public void onSendMessageFaileCallBack(long localId) {
-
+        LogUtils.i("huang","onSendMessageFaileCallBack=");
     }
 
     @Override
     public void onAddMessagerCallBack(List<IMMessage> msgs) {
         LogUtils.i("huang","onAddMessagerCallBack="+msgs.toString());
-        chatMessageAdapter.setImData(msgs);
+        onRefresfItemAddList(msgs);
     }
 
     @Override
     public void onAddMessagerCallBack(IMMessage message) {
+
         LogUtils.i("huang","onAddMessagerCallBack2="+message.toString());
-        chatMessageAdapter.setImData(message);
+        message.refresh();
+        mMessagerLoader.addMessager(message);
+        chatMessageAdapter.addOneImData(message);
     }
 
     @Override
@@ -1215,4 +1222,35 @@ public class ShopChatTestActivity extends BaseActivity<ShopChatPresenter> implem
         }
         finish();
     }
+
+    public void onRefresfItemAddList(List<IMMessage> list) {
+        if (list == null || list.isEmpty())
+            return;
+        //刷新会话
+        if (mImChat == null) {
+            mImChat = mImChatControl.getOrCreateChat();
+        }
+        mImChat.refresh();
+        mImChatControl.updataUnReadCount(list);
+        addItem(list,true);
+    }
+
+    /**
+     * 添加视图
+     */
+    private void addItem(List<IMMessage> list, boolean isBottom) {
+        if (list == null || list.isEmpty())
+            return;
+
+        mMessagerLoader.addMessager(list, isBottom);
+        chatMessageAdapter.addListImData(list);
+
+//        if (isBottom) {
+//            mLinearLayoutManager.scrollToPositionWithOffset(0, 100);
+//        }
+
+    }
+
+    private long mNewMsgId = -1;
+
 }

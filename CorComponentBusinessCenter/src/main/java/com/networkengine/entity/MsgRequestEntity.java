@@ -83,4 +83,13 @@ public class MsgRequestEntity {
 //	public void setChatType(String mk) {
 //		this.mk = mk;
 //	}
+
+
+	@Override
+	public String toString() {
+		return "MsgRequestEntity{" +
+				"param=" + param +
+				", msgContent=" + msgContent +
+				'}';
+	}
 }

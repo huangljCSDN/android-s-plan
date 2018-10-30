@@ -8,6 +8,7 @@ import com.networkengine.engine.LogicEngine;
 import java.io.IOException;
 
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okio.Buffer;
 import okio.BufferedSink;
@@ -23,6 +24,9 @@ public abstract class SingUploadNetWorkTask extends SingNetWorkTask {
 
 
     public abstract RequestBody setRequestBody();
+    public MultipartBody setRequestBody2(){
+        return null;
+    }
 
     /**
      * 默认上传方法，子类可以重写该方法，实现上传的逻辑
@@ -70,8 +74,16 @@ public abstract class SingUploadNetWorkTask extends SingNetWorkTask {
             Log.e("error", "uploadFile >>>　" + e.getMessage());
             return false;
         }
+//        MultipartBody body = setRequestBody2();
 
-
+//        String string = "";
+//        try {
+//            string = uploadFile2(body);
+//        } catch (IllegalStateException e) {
+//            Log.e("error", "uploadFile >>>　" + e.getMessage());
+//            return false;
+//        }
+        Log.e("error", "string >>>　" + string);
         if (TextUtils.isEmpty(string))
             return false;
         mFileSubPackage.setNetResult(string);

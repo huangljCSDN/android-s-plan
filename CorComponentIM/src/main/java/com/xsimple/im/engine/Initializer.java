@@ -51,7 +51,7 @@ public class Initializer {
 //        });
 
         //暂时不拉消息，这里很重要，拉取后台消息
-//        IMEngine.getInstance(mCt).initMessages();
+        IMEngine.getInstance(mCt).initMessages();
 
         loadGroup(initializerCallback);
     }

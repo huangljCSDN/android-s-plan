@@ -309,11 +309,28 @@ public class IMFileManager {
             MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
 
             builder.addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("application/octet-stream"), file));
-            builder.addFormDataPart("senderId", parameter.get("senderId"));
-            builder.addFormDataPart("receiverId", parameter.get("receiverId"));
-
+//            builder.addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("multipart/form-data"), file));
+//            builder.addFormDataPart("senderId", parameter.get("senderId"));
+//            builder.addFormDataPart("receiverId", parameter.get("receiverId"));
             return builder.build();
 
+        }
+
+        @Override
+        public MultipartBody setRequestBody2() {
+            if (mFileSubPackage == null)
+                return null;
+            Map<String, String> parameter = mFileSubPackage.getParameter();
+            if (parameter == null) {
+                return null;
+            }
+            File file = new File(mFileSubPackage.getLocalPath());
+            MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
+            builder.addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("multipart/form-data"), file));
+//            builder.addFormDataPart("senderId", parameter.get("senderId"));
+//            builder.addFormDataPart("receiverId", parameter.get("receiverId"));
+            MultipartBody multipartBody = builder.build();
+            return multipartBody;
         }
 
         @Override

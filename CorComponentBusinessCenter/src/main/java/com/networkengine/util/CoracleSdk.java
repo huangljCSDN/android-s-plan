@@ -25,7 +25,6 @@ public final class CoracleSdk {
         if (!isInit) {
             Preconditions.checkNotNull(context);
             sContext = context.getApplicationContext();
-
             // 全局生命周期监听
             sLifecycleListener = new ApplicationLifecycleListener();
             Application app = (Application) sContext.getApplicationContext();

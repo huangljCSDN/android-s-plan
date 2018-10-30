@@ -76,6 +76,7 @@ import com.networkengine.mqtt.MqttChannel;
 import com.networkengine.mqtt.SubjectDot;
 import com.networkengine.networkutil.interfaces.SingNetFileTransferListener;
 import com.networkengine.util.AtUtil;
+import com.networkengine.util.LogUtil;
 import com.networkengine.util.Util;
 import com.xsimple.im.Initializer;
 import com.xsimple.im.R;
@@ -2132,6 +2133,7 @@ public class IMEngine implements Handler.Callback {
             imMsgRequestEntity.buildIMMsgRequestEntity(targetMem.getType(), msgType, getMyName(), getMyId(), targetMem.getUserId(), targetMem.getUserName(), content, targetMem.getUserName());
 
         }
+        LogUtil.i("imMsgRequestEntity="+imMsgRequestEntity.toString());
         ProtocolStack mProtocolStack = new ProtocolStack(mContext, mDbManager);
         IMMessage message = mProtocolStack.proceessMessage(imMsgRequestEntity);
 
@@ -2180,7 +2182,7 @@ public class IMEngine implements Handler.Callback {
         DoInitSubPackage doInitSubPackage = new DoInitSubPackage();
         doInitSubPackage.setSize(fileInfo.getSize())
                 .setLocalPath(fileInfo.getPath())
-                .setNetPath("")
+                .setNetPath("http://120.79.244.243:18000/uneed-im/jsse/file/upload ")
                 .setParameterMap(map)
                 .setIMMessageId(message.getLocalId());
         if (callback != null) {

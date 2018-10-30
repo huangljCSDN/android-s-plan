@@ -147,4 +147,25 @@ public class RequestMessageEntity extends MessageEntity {
     public void setUnreadCount(int unreadCount) {
         this.unreadCount = unreadCount;
     }
+
+    @Override
+    public String toString() {
+        return "RequestMessageEntity{" +
+                "content='" + content + '\'' +
+                ", atInfo=" + atInfo +
+                ", unreadCount=" + unreadCount +
+                ", fileInfo=" + fileInfo +
+                ", locationInfo=" + locationInfo +
+                ", replyInfo=" + replyInfo +
+                ", chatRecordInfo=" + chatRecordInfo +
+                ", callInfo=" + callInfo +
+                ", rids='" + rids + '\'' +
+                ", senderName='" + senderName + '\'' +
+                ", type='" + type + '\'' +
+                ", chatType='" + chatType + '\'' +
+                ", groupName='" + groupName + '\'' +
+                ", time='" + time + '\'' +
+                ", fromDevice='" + fromDevice + '\'' +
+                '}';
+    }
 }

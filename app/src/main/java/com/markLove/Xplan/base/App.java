@@ -33,6 +33,8 @@ public class App extends Application {
         super.onCreate();
         mInstance = this;
         initPhotoError();
+        com.xsimple.im.Initializer initializer = new com.xsimple.im.Initializer();
+        initializer.onCreate(this);
     }
 
 

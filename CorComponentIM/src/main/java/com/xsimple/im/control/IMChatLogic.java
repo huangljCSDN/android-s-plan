@@ -665,9 +665,7 @@ public class IMChatLogic implements IIMChatLogic, IMObserver, Handler.Callback {
     @Override
     public boolean fileIsDownLoadOrUpload(String type) {
         return mImFileManager.isContainTask(type);
-
     }
-
 
     @Override
     public void singUploadLocalFiles(String dirPath, String msgType) {

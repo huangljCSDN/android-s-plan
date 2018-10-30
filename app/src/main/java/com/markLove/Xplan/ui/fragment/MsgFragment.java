@@ -12,10 +12,12 @@ import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseFragment;
 import com.markLove.Xplan.bean.ChatBean;
+import com.markLove.Xplan.bean.GoViewBeaan;
 import com.markLove.Xplan.ui.activity.CpChatActivity;
 import com.markLove.Xplan.ui.activity.GroupChatActivity;
 import com.markLove.Xplan.ui.activity.ShopChatActivity;
 import com.markLove.Xplan.ui.activity.SingleChatActivity;
+import com.markLove.Xplan.ui.activity.WebViewActivity;
 import com.markLove.Xplan.ui.widget.MyWebView;
 import com.markLove.Xplan.utils.GsonUtils;
 import com.markLove.Xplan.utils.LogUtils;
@@ -66,6 +68,20 @@ public class MsgFragment extends BaseFragment {
                     break;
             }
         }
+
+        @JavascriptInterface
+        public void goView(String json) {
+            LogUtils.i("json="+json);
+            GoViewBeaan goViewBeaan = GsonUtils.json2Bean(json,GoViewBeaan.class);
+            startWebViewActivity(goViewBeaan.getUrlPort());
+//            startPublishActivity();
+        }
+    }
+
+    private void startWebViewActivity(String url) {
+        Intent intent = new Intent(getContext(), WebViewActivity.class);
+        intent.putExtra("url", url);
+        startActivityForResult(intent,200);
     }
 
     private void startShopChatActivity(int id) {
