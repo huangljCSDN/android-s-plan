@@ -2,6 +2,7 @@ package com.markLove.Xplan.api;
 
 import com.markLove.Xplan.bean.BaseBean;
 import com.markLove.Xplan.bean.GroupDetailBean;
+import com.markLove.Xplan.bean.ListBean;
 import com.markLove.Xplan.bean.MerchantBean;
 import com.markLove.Xplan.bean.MerchantInfoBean;
 import com.markLove.Xplan.bean.NearUserBean;
@@ -66,7 +67,7 @@ public interface RetrofitApiService {
      * @return
      */
     @POST("merchant/discover/getNearUser")
-    Observable<BaseBean<ArrayList<NearUserBean>>> getNearUser(@QueryMap Map<String, String> map);
+    Observable<BaseBean<ListBean<ArrayList<NearUserBean>>>> getNearUser(@QueryMap Map<String, String> map);
 
     /**
      * 新增轨迹

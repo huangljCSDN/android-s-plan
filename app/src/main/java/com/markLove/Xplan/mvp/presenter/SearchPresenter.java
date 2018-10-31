@@ -2,6 +2,7 @@ package com.markLove.Xplan.mvp.presenter;
 
 import com.markLove.Xplan.api.util.RequestCallBack;
 import com.markLove.Xplan.bean.BaseBean;
+import com.markLove.Xplan.bean.ListBean;
 import com.markLove.Xplan.bean.MerchantBean;
 import com.markLove.Xplan.bean.NearUserBean;
 import com.markLove.Xplan.mvp.contract.SearchContract;
@@ -48,12 +49,12 @@ public class SearchPresenter extends SearchContract.Presenter {
         if (!isAttach()) return;
         getView().showLoading();
 
-        mModel.getNearUser(map, new RequestCallBack<BaseBean<ArrayList<NearUserBean>>>() {
+        mModel.getNearUser(map, new RequestCallBack<BaseBean<ListBean<ArrayList<NearUserBean>>>>() {
             @Override
-            public void onSuccess(BaseBean<ArrayList<NearUserBean>> json) {
+            public void onSuccess(BaseBean<ListBean<ArrayList<NearUserBean>>> json) {
                 LogUtils.i("SearchPresenter",json.toString());
                 getView().hideLoading();
-                getView().refreshUserList(json.Data);
+                getView().refreshUserList(json.Data.list);
             }
 
             @Override

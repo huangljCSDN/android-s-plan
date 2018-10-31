@@ -101,6 +101,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     //    AutoCameraUtils autoCameraUtils;
     int me_user_id;
     int to_user_id;
+    int groupId; //组局id
     boolean isEnd = false;
     boolean isLikeAndUser = false;
     boolean isBlackUser = false;
@@ -242,6 +243,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 //            headImgUrl = bundle.getString("head_img_url");
 //        }
         to_user_id = intent.getIntExtra("chatId",0);
+        groupId = intent.getIntExtra("dataId",0);
         me_user_id = PreferencesUtils.getInt(this, Constants.ME_USER_ID);
         LogUtils.d("me_user_id=" + me_user_id);
 //        tvChatUser.setText(nickName);

@@ -24,6 +24,7 @@ import com.markLove.Xplan.config.Constants;
 import com.markLove.Xplan.mvp.contract.MainContract;
 import com.markLove.Xplan.mvp.presenter.MainPresenter;
 import com.markLove.Xplan.ui.adapter.FragmentTabAdapter;
+import com.markLove.Xplan.ui.dialog.ExitRoomDialog;
 import com.markLove.Xplan.ui.fragment.GroupFragment;
 import com.markLove.Xplan.ui.fragment.MineFragment;
 import com.markLove.Xplan.ui.fragment.MsgFragment;
@@ -34,6 +35,7 @@ import com.markLove.Xplan.utils.StatusBarUtil;
 import com.networkengine.controller.callback.ErrorResult;
 import com.networkengine.controller.callback.XCallback;
 import com.networkengine.database.table.Member;
+import com.networkengine.engine.LogicEngine;
 import com.networkengine.util.CoracleSdk;
 import com.xsimple.im.engine.LoginLogic;
 
@@ -246,5 +248,23 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
                 Toast.makeText(MainActivity.this, result.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        showExitDialog();
+    }
+
+    private void showExitDialog(){
+        ExitRoomDialog exitRoomDialog = new ExitRoomDialog(this);
+        exitRoomDialog.setOnDialogCallBack(new ExitRoomDialog.OnDialogCallBack() {
+            @Override
+            public void onCallBack(String content) {
+                LogicEngine.getInstance().getSystemController().logout(true);
+                finish();
+            }
+        });
+        exitRoomDialog.show();
+        exitRoomDialog.setTipContent(getString(R.string.tip_outlogin));
     }
 }

@@ -92,7 +92,7 @@ public class SystemController extends BusinessController {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
+                LogicEngine.getInstance().getMqttService().unregistMqttObserver("LoginLogic");
                 // 停止mqtt
                 LogicEngine.getInstance().getMqttService().stopMqtt();
 

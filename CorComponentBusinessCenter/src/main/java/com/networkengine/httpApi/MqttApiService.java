@@ -1,7 +1,6 @@
 package com.networkengine.httpApi;
 
 import com.networkengine.PubConstant;
-import com.networkengine.database.entity.IMMessageBean;
 import com.networkengine.entity.AddOrUpdateAfficheEntity;
 import com.networkengine.entity.AfficheListEntity;
 import com.networkengine.entity.AfficheListResult;
@@ -63,7 +62,7 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 
-public interface MchlApiService {
+public interface MqttApiService {
 
     /**
      * 登陆 api/v3/mchl/login
@@ -103,9 +102,6 @@ public interface MchlApiService {
     @POST(PubConstant.API_SEDMESSAGE)
     Call<IMSendResult> sendMsg(@Body MsgRequestEntity msgRequestEntity);
 
-    @POST(PubConstant.API_SEDMESSAGE)
-    io.reactivex.Observable<IMSendResult> sendMsg2(@Body IMMessageBean imMessageBean);
-
     /**
      * 批量发送消息
      *
@@ -137,10 +133,6 @@ public interface MchlApiService {
      */
     @POST("api/v4/chatRoom/create")
     Call<MchlBaseResult<IMSendResult>> createChatRoom(@Body RequestGetMembersParam requestGetMembersParam);
-
-
-
-
 
 
 

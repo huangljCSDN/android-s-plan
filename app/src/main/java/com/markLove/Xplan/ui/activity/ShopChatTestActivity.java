@@ -81,7 +81,6 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -116,6 +115,7 @@ public class ShopChatTestActivity extends BaseActivity<ShopChatPresenter> implem
     //    AutoCameraUtils autoCameraUtils;
     int me_user_id;
     int to_user_id;
+    int groupId = 1; //组局id
     boolean isEnd = false;
     boolean isLikeAndUser = false;
     boolean isBlackUser = false;
@@ -237,6 +237,7 @@ public class ShopChatTestActivity extends BaseActivity<ShopChatPresenter> implem
 //            headImgUrl = bundle.getString("head_img_url");
 //        }
         to_user_id = getIntent().getIntExtra("chatId", 0);
+//        groupId = intent.getIntExtra("dataId",0);
         me_user_id = PreferencesUtils.getInt(this, Constants.ME_USER_ID);
         LogUtils.i("me_user_id=" + me_user_id + " to_user_id=" + to_user_id);
 //        tvChatUser.setText(nickName);
@@ -926,8 +927,8 @@ public class ShopChatTestActivity extends BaseActivity<ShopChatPresenter> implem
     private void initIm(){
         EventBus.getDefault().register(this);
         Member member = new Member();
-        member.setId("369033");
-        member.setUserId("369033");
+        member.setId(me_user_id+"");
+        member.setUserId(me_user_id+"");
         member.setUserName("huang");
         LogicEngine.getInstance().setUser(member);
         mImEngine = IMEngine.getInstance(this);
@@ -936,7 +937,7 @@ public class ShopChatTestActivity extends BaseActivity<ShopChatPresenter> implem
 //        IMChatActivity.startMe(getContext(), new MemEntity(group.getId(), group.getName(), group.getType()), null, null);
 
 //        final MemEntity memEntity = (MemEntity) getIntent().getSerializableExtra(EXTRA_TARGET);
-        final MemEntity memEntity = new MemEntity(to_user_id+"","测试",0);
+        final MemEntity memEntity = new MemEntity(groupId+"","测试",0);
         mImChatControl = new IMChatLogic.Build() {
             @Override
             public MemEntity setTargetMem() {
@@ -1009,7 +1010,7 @@ public class ShopChatTestActivity extends BaseActivity<ShopChatPresenter> implem
      * 加入聊天室，并订阅聊天室消息
      */
     private void joinChatRoom(){
-        RequestGetMembersParam requestGetMembersParam = new RequestGetMembersParam(to_user_id+"");
+        RequestGetMembersParam requestGetMembersParam = new RequestGetMembersParam(groupId+"");
         mImEngine.getIMController().joinChatRoom(requestGetMembersParam, new XCacheCallback<IMSendResult>() {
             @Override
             public void onLoaderCache(IMSendResult imSendResult) {
@@ -1019,7 +1020,7 @@ public class ShopChatTestActivity extends BaseActivity<ShopChatPresenter> implem
             @Override
             public void onSuccess(IMSendResult result) {
                 LogUtils.i("ShopChatTestActivity","加入聊天室成功");
-                mImEngine.subscribeToTopic(to_user_id+"");
+                mImEngine.subscribeToTopic(groupId+"");
             }
 
             @Override
@@ -1043,7 +1044,7 @@ public class ShopChatTestActivity extends BaseActivity<ShopChatPresenter> implem
             @Override
             public void onSuccess(IMSendResult result) {
                 LogUtils.i("ShopChatTestActivity","退出聊天室成功");
-                mImEngine.unsubscribeToTopic(to_user_id+"");
+                mImEngine.unsubscribeToTopic(groupId+"");
             }
 
             @Override

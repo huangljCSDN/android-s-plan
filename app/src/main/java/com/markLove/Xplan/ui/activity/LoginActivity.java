@@ -4,11 +4,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.LinearLayout;
 
@@ -100,6 +98,7 @@ public class LoginActivity extends BaseContractActivity {
             PreferencesUtils.putString(LoginActivity.this,Constants.TOKEN_KEY,userBean.getToken());
             Intent intent = new Intent(LoginActivity.this,MainActivity.class);
             LoginActivity.this.startActivity(intent);
+            finish();
         }
     }
 

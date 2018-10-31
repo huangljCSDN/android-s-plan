@@ -15,14 +15,17 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.networkengine.AsyncUtil.Marker;
+import com.networkengine.database.entity.IMMessageBean;
 import com.networkengine.entity.AtInfo;
 import com.networkengine.entity.CollectContent;
 import com.networkengine.entity.CollectResult;
 import com.networkengine.entity.CollectStatus;
 import com.networkengine.entity.FileSubPackage;
+import com.networkengine.entity.IMSendResult;
 import com.networkengine.entity.MemEntity;
 import com.networkengine.entity.MsgRequestEntity;
 import com.networkengine.entity.RetraceMsgEntity;
+import com.networkengine.mvp.MsgFactory;
 import com.networkengine.networkutil.interfaces.SingNetFileTransferListener;
 import com.networkengine.util.AtUtil;
 import com.networkengine.util.UnicodeUtils;
@@ -32,6 +35,7 @@ import com.xsimple.im.bean.IMSendFileEntity;
 import com.xsimple.im.control.iable.IIMChatLogic;
 import com.xsimple.im.control.iable.IMObserver;
 import com.xsimple.im.control.listener.IMChatCallBack;
+import com.xsimple.im.control.listener.IMChatMessageSendStateListener;
 import com.xsimple.im.control.listener.MediaPlayerListener;
 import com.xsimple.im.db.datatable.IMChat;
 import com.xsimple.im.db.datatable.IMChatRecordInfo;
@@ -66,7 +70,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -413,9 +421,41 @@ public class IMChatLogic implements IIMChatLogic, IMObserver, Handler.Callback {
         }
         IMMsgRequest localMsg = mImEngine.createLocalMsg(msgType, content, mTargetMem, atInfos, unreadCount);
         mIMChatCallBack.onAddMessagerCallBack(localMsg.getIMessage());
-        mImEngine.senIMTextMessage(localMsg, mIMChatCallBack);
-
+//        mImEngine.senIMTextMessage(localMsg, mIMChatCallBack);
+        sendMessage2(mIMChatCallBack);
         //  sendMsgAndCallUi(message, imMsgRequestEntity);
+    }
+
+    private void sendMessage2(final IMChatMessageSendStateListener imChatMessageStateListener){
+       final IMMessageBean imMessageBean = MsgFactory.createTxtMsgBean( Integer.valueOf(mTargetMem.getUserId()),Integer.valueOf(myUserId),getMyName());
+       mImEngine.getLogicEngine().getMchlClient().sendMsg2(imMessageBean).timeout(60, TimeUnit.SECONDS)
+               .subscribeOn(Schedulers.io())
+               .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
+               .subscribe(new Observer<IMSendResult>() {
+                   @Override
+                   public void onSubscribe(Disposable d) {
+
+                   }
+
+                   @Override
+                   public void onNext(IMSendResult value) {
+                       if (imChatMessageStateListener != null) {
+                           imChatMessageStateListener.onSendMessageSuccessCallBack(imMessageBean.getSender());
+                       }
+                   }
+
+                   @Override
+                   public void onError(Throwable e) {
+                       if (imChatMessageStateListener != null) {
+                           imChatMessageStateListener.onSendMessageFaileCallBack(imMessageBean.getSender());
+                       }
+                   }
+
+                   @Override
+                   public void onComplete() {
+
+                   }
+               });
     }
 
     /**

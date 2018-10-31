@@ -34,8 +34,13 @@ public class CameraActivity extends BaseActivity {
         jCameraView = (JCameraView) findViewById(R.id.jcameraview);
         //设置视频保存路径
         jCameraView.setSaveVideoPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "xplan" + File.separator + "camera");
-        jCameraView.setFeatures(JCameraView.BUTTON_STATE_BOTH);
-        jCameraView.setTip("轻触拍照，按住摄影");
+        int type = getIntent().getIntExtra("type",JCameraView.BUTTON_STATE_BOTH);
+        jCameraView.setFeatures(type);
+        if (type == JCameraView.BUTTON_STATE_BOTH){
+            jCameraView.setTip("轻触拍照,按住摄影");
+        } else {
+            jCameraView.setTip("轻触拍照");
+        }
         jCameraView.setMediaQuality(JCameraView.MEDIA_QUALITY_MIDDLE);
 
         jCameraView.setErrorLisenter(new ErrorListener() {

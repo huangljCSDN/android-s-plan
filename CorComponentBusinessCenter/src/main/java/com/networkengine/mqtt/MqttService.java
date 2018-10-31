@@ -213,7 +213,12 @@ public class MqttService extends Thread implements Handler.Callback {
         if (msg == null) {
             return false;
         }
-        mSubjectDot.notice(msg);
+        try {
+            mSubjectDot.notice(msg);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
         return true;
     }
 

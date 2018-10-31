@@ -353,7 +353,8 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
                         }
                     }
                     //是否原图
-                    Boolean isOrigin = data.getBooleanExtra(PickerConfig.IS_ORIGIN, false);
+//                    Boolean isOrigin = data.getBooleanExtra(PickerConfig.IS_ORIGIN, false);
+                    Boolean isOrigin = true;
                     for (final Media media : select) {
                         onImageReturn(null, media.path, isOrigin);
                     }

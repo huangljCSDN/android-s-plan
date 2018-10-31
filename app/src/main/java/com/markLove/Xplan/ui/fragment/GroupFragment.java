@@ -2,10 +2,7 @@ package com.markLove.Xplan.ui.fragment;
 
 import android.content.Intent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
 import android.widget.LinearLayout;
 
 import com.dmcbig.mediapicker.PickerConfig;
@@ -230,6 +227,7 @@ public class GroupFragment extends BaseFragment {
         ChatBean chatBean = GsonUtils.json2Bean(json, ChatBean.class);
         Intent intent = new Intent(getContext(), GroupChatActivity.class);
         intent.putExtra("chatId", chatBean.getChatId());
+        intent.putExtra("dataId", chatBean.getDataId());
         startActivityForResult(intent,100);
     }
 

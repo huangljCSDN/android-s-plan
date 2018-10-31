@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import com.networkengine.database.table.Member;
 import com.networkengine.engine.EngineParameter;
@@ -154,11 +155,11 @@ public class MqttChannel implements MqttCallbackExtended {
                 mHandler.sendEmptyMessage(MQTT_ACTION_CONNECT_FAILED);
             }
         });
-
         return true;
     }
 
     public void disconnect() {
+        LogUtil.d("停止mqtt");
         try {
             if (mClient != null) {
                 if (mClient.isConnected()) {
@@ -216,9 +217,11 @@ public class MqttChannel implements MqttCallbackExtended {
             try {
                 String subject = TOPIC_PUSH + mParameter.appKey + "/" + topicName;
                 mClient.subscribe(subject, 0);
+                Toast.makeText(mContext,"订阅聊天室成功 id="+topicName,Toast.LENGTH_SHORT).show();
                 LogUtil.d("订阅成功: " + subject);
             } catch (MqttException e) {
                 LogUtil.e("订阅失败: " + topicName, e);
+                Toast.makeText(mContext,"订阅失败 id="+topicName,Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -291,9 +294,6 @@ public class MqttChannel implements MqttCallbackExtended {
             sp.edit().putBoolean(SERVICE_STOP, true).apply();
             LogicEngine.getInstance().getSystemController().logout(true);
             disconnect();
-        } else if (mqttTopic.equals(TOPIC_PUSH + mParameter.appKey + "/pcStatus/" + mParameter.imei)) { // PC端上下线
-            Message msg = mHandler.obtainMessage(MQTT_ACTION_PC_SATUS_CHANGED, null);
-            mHandler.sendMessage(msg);
         } else if (mqttTopic.equals(TOPIC_PUSH + mParameter.appKey + "/sys/" + member.getId())) { // 管理平台消息
             Message msg = mHandler.obtainMessage(MQTT_ACTION_SYS_MESSAGE_ARRIVED, null);
             mHandler.sendMessage(msg);
