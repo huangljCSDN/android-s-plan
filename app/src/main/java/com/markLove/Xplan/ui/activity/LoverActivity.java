@@ -7,6 +7,7 @@ import android.webkit.WebView;
 import android.widget.LinearLayout;
 
 import com.markLove.Xplan.R;
+import com.markLove.Xplan.base.BaseJsInterface;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.ui.widget.MyWebView;
@@ -29,7 +30,7 @@ public class LoverActivity extends BaseActivity {
         mWebView = new MyWebView(this);
         LinearLayout mll = findViewById(R.id.rootView);
         mll.addView(mWebView);
-
+        mWebView.addJavascriptInterface(new BaseJsInterface(this), "xplanfunc");
         mWebView.loadUrl("file:///android_asset/package/main/index.html#/find/180cp");
     }
 

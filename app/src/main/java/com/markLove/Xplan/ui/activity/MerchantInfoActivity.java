@@ -1,5 +1,6 @@
 package com.markLove.Xplan.ui.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.webkit.WebView;
 import android.widget.LinearLayout;
 
 import com.markLove.Xplan.R;
+import com.markLove.Xplan.base.BaseJsInterface;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.ChatBean;
@@ -34,11 +36,15 @@ public class MerchantInfoActivity extends BaseActivity {
         mll.addView(mWebView);
 
         id = getIntent().getIntExtra("chatId",0);
-        mWebView.addJavascriptInterface(new JSInterface(), "xplanfunc");
+        mWebView.addJavascriptInterface(new JSInterface(this), "xplanfunc");
         mWebView.loadUrl("file:///android_asset/package/main/index.html#/find/store/"+id+"");
     }
 
-    public class JSInterface {
+    public class JSInterface extends BaseJsInterface {
+
+        public JSInterface(Activity mActivity) {
+            super(mActivity);
+        }
 
         @JavascriptInterface
         public void toChatRoom(String json) {
@@ -51,6 +57,7 @@ public class MerchantInfoActivity extends BaseActivity {
         ChatBean chatBean = GsonUtils.json2Bean(json, ChatBean.class);
         Intent intent = new Intent(this, ShopChatActivity.class);
         intent.putExtra("chatId", chatBean.getChatId());
+        intent.putExtra("dataId", chatBean.getChatId());
         startActivity(intent);
     }
 

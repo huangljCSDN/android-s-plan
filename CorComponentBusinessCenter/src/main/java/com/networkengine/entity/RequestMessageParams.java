@@ -105,4 +105,18 @@ public class RequestMessageParams {
     public void setMsgType(String msgType) {
         this.msgType = msgType;
     }
+
+    @Override
+    public String toString() {
+        return "RequestMessageParams{" +
+                "sender='" + sender + '\'' +
+                ", senderName='" + senderName + '\'' +
+                ", groupId='" + groupId + '\'' +
+                ", groupName='" + groupName + '\'' +
+                ", msgType='" + msgType + '\'' +
+                ", chatType='" + chatType + '\'' +
+                ", type='" + type + '\'' +
+                ", receiverIds=" + receiverIds +
+                '}';
+    }
 }

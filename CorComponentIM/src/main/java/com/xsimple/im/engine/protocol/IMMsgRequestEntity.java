@@ -3,6 +3,7 @@ package com.xsimple.im.engine.protocol;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
+import com.networkengine.PubConstant;
 import com.networkengine.entity.CallInfo;
 import com.networkengine.entity.ChatRecordInfo;
 import com.networkengine.entity.FileInfo;
@@ -99,15 +100,15 @@ public class IMMsgRequestEntity extends MsgRequestEntity implements IProcessorPa
             params.setGroupId(tagertId);
             params.setGroupName(groupName);
             requestMessageEntity.setGroupName(groupName);
-            params.setChatType(com.networkengine.PubConstant.ConversationType.FIXEDGROUP);
-            requestMessageEntity.setChatType(com.networkengine.PubConstant.ConversationType.FIXEDGROUP);
+            params.setChatType(PubConstant.ConversationType.CHATROOM);
+            requestMessageEntity.setChatType(com.networkengine.PubConstant.ConversationType.CHATROOM);
         } else if (2 == type) {//讨论组
             //设置群聊id
             params.setGroupId(tagertId);
             params.setGroupName(groupName);
             requestMessageEntity.setGroupName(groupName);
-            params.setChatType(com.networkengine.PubConstant.ConversationType.DISCUSSIONGROUP);
-            requestMessageEntity.setChatType(com.networkengine.PubConstant.ConversationType.DISCUSSIONGROUP);
+            params.setChatType(com.networkengine.PubConstant.ConversationType.CHATROOM);
+            requestMessageEntity.setChatType(com.networkengine.PubConstant.ConversationType.CHATROOM);
         }
         //rids id
 

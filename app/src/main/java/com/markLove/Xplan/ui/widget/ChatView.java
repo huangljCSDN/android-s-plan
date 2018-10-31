@@ -32,6 +32,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cjt2325.cameralibrary.JCameraView;
 import com.dmcbig.mediapicker.PickerActivity;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
@@ -44,12 +45,19 @@ import com.markLove.Xplan.config.Constants;
 import com.markLove.Xplan.module.emoji.EmojiOnClickListener;
 import com.markLove.Xplan.module.emoji.EmojiUtils;
 import com.markLove.Xplan.ui.activity.CameraActivity;
+import com.markLove.Xplan.ui.activity.ShopChatActivity;
 import com.markLove.Xplan.ui.adapter.EmojiPagerAdapter;
 import com.markLove.Xplan.utils.AudioUtils;
 import com.markLove.Xplan.utils.FileUtils;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
 import com.markLove.Xplan.utils.ToastUtils;
+import com.networkengine.util.AtUtil;
+import com.xsimple.im.control.MessagerLoader;
+import com.xsimple.im.control.iable.IIMChatLogic;
+import com.xsimple.im.db.datatable.IMChat;
+import com.xsimple.im.db.datatable.IMMessage;
+import com.xsimple.im.engine.IMEngine;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -62,7 +70,7 @@ import java.util.List;
  */
 public class ChatView extends FrameLayout implements View.OnClickListener{
 
-    private EditText etChatSnedMsg;
+    private EditText mEditTextView;
     private RelativeLayout mRlRecord;
     private TextView mTvRecordTip, mTvRecordTime;
     private ArrayAdapter<Recorder> mAdapter;
@@ -106,7 +114,7 @@ public class ChatView extends FrameLayout implements View.OnClickListener{
     private void initView(){
         llChatEmojiPoint = findViewById(R.id.chat_emoji_point);
         mRlRecord = findViewById(R.id.ll_record_sound);
-        etChatSnedMsg = findViewById(R.id.et_input_msg);
+        mEditTextView = findViewById(R.id.et_input_msg);
         mTvRecordTip = findViewById(R.id.tv_record_tip);
         mTvRecordTime = findViewById(R.id.tv_record_time);
         emojiView = findViewById(R.id.chat_emoji_pager);
@@ -114,7 +122,7 @@ public class ChatView extends FrameLayout implements View.OnClickListener{
         mIvRecord = findViewById(R.id.iv_record);
         mIvEmoji = findViewById(R.id.iv_emoji);
         tvChatSend = findViewById(R.id.btn_send);
-        etChatSnedMsg.clearFocus();
+        mEditTextView.clearFocus();
         mAudioRecorderButton = findViewById(R.id.id_recorder_button);
 
         tvChatSend.setEnabled(false);
@@ -128,7 +136,7 @@ public class ChatView extends FrameLayout implements View.OnClickListener{
         initEmoji();
         initUI();
 
-        etChatSnedMsg.addTextChangedListener(new TextWatcher() {
+        mEditTextView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -182,7 +190,8 @@ public class ChatView extends FrameLayout implements View.OnClickListener{
                 showEmojiView();
                 break;
             case R.id.btn_send:
-                send();
+//                send();
+                sendTextMessage();
                 break;
         }
     }
@@ -195,7 +204,7 @@ public class ChatView extends FrameLayout implements View.OnClickListener{
      * 发送消息
      */
     public void send() {
-        String msg = etChatSnedMsg.getText().toString().trim();
+        String msg = mEditTextView.getText().toString().trim();
         if (!TextUtils.isEmpty(msg)) {
             Message message;
 
@@ -207,7 +216,7 @@ public class ChatView extends FrameLayout implements View.OnClickListener{
             if (onSendMessageListener != null){
                 onSendMessageListener.onSendMessage(message);
             }
-            etChatSnedMsg.setText("");
+            mEditTextView.setText("");
         } else {
             ToastUtils.showCenter(getContext(), "发送内容不能为空", 0);
         }
@@ -509,7 +518,7 @@ public class ChatView extends FrameLayout implements View.OnClickListener{
                             .PERMISSION_GRANTED &&
                     ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) == PackageManager
                             .PERMISSION_GRANTED) {
-                getActivity().startActivityForResult(new Intent(getActivity(), CameraActivity.class), Constants.REQUEST_CODE_CAMERA);
+                startCameraActivity2();
             } else {
                 //不具有获取权限，需要进行权限申请
                 ActivityCompat.requestPermissions(getActivity(), new String[]{
@@ -518,8 +527,14 @@ public class ChatView extends FrameLayout implements View.OnClickListener{
                         Manifest.permission.CAMERA}, Constants.REQUEST_CODE_PERMISSION_ONE);
             }
         } else {
-            getActivity().startActivityForResult(new Intent(getActivity(), CameraActivity.class), Constants.REQUEST_CODE_CAMERA);
+            startCameraActivity2();
         }
+    }
+
+    private void startCameraActivity2(){
+        Intent intent = new Intent(getActivity(), CameraActivity.class);
+        intent.putExtra("type",JCameraView.BUTTON_STATE_ONLY_CAPTURE);
+        getActivity().startActivityForResult(intent, Constants.REQUEST_CODE_CAMERA);
     }
 
 
@@ -570,7 +585,7 @@ public class ChatView extends FrameLayout implements View.OnClickListener{
     protected void initUI() {
 
         meIsLove = PreferencesUtils.getBoolean(getContext(), Constants.USER_IS_LOVES_INFO_KEY);
-        etChatSnedMsg.addTextChangedListener(new TextWatcher() {
+        mEditTextView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -653,17 +668,17 @@ public class ChatView extends FrameLayout implements View.OnClickListener{
                     }
                 }
                 if (position >= 0 && position < EmojiUtils.emojiIcons.length) {
-                    String str = etChatSnedMsg.getText().toString() + EmojiUtils.emojiValues[position];
+                    String str = mEditTextView.getText().toString() + EmojiUtils.emojiValues[position];
                     SpannableString spannableString = EmojiUtils.parseEmoji(getContext(), str);
-                    etChatSnedMsg.setText(spannableString);
-                    etChatSnedMsg.setSelection(spannableString.length());
+                    mEditTextView.setText(spannableString);
+                    mEditTextView.setSelection(spannableString.length());
                 }
             } else {
                 int keyCode = KeyEvent.KEYCODE_DEL;
                 KeyEvent keyEventDown = new KeyEvent(KeyEvent.ACTION_DOWN, keyCode);
                 KeyEvent keyEventUp = new KeyEvent(KeyEvent.ACTION_UP, keyCode);
-                etChatSnedMsg.onKeyDown(keyCode, keyEventDown);
-                etChatSnedMsg.onKeyUp(keyCode, keyEventUp);
+                mEditTextView.onKeyDown(keyCode, keyEventDown);
+                mEditTextView.onKeyUp(keyCode, keyEventUp);
             }
         }
     };
@@ -694,5 +709,96 @@ public class ChatView extends FrameLayout implements View.OnClickListener{
                 imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
             }
         }
+    }
+
+    //---------------------以下是新的内容-----------------------------------
+    /**
+     * 聊天控制器
+     */
+    private IIMChatLogic mImChatControl;
+
+    /**
+     * Im　消息引擎
+     */
+    private IMEngine mImEngine;
+
+    private MessagerLoader mMessagerLoader;
+
+
+    public void setmChatControl(IIMChatLogic mChatControl) {
+        this.mImChatControl = mChatControl;
+    }
+
+    public void setmImEngine(IMEngine mImEngine) {
+        this.mImEngine = mImEngine;
+    }
+
+    public void setmMessagerLoader(MessagerLoader mMessagerLoader) {
+        this.mMessagerLoader = mMessagerLoader;
+    }
+
+    public void initEvent(IIMChatLogic mChatControl,IMEngine mImEngine,MessagerLoader mMessagerLoader) {
+        this.mImChatControl = mChatControl;
+        this.mImEngine = mImEngine;
+        this.mMessagerLoader = mMessagerLoader;
+    }
+
+    /**
+     * 发送消息
+     */
+    private void sendTextMessage() {
+        String trim = mEditTextView.getText().toString();
+        if (TextUtils.isEmpty(trim)) {
+            return;
+        }
+        mEditTextView.setText("");
+        //草稿置空
+        IMChat imChat = mImChatControl.getIMChat();
+        if (imChat != null && !TextUtils.isEmpty(imChat.getDrafts())) {
+            imChat.setDrafts("");
+            imChat.update();
+        }
+        //没有回复消息这种需求
+//        if (null != imMessageOnReply) {
+//            IMReplyInfo replyInfo = new IMReplyInfo();
+//            replyInfo.setVirtualMsgId(imMessageOnReply.getVId());
+//            replyInfo.setMsgSenderId(imMessageOnReply.getSenderId());
+//            replyInfo.setMsgSender(imMessageOnReply.getSenderName());
+//            if (IMMessage.CONTENT_TYPE_GROUP_REMARK.equals(imMessageOnReply.getContentType())) {
+//                IMGroupRemark imGroupRemark = imMessageOnReply.getIMGroupRemark();
+//                String content = imGroupRemark.getTitle()
+//                        + "\n"
+//                        + imGroupRemark.getContent();
+//                replyInfo.setMsgContent(content);
+//            } else if (IMMessage.CONTENT_TYPE_REPLY.equals(imMessageOnReply.getContentType())) {
+//                replyInfo.setMsgContent(imMessageOnReply.getIMReplyInfo().getContent());
+//            } else {
+//                replyInfo.setMsgContent(imMessageOnReply.getContent());
+//            }
+//            replyInfo.setContent(trim);
+//            mImChatControl.sendMessage(IMMessage.CONTENT_TYPE_REPLY, new Gson().toJson(replyInfo));
+//        } else {
+//            mImChatControl.sendMessage(IMMessage.CONTENT_TYPE_TXT, trim);
+//        }
+        mImChatControl.sendMessage(IMMessage.CONTENT_TYPE_TXT, trim);
+    }
+
+    /**
+     * 设置草稿
+     */
+    public void setDrafts() {
+        String trim = mEditTextView.getText().toString();
+        //只判断null ,不能判空字符串
+        if (TextUtils.isEmpty(trim) && mImChatControl.getIMChat() == null)
+            return;
+        if (mImChatControl.getIMChat() != null && TextUtils.isEmpty(mImChatControl.getIMChat().getDrafts()) && TextUtils.isEmpty(trim)) {
+            return;
+        }
+        if (mMessagerLoader.getCacheMessage().size() > 0) {
+            mImChatControl.saveDrafts(trim, mMessagerLoader.getCacheMessage().get(0).getTime());
+        } else {
+            mImChatControl.saveDrafts(trim, System.currentTimeMillis());
+        }
+
     }
 }

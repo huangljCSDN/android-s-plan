@@ -22,6 +22,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cjt2325.cameralibrary.JCameraView;
 import com.cjt2325.cameralibrary.util.FileUtil;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
@@ -708,7 +709,7 @@ public class CpChatActivity extends BaseActivity<CpChatPresenter> implements Vie
                     size++;
                 }
                 if (size == 0) {
-                    startActivityForResult(new Intent(CpChatActivity.this, CameraActivity.class), Constants.REQUEST_CODE_CAMERA);
+                    startCameraActivity2();
                 } else {
                     Toast.makeText(this, "请到设置-权限管理中开启", Toast.LENGTH_SHORT).show();
                 }
@@ -738,6 +739,12 @@ public class CpChatActivity extends BaseActivity<CpChatPresenter> implements Vie
                 }
             }
         }
+    }
+
+    private void startCameraActivity2(){
+        Intent intent = new Intent(this, CameraActivity.class);
+        intent.putExtra("type",JCameraView.BUTTON_STATE_ONLY_CAPTURE);
+        startActivityForResult(intent, Constants.REQUEST_CODE_CAMERA);
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.markLove.Xplan.ui.fragment;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.webkit.WebView;
 import android.widget.LinearLayout;
 
 import com.markLove.Xplan.R;
+import com.markLove.Xplan.base.BaseJsInterface;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseFragment;
 import com.markLove.Xplan.bean.ChatBean;
@@ -41,12 +43,16 @@ public class MsgFragment extends BaseFragment {
      * 设置websetting
      */
     private void initWebSettings(){
-        mWebView.addJavascriptInterface(new JSInterface(), "xplanfunc");
+        mWebView.addJavascriptInterface(new JSInterface(getActivity()), "xplanfunc");
         mWebView.loadUrl("file:///android_asset/package/main/index.html#/message/native/1");
 
     }
 
-    public class JSInterface extends Object {
+    public class JSInterface extends BaseJsInterface {
+
+        public JSInterface(Activity mActivity) {
+            super(mActivity);
+        }
 
         // 被JS调用的方法必须加入@JavascriptInterface注解
         @JavascriptInterface
