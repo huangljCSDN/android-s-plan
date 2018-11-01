@@ -34,7 +34,7 @@ public class GoodPlayActivity extends BaseActivity {
         mWebView = new MyWebView(this);
         LinearLayout mll = findViewById(R.id.rootView);
         mll.addView(mWebView);
-        mWebView.addJavascriptInterface(new GoodPlayActivity.JSInterface(), "xplanfunc");
+        mWebView.addJavascriptInterface(new GoodPlayActivity.JSInterface(this), "xplanfunc");
         mWebView.loadUrl("file:///android_asset/package/main/index.html#/find/interesting");
     }
 

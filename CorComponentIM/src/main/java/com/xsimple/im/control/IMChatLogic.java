@@ -405,8 +405,6 @@ public class IMChatLogic implements IIMChatLogic, IMObserver, Handler.Callback {
 //        }
         imMsgRequestEntity.buildIMMsgRequestEntity(mTargetMem.getType(), msgType, getMyName(), myUserId, mTargetMem.getUserId(), gropName, content, mTargetMem.getUserName());
 
-        IMMessage message = mProtocolStack.proceessMessage(imMsgRequestEntity);
-
         ArrayList<AtInfo> atInfos = null;
         int unreadCount = 1;
         if (mTargetMem.getType() != 0) {
@@ -422,42 +420,10 @@ public class IMChatLogic implements IIMChatLogic, IMObserver, Handler.Callback {
         }
         IMMsgRequest localMsg = mImEngine.createLocalMsg(msgType, content, mTargetMem, atInfos, unreadCount);
         mIMChatCallBack.onAddMessagerCallBack(localMsg.getIMessage());
-//        mImEngine.senIMTextMessage(localMsg, mIMChatCallBack);
-        sendMessage2(mIMChatCallBack);
+        mImEngine.senIMTextMessage(localMsg, mIMChatCallBack);
         //  sendMsgAndCallUi(message, imMsgRequestEntity);
     }
 
-    private void sendMessage2(final IMChatMessageSendStateListener imChatMessageStateListener){
-       final IMMessageBean imMessageBean = MsgFactory.createTxtMsgBean( Integer.valueOf(mTargetMem.getUserId()),Integer.valueOf(myUserId),getMyName());
-       mImEngine.getLogicEngine().getMchlClient().sendMsg2(imMessageBean).timeout(60, TimeUnit.SECONDS)
-               .subscribeOn(Schedulers.io())
-               .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
-               .subscribe(new Observer<IMSendResult>() {
-                   @Override
-                   public void onSubscribe(Disposable d) {
-
-                   }
-
-                   @Override
-                   public void onNext(IMSendResult value) {
-                       if (imChatMessageStateListener != null) {
-                           imChatMessageStateListener.onSendMessageSuccessCallBack(imMessageBean.getSender());
-                       }
-                   }
-
-                   @Override
-                   public void onError(Throwable e) {
-                       if (imChatMessageStateListener != null) {
-                           imChatMessageStateListener.onSendMessageFaileCallBack(imMessageBean.getSender());
-                       }
-                   }
-
-                   @Override
-                   public void onComplete() {
-
-                   }
-               });
-    }
 
     /**
      * 根据At数组来计算未读数

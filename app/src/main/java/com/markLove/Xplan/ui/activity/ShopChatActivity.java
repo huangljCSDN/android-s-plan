@@ -1035,6 +1035,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 
     /**
      * 加入聊天室，并订阅聊天室消息
+     *
      */
     private void joinChatRoom(){
         RequestGetMembersParam requestGetMembersParam = new RequestGetMembersParam(1+"");

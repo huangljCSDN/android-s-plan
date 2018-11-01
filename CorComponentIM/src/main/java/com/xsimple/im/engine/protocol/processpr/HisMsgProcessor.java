@@ -85,6 +85,8 @@ public class HisMsgProcessor extends Processor<MsgEntity, IMMessage> {
             return IMMessage.TYPE_GROUP;
         } else if (IMMessage.STRING_TYPE_DISCUSS.equals(msgStringType)) {
             return IMMessage.TYPE_DISCUSS;
+        } else if (IMMessage.STRING_TYPE_CHATROOM.equals(msgStringType)) {
+            return IMMessage.TYPE_GROUP;
         }
         return IMMessage.TYPE_CHAT;
     }

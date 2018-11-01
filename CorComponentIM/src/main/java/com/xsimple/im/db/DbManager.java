@@ -3,6 +3,7 @@ package com.xsimple.im.db;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.networkengine.util.LogUtil;
 import com.xsimple.im.db.datatable.IMBHelper;
 import com.xsimple.im.db.datatable.IMCallInfo;
 import com.xsimple.im.db.datatable.IMChat;
@@ -322,7 +323,7 @@ public class DbManager {
         builder = mMessageDao.queryBuilder();
 
         builder.where(IMMessageDao.Properties.CId.eq(chat_id), IMMessageDao.Properties.ContentType.notEq(IMMessage.CONTENT_TYPE_REJECT), IMMessageDao.Properties.ContentType.notEq(IMMessage.CONTENT_TYPE_CANCEL))
-                .orderDesc(IMMessageDao.Properties.Time);
+                .orderAsc(IMMessageDao.Properties.Time);
 
 
         return builder.build().list();
@@ -498,7 +499,7 @@ public class DbManager {
         if (isSingleChatMessage(iMMessage)) {
 
             for (IMChat chat : oldIMChats) {
-
+                LogUtil.i("IMChat ==="+chat.toString());
                 if (chat == null) {
                     continue;
                 }
@@ -600,7 +601,6 @@ public class DbManager {
      * 向会话中添加消息
      */
     public boolean addOrUpdateMsgToChat(String uId, IMMessage iMMessage, String singleTargetName) {
-
         if (iMMessage == null || uId == null) {
             return false;
         }
@@ -772,6 +772,7 @@ public class DbManager {
         if (oldIMChats != null && !oldIMChats.isEmpty()) {
             chat = getChatId(oldIMChats, iMMessage);
         }
+        LogUtil.i("getChat=="+chat.toString());
 
          /*是否为新会话要加入本地数据库*/
         if (chat == null) {

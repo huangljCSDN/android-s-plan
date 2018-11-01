@@ -3,6 +3,7 @@ package com.xsimple.im.control;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.networkengine.util.LogUtil;
 import com.xsimple.im.control.iable.IIMChatLogic;
 import com.xsimple.im.db.DbManager;
 import com.xsimple.im.db.datatable.IMChat;
@@ -206,14 +207,13 @@ public class MessagerLoader {
     public void getFirstLoadMessager() {
 
         List<IMMessage> list = null;
-        if (mCacheMessage.size() >= NOMER_COUNT) {
+//        if (mCacheMessage.size() >= NOMER_COUNT) {
+//            list = mCacheMessage.subList(0, NOMER_COUNT);
+//        } else {
+//            list = mCacheMessage;
+//        }
 
-            list = mCacheMessage.subList(0, NOMER_COUNT);
-
-        } else {
-
-            list = mCacheMessage;
-        }
+        list = mCacheMessage;
         if (list != null) {
             mShowMessage.addAll(list);
         }
@@ -457,7 +457,7 @@ public class MessagerLoader {
     private void loadMessager(long chatID) {
 
         List<IMMessage> list = mDbManager.loadIMMessage(chatID);
-
+        LogUtil.i("list="+list.toString());
         if (list != null) {
             mCacheMessage.addAll(list);
             for (IMMessage message : list) {

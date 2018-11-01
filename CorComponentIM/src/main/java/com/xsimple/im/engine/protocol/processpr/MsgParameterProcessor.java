@@ -115,7 +115,9 @@ public class MsgParameterProcessor extends Processor<IMMsgRequestEntity, IMMessa
         //目标id
         message.setTagertId(msgContent.getRids());
         //群聊和讨论组设置名字
-        if (PubConstant.ConversationType.FIXEDGROUP.equals(imMsgRequestEntity.getParam().getChatType()) || PubConstant.ConversationType.DISCUSSIONGROUP.equals(imMsgRequestEntity.getParam().getChatType())) {
+        if (PubConstant.ConversationType.FIXEDGROUP.equals(imMsgRequestEntity.getParam().getChatType())
+                || PubConstant.ConversationType.DISCUSSIONGROUP.equals(imMsgRequestEntity.getParam().getChatType())
+                || PubConstant.ConversationType.CHATROOM.equals(imMsgRequestEntity.getParam().getChatType())) {
             message.setGroupName(msgContent.getGroupName());
         }
 
@@ -131,8 +133,8 @@ public class MsgParameterProcessor extends Processor<IMMsgRequestEntity, IMMessa
             message.setType(1);
         } else if (PubConstant.ConversationType.DISCUSSIONGROUP.equals(imMsgRequestEntity.getParam().getChatType())) {
             message.setType(2);
-        } else if ("1".equals(imMsgRequestEntity.getParam().getMsgType())) {
-            message.setType(3);
+        } else if (PubConstant.ConversationType.CHATROOM.equals(imMsgRequestEntity.getParam().getChatType())) {
+            message.setType(1);
         }
         //消息发送中
         message.setStatus(IMMessage.STATUS_SENDING);

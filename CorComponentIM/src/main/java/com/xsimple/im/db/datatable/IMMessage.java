@@ -91,6 +91,10 @@ public class IMMessage {
      * 讨论组
      */
     public static final String STRING_TYPE_DISCUSS = "group";
+    /**
+     * 聊天室
+     */
+    public static final String STRING_TYPE_CHATROOM = "chatRoom";
 //
 //    public static final String STRING_TYPE_SYSTEM = 3;
 

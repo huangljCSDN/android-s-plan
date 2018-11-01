@@ -637,6 +637,7 @@ public class IMEngine implements Handler.Callback {
      * @return
      */
     private IMMessage saveWhenSendMessage(long msgLocalId, IMSendResult sendResult) {
+        LogUtil.i("===========saveWhenSendMessage================");
         ProtocolStack protocolStack = new ProtocolStack(mContext, mDbManager);
         if (sendResult == null) {
             IMSendResultEntity entity = new IMSendResultEntity(msgLocalId);
