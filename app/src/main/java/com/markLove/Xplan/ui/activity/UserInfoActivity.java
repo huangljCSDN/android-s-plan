@@ -8,8 +8,10 @@ import android.webkit.WebView;
 import android.widget.LinearLayout;
 
 import com.markLove.Xplan.R;
+import com.markLove.Xplan.base.BaseJsInterface;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseActivity;
+import com.markLove.Xplan.ui.fragment.GroupFragment;
 import com.markLove.Xplan.ui.widget.MyWebView;
 import com.markLove.Xplan.utils.StatusBarUtil;
 
@@ -28,7 +30,7 @@ public class UserInfoActivity extends BaseActivity {
         mWebView = new MyWebView(this);
         LinearLayout mll = findViewById(R.id.rootView);
         mll.addView(mWebView);
-
+        mWebView.addJavascriptInterface(new BaseJsInterface(this), "xplanfunc");
         mWebView.loadUrl("file:///android_asset/package/main/index.html#/user/native/1");
     }
 

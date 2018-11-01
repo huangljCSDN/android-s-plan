@@ -377,4 +377,32 @@ public class MerchantInfoBean {
             return createDT;
         }
     }
+
+    @Override
+    public String toString() {
+        return "MerchantInfoBean{" +
+                "qq='" + qq + '\'' +
+                ", userInfo=" + userInfo +
+                ", recipeList=" + recipeList +
+                ", shopName='" + shopName + '\'' +
+                ", shopAddress='" + shopAddress + '\'' +
+                ", title='" + title + '\'' +
+                ", userId=" + userId +
+                ", logoUrl='" + logoUrl + '\'' +
+                ", imGroupId=" + imGroupId +
+                ", activityId=" + activityId +
+                ", groupName='" + groupName + '\'' +
+                ", areaId=" + areaId +
+                ", pointPraiseCount=" + pointPraiseCount +
+                ", groupCount=" + groupCount +
+                ", merchantId=" + merchantId +
+                ", phone='" + phone + '\'' +
+                ", auditStatus=" + auditStatus +
+                ", tel='" + tel + '\'' +
+                ", abbreviationName='" + abbreviationName + '\'' +
+                ", activityIntroduction='" + activityIntroduction + '\'' +
+                ", email='" + email + '\'' +
+                ", introduction='" + introduction + '\'' +
+                '}';
+    }
 }

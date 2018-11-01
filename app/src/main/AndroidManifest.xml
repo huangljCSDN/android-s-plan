@@ -79,7 +79,6 @@
         <activity android:name=".ui.activity.MerchantInfoActivity" />
         <activity android:name=".ui.activity.MerchantMemberActivity" />
         <activity android:name=".ui.activity.WebViewActivity" />
-        <activity android:name=".ui.activity.ShopChatTestActivity" />
         <activity android:name=".ui.activity.SetPermissionActivity"></activity>
 
         <service android:name="com.amap.api.location.APSService"></service>

@@ -8,6 +8,7 @@ import android.webkit.WebView;
 import android.widget.LinearLayout;
 
 import com.markLove.Xplan.R;
+import com.markLove.Xplan.base.BaseJsInterface;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.ui.widget.MyWebView;
@@ -33,6 +34,7 @@ public class InvitingFriendsActivity extends BaseActivity {
         mll.addView(mWebView);
 
         id = getIntent().getIntExtra("chatId",0);
+        mWebView.addJavascriptInterface(new BaseJsInterface(this), "xplanfunc");
         mWebView.loadUrl("file:///android_asset/package/main/index.html#/bureau/invitation/{"+id+"}");
     }
 

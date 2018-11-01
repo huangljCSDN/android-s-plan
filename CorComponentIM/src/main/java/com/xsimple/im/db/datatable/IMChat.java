@@ -415,4 +415,28 @@ public class IMChat {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getIMChatDao() : null;
     }
+
+    @Override
+    public String toString() {
+        return "IMChat{" +
+                "id=" + id +
+                ", uId='" + uId + '\'' +
+                ", senderOrTarget1='" + senderOrTarget1 + '\'' +
+                ", receiverName='" + receiverName + '\'' +
+                ", senderOrTarget2='" + senderOrTarget2 + '\'' +
+                ", type=" + type +
+                ", name='" + name + '\'' +
+                ", UnReadCount=" + UnReadCount +
+                ", time=" + time +
+                ", isStick=" + isStick +
+                ", isNotDisturb=" + isNotDisturb +
+                ", drafts='" + drafts + '\'' +
+                ", refreshTime=" + refreshTime +
+                ", funKey='" + funKey + '\'' +
+                ", IMMessages=" + IMMessages +
+                ", IMSysMessage=" + IMSysMessage +
+                ", myDao=" + myDao +
+                ", daoSession=" + daoSession +
+                '}';
+    }
 }

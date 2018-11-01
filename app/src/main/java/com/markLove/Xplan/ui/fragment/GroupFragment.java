@@ -1,13 +1,18 @@
 package com.markLove.Xplan.ui.fragment;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.LinearLayout;
 
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.SinglePickerActivity;
 import com.markLove.Xplan.R;
+import com.markLove.Xplan.base.BaseJsInterface;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseFragment;
 import com.markLove.Xplan.bean.ChatBean;
@@ -42,14 +47,18 @@ public class GroupFragment extends BaseFragment {
      * 设置websetting
      */
     private void initWebSettings() {
-        mWebView.addJavascriptInterface(new JSInterface(), "xplanfunc");
+        mWebView.addJavascriptInterface(new JSInterface(getActivity()), "xplanfunc");
 
         mWebView.loadUrl("file:///android_asset/package/main/index.html#/bureau/native/1");
 
     }
 
     // 继承自Object类
-    public class JSInterface extends Object {
+    public class JSInterface extends BaseJsInterface {
+
+        public JSInterface(Activity mActivity) {
+            super(mActivity);
+        }
 
         // 被JS调用的方法必须加入@JavascriptInterface注解
         @JavascriptInterface
@@ -227,7 +236,6 @@ public class GroupFragment extends BaseFragment {
         ChatBean chatBean = GsonUtils.json2Bean(json, ChatBean.class);
         Intent intent = new Intent(getContext(), GroupChatActivity.class);
         intent.putExtra("chatId", chatBean.getChatId());
-        intent.putExtra("dataId", chatBean.getDataId());
         startActivityForResult(intent,100);
     }
 

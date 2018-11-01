@@ -1,5 +1,6 @@
 package com.markLove.Xplan.ui.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.LinearLayout;
 
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.App;
+import com.markLove.Xplan.base.BaseJsInterface;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.GoNativeBean;
@@ -37,12 +39,16 @@ public class WebViewActivity extends BaseActivity {
         mll.addView(mWebView);
 
         url = getIntent().getStringExtra("url");
-        mWebView.addJavascriptInterface(new JSInterface(), "xplanfunc");
+        mWebView.addJavascriptInterface(new JSInterface(this), "xplanfunc");
         mWebView.loadUrl("file:///android_asset/"+url);
     }
 
     // 继承自Object类
-    public class JSInterface extends Object {
+    public class JSInterface extends BaseJsInterface {
+
+        public JSInterface(Activity mActivity) {
+            super(mActivity);
+        }
 
         // 被JS调用的方法必须加入@JavascriptInterface注解
         @JavascriptInterface

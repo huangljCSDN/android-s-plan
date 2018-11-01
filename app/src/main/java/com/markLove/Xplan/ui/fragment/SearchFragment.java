@@ -22,8 +22,8 @@ import com.markLove.Xplan.mvp.contract.SearchContract;
 import com.markLove.Xplan.mvp.presenter.SearchPresenter;
 import com.markLove.Xplan.ui.activity.GoodPlayActivity;
 import com.markLove.Xplan.ui.activity.LoverActivity;
+import com.markLove.Xplan.ui.activity.MerchantInfoActivity;
 import com.markLove.Xplan.ui.activity.PlayersActivity;
-import com.markLove.Xplan.ui.activity.ShopChatTestActivity;
 import com.markLove.Xplan.ui.activity.UserInfoActivity;
 import com.markLove.Xplan.ui.adapter.MerchantListAdapter;
 import com.markLove.Xplan.ui.adapter.UserListAdapter;
@@ -218,8 +218,8 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
             @Override
             public void onItemClick(View view, int position) {
                 MerchantBean merchantBean = merchantBeanList.get(position);
-//                Intent intent = new Intent(getContext(), MerchantInfoActivity.class);
-                Intent intent = new Intent(getContext(), ShopChatTestActivity.class);
+                Intent intent = new Intent(getContext(), MerchantInfoActivity.class);
+//                Intent intent = new Intent(getContext(), ShopChatTestActivity.class);
                 intent.putExtra("chatId", merchantBean.getMerchantId());
                 startActivity(intent);
             }

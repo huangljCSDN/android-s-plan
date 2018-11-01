@@ -155,10 +155,6 @@ public class RequestMessageEntity extends MessageEntity {
                 ", atInfo=" + atInfo +
                 ", unreadCount=" + unreadCount +
                 ", fileInfo=" + fileInfo +
-                ", locationInfo=" + locationInfo +
-                ", replyInfo=" + replyInfo +
-                ", chatRecordInfo=" + chatRecordInfo +
-                ", callInfo=" + callInfo +
                 ", rids='" + rids + '\'' +
                 ", senderName='" + senderName + '\'' +
                 ", type='" + type + '\'' +

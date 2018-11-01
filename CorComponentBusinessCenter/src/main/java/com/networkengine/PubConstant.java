@@ -191,7 +191,8 @@ public interface PubConstant {
     interface ConversationType {
         String PERSONAL = "chat"; // 创建固定群组
         String FIXEDGROUP = "fixGroup"; // 创建讨论群组
-        String DISCUSSIONGROUP = "group"; // 创建讨论群组
+        String DISCUSSIONGROUP = "group"; // 群聊
+        String CHATROOM = "chatRoom"; // 聊天室
     }
 
     /**

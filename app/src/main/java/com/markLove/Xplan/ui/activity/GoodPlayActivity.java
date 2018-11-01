@@ -1,11 +1,13 @@
 package com.markLove.Xplan.ui.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.webkit.JavascriptInterface;
 import android.widget.LinearLayout;
 
 import com.markLove.Xplan.R;
+import com.markLove.Xplan.base.BaseJsInterface;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.ChatBean;
@@ -36,8 +38,11 @@ public class GoodPlayActivity extends BaseActivity {
         mWebView.loadUrl("file:///android_asset/package/main/index.html#/find/interesting");
     }
 
-    public class JSInterface {
+    public class JSInterface extends BaseJsInterface {
 
+        public JSInterface(Activity mActivity) {
+            super(mActivity);
+        }
         @JavascriptInterface
         public void toChatRoom(String json) {
             LogUtils.i("huang", "toChatRoom=" + json);
@@ -62,8 +67,7 @@ public class GoodPlayActivity extends BaseActivity {
 
     private void startShopChatActivity(final String json) {
         ChatBean chatBean = GsonUtils.json2Bean(json, ChatBean.class);
-//        Intent intent = new Intent(this, ShopChatActivity.class);
-        Intent intent = new Intent(this, ShopChatTestActivity.class);
+        Intent intent = new Intent(this, ShopChatActivity.class);
         intent.putExtra("chatId", chatBean.getChatId());
         intent.putExtra("dataId", chatBean.getDataId());
         startActivity(intent);

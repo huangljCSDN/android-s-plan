@@ -37,7 +37,7 @@ public class RxObserver<T> implements Observer<T> {
         } else if (e instanceof UnknownHostException) {
             requestCallBack.onFail("未知主机错误");
         } else {
-            requestCallBack.onFail("未知错误");
+            requestCallBack.onFail("请求网络失败");
             e.printStackTrace();
         }
     }

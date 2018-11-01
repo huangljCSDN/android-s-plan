@@ -536,6 +536,7 @@ public class IMEngine implements Handler.Callback {
                     MsgRequestEntity msgRequestEntity = msgRequestEntitys[0];
                     //过滤
                     filtrationMsgBody(msgRequestEntity);
+                    LogUtil.i("msgRequestEntity="+msgRequestEntity.toString());
                     sendMsgResponse = mLogicEngine.getMchlClient().sendMsg(msgRequestEntity).execute();
                 } catch (Exception e) {
                     e.printStackTrace();

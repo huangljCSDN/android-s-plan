@@ -45,6 +45,7 @@ import com.markLove.Xplan.utils.ImageLoaderUtils;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
 import com.markLove.Xplan.utils.ScreenUtils;
+import com.xsimple.im.db.datatable.IMMessage;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -1295,5 +1296,58 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHolder>
 
     public void setOnRejectCoupleListener(OnRejectCoupleListener listener) {
         mListener = listener;
+    }
+
+    //---------------------------新IM方法---------------------------//
+
+    public void setImData(List<IMMessage> imMessageList){
+        mDatas = changeListIMMessageToListMessage(imMessageList);
+        notifyDataSetChanged();
+    }
+
+    public void addListImData(List<IMMessage> imMessageList){
+        mDatas.addAll(changeListIMMessageToListMessage(imMessageList));
+        notifyDataSetChanged();
+    }
+
+    public void addOneImData(IMMessage imMessage){
+        mDatas.add(changeIMMessageToMessage(imMessage));
+        notifyDataSetChanged();
+    }
+
+    public List<Message> changeListIMMessageToListMessage(List<IMMessage> imMessageList){
+        List<Message> list = new ArrayList<>();
+        if (imMessageList != null || !imMessageList.isEmpty()){
+            for (IMMessage imMessage : imMessageList){
+                Message message = changeIMMessageToMessage(imMessage);
+                list.add(message);
+            }
+        }
+        return list;
+    }
+
+    public Message changeIMMessageToMessage(IMMessage imMessage){
+        Message message = null;
+        if (IMMessage.CONTENT_TYPE_SHORT_VOICE.equals(imMessage.getContentType()) ||
+                IMMessage.CONTENT_TYPE_VOICE_CHAT.equals(imMessage.getContentType())){
+            String path="";
+            String fileName = "";
+            if (imMessage.getFileInfo() != null){
+                path = imMessage.getFileInfo().getPath();
+                fileName = imMessage.getFileInfo().getName();
+            }
+            message = Message.createVoiceMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()), fileName, path);
+        } else if (IMMessage.CONTENT_TYPE_IMG.equals(imMessage.getContentType())){
+            String path="";
+            String fileName = "";
+            if (imMessage.getFileInfo() != null){
+                path = imMessage.getFileInfo().getPath();
+                fileName = imMessage.getFileInfo().getName();
+            }
+            message = Message.createImageMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()), fileName, path);
+        } else {
+            message = Message.createTxtMessage(Message.Type.CHAT,Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()),imMessage.getContent());
+        }
+        return message;
     }
 }

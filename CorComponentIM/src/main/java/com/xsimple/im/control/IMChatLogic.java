@@ -388,12 +388,13 @@ public class IMChatLogic implements IIMChatLogic, IMObserver, Handler.Callback {
     public void sendMessage(String msgType, String content) {
 
         String gropName = "";
-//        if (mTargetMem.getType() == 1 || mTargetMem.getType() == 2) {
+        if (mTargetMem.getType() == 1 || mTargetMem.getType() == 2) {
 //            gropName = mImGroup.getName();
 //            if (gropName == null) {
 //                gropName = "";
 //            }
-//        }
+            gropName = mTargetMem.getUserName();
+        }
 
         IMMsgRequestEntity imMsgRequestEntity = new IMMsgRequestEntity();
 
@@ -838,12 +839,12 @@ public class IMChatLogic implements IIMChatLogic, IMObserver, Handler.Callback {
                 return;
             }
 
-            if (!Objects.equals(next.getCId(), mChat.getId())) {
-                iterator.remove();
-            }
-            if (!mCanProcessorList.contains(next.getContentType())) {
-                iterator.remove();
-            }
+//            if (!Objects.equals(next.getCId(), mChat.getId())) {
+//                iterator.remove();
+//            }
+//            if (!mCanProcessorList.contains(next.getContentType())) {
+//                iterator.remove();
+//            }
         }
         //  mIMChatCallBack.onMsgReceived(msgList);
         mIMChatCallBack.onAddMessagerCallBack(msgList);
