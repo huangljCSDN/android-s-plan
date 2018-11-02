@@ -10,6 +10,15 @@ public class GoImgLibraryBean {
     private String sCallback;
     private String selectType;
     private int backType;
+    private String token;
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 
     public String getSelectType() {
         return selectType;

@@ -4,6 +4,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.networkengine.engine.LogicEngine;
+import com.networkengine.util.JsonUtil;
 
 import java.io.IOException;
 
@@ -84,10 +85,16 @@ public abstract class SingUploadNetWorkTask extends SingNetWorkTask {
 //            return false;
 //        }
         Log.e("error", "string >>>　" + string);
-        if (TextUtils.isEmpty(string))
-            return false;
-        mFileSubPackage.setNetResult(string);
 
+        if (TextUtils.isEmpty(string)){
+            return false;
+        } else {
+            int code = JsonUtil.getInt(string,"code");
+            if (code == -1)
+                return false;
+        }
+
+        mFileSubPackage.setNetResult(string);
         return true;
     }
 

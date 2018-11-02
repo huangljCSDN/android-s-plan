@@ -268,7 +268,7 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
             public void onItemClick(View view, int position) {
                 NearUserBean nearUserBean = userBeanList.get(position);
                 Intent intent = new Intent(getContext(), UserInfoActivity.class);
-                intent.putExtra("chatId", nearUserBean.getUserId());
+                intent.putExtra("userId", nearUserBean.getUserId()+"");
                 startActivity(intent);
             }
         });

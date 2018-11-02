@@ -2191,9 +2191,7 @@ public class IMEngine implements Handler.Callback {
             doInitSubPackage.setCallbackKey(String.valueOf(message.getCId()))
                     .setCallback(callback);
         }
-
         IMFileManager.getImFileManager(mContext).singUploadImFile(doInitSubPackage, singNetFileTransferListener);
-
     }
 
     /**

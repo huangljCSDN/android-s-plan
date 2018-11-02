@@ -21,6 +21,8 @@ public class FileMessageBody extends MessageBody {
     String fileName;
     //图片路径
     String filePath;
+    //下载网络图片用的
+    String sha;
 
     private String file;
 
@@ -30,6 +32,15 @@ public class FileMessageBody extends MessageBody {
         setChatType(chatType);
         setType(type);
         setDateTime(DataUtils.getDatetime());
+    }
+
+
+    public String getSha() {
+        return sha;
+    }
+
+    public void setSha(String sha) {
+        this.sha = sha;
     }
 
     public long getFileLength() {

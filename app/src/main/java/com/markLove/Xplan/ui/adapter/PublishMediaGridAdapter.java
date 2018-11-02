@@ -81,6 +81,7 @@ public class PublishMediaGridAdapter extends RecyclerView.Adapter<PublishMediaGr
 //        Glide.with(context)
 //                .load(mediaUri)
 //                .into(holder.media_image);
+//        ImageLoaderUtils.display(context,media.path,holder.media_image);
         ImageLoaderUtils.displayLocationRoundImage(context,media.path,holder.media_image);
 //        ImageLoaderUtils.displayRoundImage(context,new File(media.path),holder.media_image,160,160);
 

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">X-plan</string>
+    <string name="app_name">Xplan</string>
     <string name="team">组局</string>
     <string name="find">发现</string>
     <string name="msg">消息</string>
@@ -29,6 +29,7 @@
     <string name="exit_group_chat_room">确定退出组局？</string>
     <string name="hint_input_msg">请输入消息...</string>
     <string name="pressed_say">按住说话</string>
+    <string name="click_recording">点击录制</string>
     <string name="cancel_send">手指上滑，取消发送</string>
     <string name="loosen_send">松开手指，取消发送</string>
     <string name="send">发送</string>

@@ -26,20 +26,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
 import com.cjt2325.cameralibrary.JCameraView;
 import com.cjt2325.cameralibrary.util.FileUtil;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
 import com.markLove.Xplan.R;
-import com.markLove.Xplan.base.App;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.ChatUser;
-import com.markLove.Xplan.bean.MerchantBean;
 import com.markLove.Xplan.bean.MerchantInfoBean;
-import com.markLove.Xplan.bean.UserBean;
 import com.markLove.Xplan.bean.msg.Message;
 import com.markLove.Xplan.bean.msg.body.FileMessageBody;
 import com.markLove.Xplan.bean.msg.body.TxtMessageBody;
@@ -69,8 +63,6 @@ import com.markLove.Xplan.utils.ToastUtils;
 import com.networkengine.controller.callback.ErrorResult;
 import com.networkengine.controller.callback.RouterCallback;
 import com.networkengine.controller.callback.XCacheCallback;
-import com.networkengine.database.table.Member;
-import com.networkengine.engine.LogicEngine;
 import com.networkengine.entity.IMSendResult;
 import com.networkengine.entity.MemEntity;
 import com.networkengine.entity.RequestGetMembersParam;
@@ -169,7 +161,10 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
         chatView.setOnSendMessageListener(new com.markLove.Xplan.ui.widget.ChatView.OnSendMessageListener() {
             @Override
             public void onSendMessage(Message message) {
-                judeBlackList(message);
+//                judeBlackList(message);
+                FileMessageBody fileMessageBody = (FileMessageBody) message.getBody();
+
+                sendVoice(fileMessageBody.getFilePath());
             }
         });
 
@@ -267,26 +262,6 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 //        tvChatSendPrice.setText(gold + "");
 //        chatPresenter.getHistory(me_user_id, to_user_id);
 //        getGiftList();
-        getChatOpen();
-    }
-
-    private void getChatOpen() {
-//        Map<String, String> params = new HashMap<>();
-//        params.put("Token", PreferencesUtils.getString(this, Constants.TOKEN_KEY));
-//        OkGoHttpUtils.get(Constants.GET_JUDE_CHAT_OPEN, params, new OkGoHttpCallBack() {
-//        @Override
-//        public void onSuccess(String s, Call call, Response response) {
-//            ChatOpen chatOpen = GsonUtils.json2Bean(s, ChatOpen.class);
-//            if (chatOpen.isHaveData()) {
-//                ChatOpen.DtBean dtBean = chatOpen.getDt().get(0);
-//                if ("1".equals(dtBean.getChatOpen())) {
-//                    PreferencesUtils.putBoolean(ShopChatActivity.this, Constants.CHAT_OPEN_KEY, true);
-//                } else {
-//                    PreferencesUtils.putBoolean(ShopChatActivity.this, Constants.CHAT_OPEN_KEY, false);
-//                }
-//            }
-//        }
-//    });
     }
 
     RecyclerView.AdapterDataObserver adapterDataObserver = new RecyclerView.AdapterDataObserver() {
@@ -450,8 +425,10 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
         String fileName = filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length());
         final Message imgMsg = Message.createImageMessage(Message.Type.CHAT, me_user_id, to_user_id, fileName, filePath);
         imgMsg.setStatus(Message.ChatStatus.SENDING);
+        isOrigin = true;
         if (isOrigin) {
-            judeBlackList(imgMsg);
+            sendImage(filePath);
+//            judeBlackList(imgMsg);
         } else {
             Observable.create(new ObservableOnSubscribe<Message>() {
                 @Override
@@ -890,8 +867,6 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
         initIm(merchantInfoBean);
     }
 
-
-
     /**
      * 聊天控制器
      */
@@ -946,12 +921,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 
     private void initIm(MerchantInfoBean merchantInfoBean){
         EventBus.getDefault().register(this);
-        UserBean userBean = App.getInstance().getUserBean();
-        Member member = new Member();
-        member.setId(me_user_id+"");
-        member.setUserId(me_user_id+"");
-        member.setUserName(userBean.getUserInfo().getNickName());
-        LogicEngine.getInstance().setUser(member);
+
         mImEngine = IMEngine.getInstance(this);
         //聊天对象
 //        IMGroup group = mIMEngine.getIMGroup(id);

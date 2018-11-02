@@ -31,7 +31,8 @@ android {
             debuggable true
             signingConfig signingConfigs.config
 //            buildConfigField(STRING, APP_HOST, '"http://120.76.228.171:8080/xplay/"')
-            buildConfigField(STRING, APP_HOST, '"http://120.25.163.134:8080/xplay/"')
+//            buildConfigField(STRING, APP_HOST, '"http://120.25.163.134:8080/xplay/"')
+            buildConfigField(STRING, APP_HOST, '"http://47.106.65.217:8080/xplay/"')
 //            buildConfigField(STRING, APP_HOST, '"http://jack-279.ticp.io:26695/api/"')
         }
         // beta 测试环境

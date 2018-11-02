@@ -45,14 +45,12 @@ import com.markLove.Xplan.config.Constants;
 import com.markLove.Xplan.module.emoji.EmojiOnClickListener;
 import com.markLove.Xplan.module.emoji.EmojiUtils;
 import com.markLove.Xplan.ui.activity.CameraActivity;
-import com.markLove.Xplan.ui.activity.ShopChatActivity;
 import com.markLove.Xplan.ui.adapter.EmojiPagerAdapter;
 import com.markLove.Xplan.utils.AudioUtils;
 import com.markLove.Xplan.utils.FileUtils;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
 import com.markLove.Xplan.utils.ToastUtils;
-import com.networkengine.util.AtUtil;
 import com.xsimple.im.control.MessagerLoader;
 import com.xsimple.im.control.iable.IIMChatLogic;
 import com.xsimple.im.db.datatable.IMChat;
@@ -499,7 +497,7 @@ public class ChatView extends FrameLayout implements View.OnClickListener{
      */
     private void startPickerActivity() {
         Intent intent = new Intent(getActivity(), PickerActivity.class);
-        intent.putExtra(PickerConfig.SELECT_MODE, PickerConfig.PICKER_IMAGE_VIDEO);//default image and video (Optional)
+        intent.putExtra(PickerConfig.SELECT_MODE, PickerConfig.PICKER_IMAGE);//default image and video (Optional)
         long maxSize = 188743680L;//long long long
         intent.putExtra(PickerConfig.MAX_SELECT_SIZE, maxSize); //default 180MB (Optional)
         intent.putExtra(PickerConfig.MAX_SELECT_COUNT, 15);  //default 40 (Optional)

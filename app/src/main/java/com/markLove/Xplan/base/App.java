@@ -10,12 +10,15 @@ import android.text.TextUtils;
 
 import com.amap.api.location.AMapLocation;
 import com.markLove.Xplan.bean.UserBean;
+import com.markLove.Xplan.config.Constants;
 import com.markLove.Xplan.ui.activity.LoginActivity;
 import com.markLove.Xplan.ui.dialog.TokenTipDialog;
 import com.markLove.Xplan.utils.AppManager;
 import com.markLove.Xplan.utils.GsonUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
 import com.networkengine.engine.LogicEngine;
+import com.networkengine.entity.RequestLogoutParam;
+import com.xsimple.im.engine.IMEngine;
 
 import java.util.Iterator;
 import java.util.List;
@@ -93,7 +96,7 @@ public class App extends Application {
     public void outLogin(Activity lastActivity){
         PreferencesUtils.clear(getApplicationContext());
         LogicEngine.getInstance().getSystemController().logout(true);
-
+        IMEngine.getInstance(this).getLogicEngine().getMchlClient().logout(new RequestLogoutParam());
         Intent intent = new Intent(lastActivity, LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -106,6 +109,8 @@ public class App extends Application {
         UserBean userBean = GsonUtils.json2Bean(PreferencesUtils.getString(this,PreferencesUtils.KEY_USER),UserBean.class);
         if (userBean != null){
             token = userBean.getToken();
+        } else {
+            token = PreferencesUtils.getString(this,Constants.TOKEN_KEY);
         }
         return token;
     }

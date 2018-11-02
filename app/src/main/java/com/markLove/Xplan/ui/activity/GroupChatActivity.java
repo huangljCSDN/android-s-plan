@@ -37,7 +37,6 @@ import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.BaseBean;
 import com.markLove.Xplan.bean.ChatUser;
 import com.markLove.Xplan.bean.GroupDetailBean;
-import com.markLove.Xplan.bean.MerchantInfoBean;
 import com.markLove.Xplan.bean.UserBean;
 import com.markLove.Xplan.bean.msg.Message;
 import com.markLove.Xplan.bean.msg.body.FileMessageBody;

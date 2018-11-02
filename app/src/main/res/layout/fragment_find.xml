@@ -20,7 +20,7 @@
             android:layout_marginLeft="15dp"
             android:textColor="@color/color_white"
             android:textSize="30sp"
-            tools:text="肥仔的快乐" />
+            android:text="肥宅快乐!" />
 
         <LinearLayout
             android:layout_width="wrap_content"

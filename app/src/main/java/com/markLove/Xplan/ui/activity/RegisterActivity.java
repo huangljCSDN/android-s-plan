@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.cjt2325.cameralibrary.JCameraView;
+import com.cjt2325.cameralibrary.util.LogUtil;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.SinglePickerActivity;
 import com.dmcbig.mediapicker.entity.Media;
@@ -23,12 +24,14 @@ import com.markLove.Xplan.bean.GoImgLibraryBean;
 import com.markLove.Xplan.bean.GoPhotoBean;
 import com.markLove.Xplan.bean.GoPhotoFilesBean;
 import com.markLove.Xplan.bean.UploadFileBean;
+import com.markLove.Xplan.bean.UserBean;
 import com.markLove.Xplan.config.Constants;
 import com.markLove.Xplan.mvp.contract.FileContract;
 import com.markLove.Xplan.mvp.presenter.FilePresenter;
 import com.markLove.Xplan.ui.widget.MyWebView;
 import com.markLove.Xplan.utils.GsonUtils;
 import com.markLove.Xplan.utils.LogUtils;
+import com.markLove.Xplan.utils.PreferencesUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -75,6 +78,7 @@ public class RegisterActivity extends BaseActivity<FilePresenter> implements Fil
         public void goPhoto(String json) {
             goPhotoBean = GsonUtils.json2Bean(json, GoPhotoBean.class);
             type = 1;
+            PreferencesUtils.putString(RegisterActivity.this,Constants.TOKEN_KEY,goPhotoBean.getToken());
             startCameraActivity();
         }
 
@@ -90,6 +94,7 @@ public class RegisterActivity extends BaseActivity<FilePresenter> implements Fil
         public void fromImgLibrary(String json) {
             type = 2;
             goImgLibraryBean = GsonUtils.json2Bean(json, GoImgLibraryBean.class);
+            PreferencesUtils.putString(RegisterActivity.this,Constants.TOKEN_KEY,goImgLibraryBean.getToken());
             startSinglePickerActivity();
         }
 
@@ -104,12 +109,25 @@ public class RegisterActivity extends BaseActivity<FilePresenter> implements Fil
         public void goView(String json) {
             LogUtils.i("json=" + json);
         }
-    }
 
-    private void startSinglePickerActivity() {
-        Intent intent = new Intent(this, SinglePickerActivity.class);
-        intent.putExtra(PickerConfig.SELECT_MODE, Constants.REQUEST_CODE_CAMERA);
-        startActivityForResult(intent, 200);
+        /**
+         * 获取用户信息
+         *
+         * @param userInfo
+         */
+        @JavascriptInterface
+        public void toHomePage(String userInfo) {
+//            ToastUtils.showLong(RegisterActivity.this, "toHomePage");
+            LogUtil.i("userInfo= "+userInfo);
+            PreferencesUtils.putString(RegisterActivity.this,PreferencesUtils.KEY_USER,userInfo);
+            UserBean userBean = GsonUtils.json2Bean(userInfo,UserBean.class);
+            PreferencesUtils.putInt(RegisterActivity.this,Constants.ME_USER_ID,userBean.getUserInfo().getUserId());
+            PreferencesUtils.putString(RegisterActivity.this,Constants.ME_HEAD_IMG_URL,userBean.getUserInfo().getHeadImageUrl());
+            PreferencesUtils.putString(RegisterActivity.this,Constants.TOKEN_KEY,userBean.getToken());
+            Intent intent = new Intent(RegisterActivity.this,MainActivity.class);
+            RegisterActivity.this.startActivity(intent);
+            finish();
+        }
     }
 
     /**
@@ -152,6 +170,7 @@ public class RegisterActivity extends BaseActivity<FilePresenter> implements Fil
      * 上传文件
      */
     private void uploadFile() {
+        if (mediaList.isEmpty()) return;
         List<File> files = new ArrayList<>();
         for (Media media : mediaList) {
             String path = media.path;
@@ -179,6 +198,7 @@ public class RegisterActivity extends BaseActivity<FilePresenter> implements Fil
                 final String path = data.getStringExtra("path");
                 Log.i("huang", "path=" + path);
                 Media media = new Media(path, "", 0, 1, 999, 9999, "");
+                mediaList.clear();
                 mediaList.add(media);
                 localFilePath = path;
                 uploadFile();
@@ -188,6 +208,7 @@ public class RegisterActivity extends BaseActivity<FilePresenter> implements Fil
                 for (final Media media : select) {
                     Log.i("media", media.toString());
                     Media media1 = new Media(media.path, "", 0, 1, 999, 9999, "");
+                    mediaList.clear();
                     mediaList.add(media1);
                     localFilePath = media.path;
                 }
@@ -198,6 +219,7 @@ public class RegisterActivity extends BaseActivity<FilePresenter> implements Fil
 
     @Override
     public void uploadSuccess(UploadFileBean bean) {
+        hideLoading();
         ArrayList<String> paths = new ArrayList<>();
         if (bean.getList() != null && !bean.getList().isEmpty()){
             for (UploadFileBean.FileBean fileBean : bean.getList()) {
@@ -205,37 +227,44 @@ public class RegisterActivity extends BaseActivity<FilePresenter> implements Fil
             }
         }
 
+        LogUtils.i("huang","localFilePath="+localFilePath);
         if (type == 1 && goPhotoBean != null){
             File file = new File(localFilePath);
+            String netUrl = paths.get(0);
             if (!file.exists()){
                 try {
                     file.createNewFile();
-                    String netUrl = paths.get(0);
-                    GoPhotoFilesBean goPhotoFilesBean = new GoPhotoFilesBean();
-                    goPhotoFilesBean.setImgName(file.getName());
-                    goPhotoFilesBean.setImgPath(file.getAbsolutePath());
-                    goPhotoFilesBean.setUploadData(netUrl);
-                    mWebView.loadUrl("javascript:"+goPhotoBean.getsCallback()+"(\"" + GsonUtils.obj2Json(goPhotoFilesBean) + "\")");
+                    fileToJs(file,netUrl,goPhotoBean.getsCallback());
                 } catch (Exception e){
                     e.printStackTrace();
                 }
+            } else {
+                fileToJs(file,netUrl,goPhotoBean.getsCallback());
             }
         } else if (type == 2 && goImgLibraryBean != null){
             File file = new File(localFilePath);
+            String netUrl = paths.get(0);
             if (!file.exists()){
                 try {
                     file.createNewFile();
-                    String netUrl = paths.get(0);
-                    GoPhotoFilesBean goPhotoFilesBean = new GoPhotoFilesBean();
-                    goPhotoFilesBean.setImgName(file.getName());
-                    goPhotoFilesBean.setImgPath(file.getAbsolutePath());
-                    goPhotoFilesBean.setUploadData(netUrl);
-                    mWebView.loadUrl("javascript:"+goImgLibraryBean.getsCallback()+"(\"" + GsonUtils.obj2Json(goPhotoFilesBean) + "\")");
+                    fileToJs(file,netUrl,goImgLibraryBean.getsCallback());
                 } catch (Exception e){
                     e.printStackTrace();
                 }
+            } else {
+                fileToJs(file,netUrl,goImgLibraryBean.getsCallback());
             }
         }
+    }
+
+    private void fileToJs(File file,String netUrl,String callBackName){
+        GoPhotoFilesBean goPhotoFilesBean = new GoPhotoFilesBean();
+        goPhotoFilesBean.setImgName(file.getName());
+        goPhotoFilesBean.setImgPath(file.getAbsolutePath());
+        goPhotoFilesBean.setUploadData(netUrl);
+        String url = "javascript:"+callBackName+"(" + GsonUtils.obj2Json(goPhotoFilesBean) + ")";
+        LogUtils.i("url="+url);
+        mWebView.loadUrl("javascript:"+callBackName+"(" + GsonUtils.obj2Json(goPhotoFilesBean) + ")");
     }
 
     @TargetApi(23)
@@ -270,6 +299,12 @@ public class RegisterActivity extends BaseActivity<FilePresenter> implements Fil
         Intent intent = new Intent(RegisterActivity.this, CameraActivity.class);
         intent.putExtra("type", JCameraView.BUTTON_STATE_ONLY_CAPTURE);
         startActivityForResult(intent, Constants.REQUEST_CODE_CAMERA);
+    }
+
+    private void startSinglePickerActivity() {
+        Intent intent = new Intent(this, SinglePickerActivity.class);
+        intent.putExtra(PickerConfig.SELECT_MODE, PickerConfig.PICKER_IMAGE);
+        startActivityForResult(intent, Constants.REQUEST_CODE_PICKER);
     }
 
         @Override

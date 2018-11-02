@@ -327,7 +327,7 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
         isReset = true;
         isEnd = false;
         handler.removeMessages(1);
-        mTvRecordTip.setText(getString(R.string.pressed_say));
+        mTvRecordTip.setText(getString(R.string.click_recording));
         ivDeleteVoice.setVisibility(GONE);
         ivConfirmVoice.setVisibility(GONE);
         mTvRecordTime.setText("0s");
@@ -371,7 +371,7 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
         isEnd = true;
         mTvRecordTime.setText("0s");
         mTvRecordTime.setVisibility(View.GONE);
-        mTvRecordTip.setText(getString(R.string.pressed_say));
+        mTvRecordTip.setText(getString(R.string.click_recording));
     }
 
     public void postRecorderingMessage() {

@@ -31,6 +31,7 @@ import com.markLove.Xplan.ui.fragment.MsgFragment;
 import com.markLove.Xplan.ui.fragment.SearchFragment;
 import com.markLove.Xplan.utils.AMapClient;
 import com.markLove.Xplan.utils.LogUtils;
+import com.markLove.Xplan.utils.PreferencesUtils;
 import com.markLove.Xplan.utils.StatusBarUtil;
 import com.networkengine.controller.callback.ErrorResult;
 import com.networkengine.controller.callback.XCallback;
@@ -239,7 +240,16 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
         new LoginLogic(this).init(userBean.getUserInfo().getPhone(), "123456",String.valueOf(userBean.getUserInfo().getUserId()), new XCallback<Member, ErrorResult>() {
             @Override
             public void onSuccess(Member result) {
-                LogUtils.i("MainActivity","登录mchl成功");
+                PreferencesUtils.putString(getApplicationContext(),PreferencesUtils.KEY_USER_TOKEN,result.getUserToken());
+                LogUtils.i("MainActivity","登录mchl成功=,member="+result.toString());
+
+                UserBean userBean = App.getInstance().getUserBean();
+                Member member = new Member();
+                member.setId(String.valueOf(userBean.getUserInfo().getUserId()));
+                member.setUserId(String.valueOf(userBean.getUserInfo().getUserId()));
+                member.setUserName(userBean.getUserInfo().getNickName());
+                member.setUserToken(result.getUserToken());
+                LogicEngine.getInstance().setUser(member);
             }
 
             @Override

@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
-import android.widget.Toast;
 
 import com.networkengine.database.table.Member;
 import com.networkengine.engine.EngineParameter;
@@ -217,11 +216,11 @@ public class MqttChannel implements MqttCallbackExtended {
             try {
                 String subject = TOPIC_PUSH + mParameter.appKey + "/" + topicName;
                 mClient.subscribe(subject, 0);
-                Toast.makeText(mContext,"订阅聊天室成功 id="+topicName,Toast.LENGTH_SHORT).show();
+//                Toast.makeText(mContext,"订阅聊天室成功 id="+topicName,Toast.LENGTH_SHORT).show();
                 LogUtil.d("订阅成功: " + subject);
             } catch (MqttException e) {
                 LogUtil.e("订阅失败: " + topicName, e);
-                Toast.makeText(mContext,"订阅失败 id="+topicName,Toast.LENGTH_SHORT).show();
+//                Toast.makeText(mContext,"订阅失败 id="+topicName,Toast.LENGTH_SHORT).show();
             }
         }
     }

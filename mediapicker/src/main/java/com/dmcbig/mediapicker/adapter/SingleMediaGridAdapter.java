@@ -72,6 +72,7 @@ public class SingleMediaGridAdapter extends RecyclerView.Adapter<SingleMediaGrid
         Glide.with(context)
                 .load(mediaUri)
                 .into(holder.media_image);
+
         holder.media_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

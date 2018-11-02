@@ -11,6 +11,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -41,10 +42,12 @@ import com.markLove.Xplan.ui.dialog.CoupleGiftPopupWindow;
 import com.markLove.Xplan.utils.AudioUtils;
 import com.markLove.Xplan.utils.DensityUtils;
 import com.markLove.Xplan.utils.FileUtils;
+import com.markLove.Xplan.utils.ImageDisplayUtil;
 import com.markLove.Xplan.utils.ImageLoaderUtils;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
 import com.markLove.Xplan.utils.ScreenUtils;
+import com.networkengine.engine.LogicEngine;
 import com.xsimple.im.db.datatable.IMMessage;
 
 import java.io.File;
@@ -499,8 +502,17 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHolder>
                     } else {
                         damageImg = R.mipmap.receiver_file_damage;
                     }
-//                    ImageLoaderUtils.display(context,damageImg,imgMsg,200,200);
-                    ImageLoaderUtils.displayRoundImage(context,damageImg,imgMsg,200,200);
+
+                    String url = imgPath3;
+                    if (TextUtils.isEmpty(url) || !new File(url).exists()) {
+                        if (!TextUtils.isEmpty(imgMessageBody.getSha())) {
+                            url = LogicEngine.getMchlDownLoadPath(imgMessageBody.getSha());
+                        } else {
+                            url = "";
+                        }
+                    }
+                    ImageDisplayUtil.setImgByUrl(imgMsg,url,null,ImageDisplayUtil.IMAGE_SIZE.S,damageImg,null);
+//                    ImageLoaderUtils.displayRoundImage(context,damageImg,imgMsg,200,200);
                 }
             }
         }

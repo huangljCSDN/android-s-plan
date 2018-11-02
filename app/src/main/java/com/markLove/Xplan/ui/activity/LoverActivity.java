@@ -1,11 +1,13 @@
 package com.markLove.Xplan.ui.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.webkit.JavascriptInterface;
 import android.widget.LinearLayout;
 
 import com.markLove.Xplan.R;
+import com.markLove.Xplan.base.BaseJsInterface;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.ChatBean;
@@ -32,11 +34,15 @@ public class LoverActivity extends BaseActivity {
         mWebView = new MyWebView(this);
         LinearLayout mll = findViewById(R.id.rootView);
         mll.addView(mWebView);
-        mWebView.addJavascriptInterface(new JSInterface(), "xplanfunc");
+        mWebView.addJavascriptInterface(new JSInterface(this), "xplanfunc");
         mWebView.loadUrl("file:///android_asset/package/main/index.html#/find/180cp");
     }
 
-    public class JSInterface {
+    public class JSInterface  extends BaseJsInterface {
+
+        public JSInterface(Activity mActivity) {
+            super(mActivity);
+        }
 
         @JavascriptInterface
         public void toChatRoom(String json) {

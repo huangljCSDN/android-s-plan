@@ -202,7 +202,7 @@ public class SinglePickerActivity extends Activity implements DataCallback, View
         Intent intent = new Intent();
         intent.putParcelableArrayListExtra(PickerConfig.EXTRA_RESULT, selects);
         intent.putExtra(PickerConfig.IS_ORIGIN,true);
-        setResult(PickerConfig.RESULT_CODE, intent);
+        setResult(RESULT_OK, intent);
         finish();
     }
 

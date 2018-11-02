@@ -15,7 +15,7 @@ import java.util.List;
  * 组织成员
  */
 @Entity
-public class Member implements Comparable<Member>, Cloneable {
+public class Member implements Comparable<Member>, Cloneable{
 
 
     @Id

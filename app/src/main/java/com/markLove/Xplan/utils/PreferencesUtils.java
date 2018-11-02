@@ -16,7 +16,8 @@ import java.io.ObjectOutputStream;
 public class PreferencesUtils {
 
     public static final String KEY_USER = "key_user";
-
+    public static final String KEY_MEMBER = "key_merber";
+    public static final String KEY_USER_TOKEN = "key_user_token";
 
     private static SharedPreferences getSharedPreferences(Context context) {
         return context.getSharedPreferences("config", Context.MODE_PRIVATE);

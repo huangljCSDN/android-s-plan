@@ -3,19 +3,14 @@ package com.markLove.Xplan.ui.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
 import android.widget.LinearLayout;
 
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.BaseJsInterface;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseActivity;
-import com.markLove.Xplan.bean.GoNativeBean;
 import com.markLove.Xplan.ui.widget.MyWebView;
-import com.markLove.Xplan.utils.GsonUtils;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.StatusBarUtil;
 

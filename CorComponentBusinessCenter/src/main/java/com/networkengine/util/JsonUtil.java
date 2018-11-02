@@ -62,5 +62,18 @@ public class JsonUtil {
         return je == null ? null : je.getAsJsonObject().get(key).getAsString();
     }
 
+    public static int getInt(String json, String key) {
+        try {
+            JsonElement je = new JsonParser().parse(json);
+            if (je != null && je.getAsJsonObject() != null && je.getAsJsonObject().get(key) != null) {
+                return je.getAsJsonObject().get(key).getAsInt();
+            } else {
+                return 0;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+       return 0;
+    }
 }
 

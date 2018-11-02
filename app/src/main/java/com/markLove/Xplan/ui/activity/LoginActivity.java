@@ -18,7 +18,6 @@ import com.markLove.Xplan.config.Constants;
 import com.markLove.Xplan.ui.widget.MyWebView;
 import com.markLove.Xplan.utils.GsonUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
-import com.markLove.Xplan.utils.ToastUtils;
 
 public class LoginActivity extends BaseContractActivity {
     private MyWebView mWebView;
@@ -78,9 +77,7 @@ public class LoginActivity extends BaseContractActivity {
     }
 
     // 继承自Object类
-    public class JSInterface extends Object {
-
-        // 被JS调用的方法必须加入@JavascriptInterface注解
+    public class JSInterface{
 
         /**
          * 获取用户信息
@@ -89,7 +86,7 @@ public class LoginActivity extends BaseContractActivity {
          */
         @JavascriptInterface
         public void toHomePage(String userInfo) {
-            ToastUtils.showLong(LoginActivity.this, "toHomePage");
+//            ToastUtils.showLong(LoginActivity.this, "toHomePage");
             LogUtil.i("userInfo= "+userInfo);
             PreferencesUtils.putString(LoginActivity.this,PreferencesUtils.KEY_USER,userInfo);
             UserBean userBean = GsonUtils.json2Bean(userInfo,UserBean.class);
@@ -101,7 +98,6 @@ public class LoginActivity extends BaseContractActivity {
             finish();
         }
     }
-
 
     @Override
     public void onBackPressed() {

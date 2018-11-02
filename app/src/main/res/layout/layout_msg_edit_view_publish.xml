@@ -130,7 +130,7 @@
             android:layout_below="@id/tv_record_time"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="1dp"
-            android:text="@string/pressed_say"
+            android:text="@string/click_recording"
             android:textColor="@color/black"
             android:textSize="14sp" />
 

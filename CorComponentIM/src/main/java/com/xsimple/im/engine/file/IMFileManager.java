@@ -11,6 +11,7 @@ import com.networkengine.networkutil.interfaces.SingNetFileTransferListener;
 import com.networkengine.networkutil.process.NetFileTransferControl;
 import com.networkengine.networkutil.process.SingDownNetWorkTask;
 import com.networkengine.networkutil.process.SingUploadNetWorkTask;
+import com.networkengine.util.LogUtil;
 import com.xsimple.im.db.DbManager;
 import com.xsimple.im.db.datatable.IMFileInfo;
 import com.xsimple.im.db.datatable.IMMessage;
@@ -308,29 +309,12 @@ public class IMFileManager {
             File file = new File(mFileSubPackage.getLocalPath());
             MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
 
-            builder.addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("application/octet-stream"), file));
-//            builder.addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("multipart/form-data"), file));
+//            builder.addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("application/octet-stream"), file));
+            builder.addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("multipart/form-data"), file));
 //            builder.addFormDataPart("senderId", parameter.get("senderId"));
 //            builder.addFormDataPart("receiverId", parameter.get("receiverId"));
             return builder.build();
 
-        }
-
-        @Override
-        public MultipartBody setRequestBody2() {
-            if (mFileSubPackage == null)
-                return null;
-            Map<String, String> parameter = mFileSubPackage.getParameter();
-            if (parameter == null) {
-                return null;
-            }
-            File file = new File(mFileSubPackage.getLocalPath());
-            MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
-            builder.addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("multipart/form-data"), file));
-//            builder.addFormDataPart("senderId", parameter.get("senderId"));
-//            builder.addFormDataPart("receiverId", parameter.get("receiverId"));
-            MultipartBody multipartBody = builder.build();
-            return multipartBody;
         }
 
         @Override
@@ -365,6 +349,7 @@ public class IMFileManager {
             if (mDoInitSubPackage.getIMMessageId() != -1) {
                 subPackage.setType(String.valueOf(mDoInitSubPackage.getIMMessageId()));
             }
+            LogUtil.i("FileSubPackage="+subPackage.toString());
             return subPackage;
         }
 

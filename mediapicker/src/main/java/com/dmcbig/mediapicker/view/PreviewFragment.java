@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.dmcbig.mediapicker.PreviewActivity;
 import com.dmcbig.mediapicker.R;
 import com.dmcbig.mediapicker.entity.Media;
 
@@ -64,8 +62,8 @@ public class PreviewFragment extends Fragment {
         mPhotoView.setOnPhotoTapListener(new PhotoViewAttacher.OnPhotoTapListener() {
             @Override
             public void onPhotoTap(View view, float x, float y) {
-                PreviewActivity previewActivity=  (PreviewActivity)getActivity();
-                previewActivity.setBarStatus();
+//                PreviewActivity previewActivity=  (PreviewActivity)getActivity();
+//                previewActivity.setBarStatus();
             }
         });
         setPlayView(media);

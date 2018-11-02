@@ -13,6 +13,8 @@ import com.networkengine.httpApi.intercept.H5Interceptor;
 import com.networkengine.httpApi.intercept.MchlInterceptor;
 import com.networkengine.httpApi.ssl.SSLHelper;
 import com.networkengine.httpApi.ssl.SafeHostnameVerifier;
+import com.networkengine.retrofit2.converter.scalars.ScalarsConverterFactory;
+import com.networkengine.util.LogUtil;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -140,7 +142,7 @@ public final class Api {
                 .baseUrl(engineParameter.imServiceBaseUrl);
 
         // retrofitBuilder.addConverterFactory(SignConverterFactory.create(ct));
-//        retrofitBuilder.addConverterFactory(ScalarsConverterFactory.create());
+        retrofitBuilder.addConverterFactory(ScalarsConverterFactory.create());
         retrofitBuilder.addCallAdapterFactory(RxJava2CallAdapterFactory.create());
         if (TextUtils.isEmpty(EncryptCenter.getType())) {
             retrofitBuilder.addConverterFactory(GsonConverterFactory.create());
@@ -203,7 +205,7 @@ public final class Api {
         Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
                 .baseUrl(engineParameter.imServiceBaseUrl);
 
-//        retrofitBuilder.addConverterFactory(ScalarsConverterFactory.create());
+        retrofitBuilder.addConverterFactory(ScalarsConverterFactory.create());
         retrofitBuilder.addConverterFactory(GsonConverterFactory.create());
 //        retrofitBuilder.addConverterFactory(MoshiConverterFactory.create());
 
@@ -455,7 +457,7 @@ public final class Api {
                         , !TextUtils.isEmpty(member.getUserToken()) ? member.getUserToken() : "");
                 requestBuilder.method(request.method(), request.body());
                 request = requestBuilder.build();
-
+                LogUtil.i("requestHead="+requestBuilder.toString());
                 return chain.proceed(request);
             }
         };

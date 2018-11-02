@@ -464,7 +464,8 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
         String fileName = filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length());
         final Message imgMsg = Message.createImageMessage(Message.Type.CHAT, 0, 0, fileName, filePath);
         imgMsg.setStatus(Message.ChatStatus.SENDING);
-
+        isOrigin = true;
+        LogUtils.i("huang","filePath="+filePath);
         if (isOrigin) {
             Media media = new Media(filePath, "", 0, 1, 999, 9999, "");
             mediaList.add(media);

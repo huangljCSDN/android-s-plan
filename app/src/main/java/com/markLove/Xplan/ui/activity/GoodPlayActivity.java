@@ -43,6 +43,7 @@ public class GoodPlayActivity extends BaseActivity {
         public JSInterface(Activity mActivity) {
             super(mActivity);
         }
+
         @JavascriptInterface
         public void toChatRoom(String json) {
             LogUtils.i("huang", "toChatRoom=" + json);
