@@ -45,6 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_marginRight="8dp"
+            android:background="@drawable/chat_bg_shop_right"
             android:layout_toLeftOf="@id/rl_chat_head_img">
 
             <RelativeLayout
@@ -53,7 +54,6 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_toStartOf="@+id/chat_head_img"
-                android:background="@drawable/chat_bg_shop_right"
                 android:gravity="center_vertical"
                 android:paddingRight="12dp"
                 android:paddingLeft="12dp"

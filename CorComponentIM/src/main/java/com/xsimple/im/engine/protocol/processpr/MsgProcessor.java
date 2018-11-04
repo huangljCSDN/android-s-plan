@@ -12,6 +12,7 @@ import com.networkengine.entity.LocalInfo;
 import com.networkengine.entity.ReplyInfo;
 import com.networkengine.networkutil.util.StringUtil;
 import com.networkengine.util.AtUtil;
+import com.networkengine.util.LogUtil;
 import com.xsimple.im.db.DbManager;
 import com.xsimple.im.db.datatable.IMCallInfo;
 import com.xsimple.im.db.datatable.IMChatRecordInfo;
@@ -52,6 +53,7 @@ public class MsgProcessor extends Processor<MsgEntity, IMMessage> {
         }
         IMMessage imMessage = transform(msgEntity);
         if (imMessage != null){
+            LogUtil.i("imMessage="+imMessage.toString());
             mDbManager.addOrUpdateMsgToChat(mUid, imMessage, msgEntity.getMsgContent().getSenderName());
         }
 
@@ -77,7 +79,7 @@ public class MsgProcessor extends Processor<MsgEntity, IMMessage> {
 
             imMsgs.add(transform(msgEntity));
         }
-
+        LogUtil.i("imMsgs="+imMsgs.toString());
         mDbManager.addOrUpdateMsgToChat(mUid, imMsgs);
 
         return imMsgs;
@@ -91,6 +93,8 @@ public class MsgProcessor extends Processor<MsgEntity, IMMessage> {
             return IMMessage.TYPE_GROUP;
         } else if (IMMessage.STRING_TYPE_DISCUSS.equals(msgStringType)) {
             return IMMessage.TYPE_DISCUSS;
+        } else if (IMMessage.STRING_TYPE_CHATROOM.equals(msgStringType)) {
+            return IMMessage.TYPE_GROUP;
         }
         return IMMessage.TYPE_CHAT;
     }
@@ -153,13 +157,10 @@ public class MsgProcessor extends Processor<MsgEntity, IMMessage> {
                 if (msgEntity.getParam().getSenderId().equals(mUid) && !TextUtils.isEmpty(fileInfo.getSha())) {
                     imFileInfo.setStatus(IMMessage.STATUS_SUCCESS);
                 }
-
-
                 //设置文件消息
                 Long insert = mDbManager.insertIMFileInfo(imFileInfo);
-
                 imMessage.setFId(insert);
-
+                imMessage.setIMFileInfo(imFileInfo);
             }
         } else if (IMMessage.CONTENT_TYPE_MAP.equals(contentType)) {
             if (localInfo != null) {

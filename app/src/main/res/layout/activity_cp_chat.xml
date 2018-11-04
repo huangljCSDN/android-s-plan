@@ -11,8 +11,8 @@
     <RelativeLayout
         android:id="@+id/rl_title_bar"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:layout_marginTop="25dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="20dp"
         android:gravity="center_vertical">
 
         <FrameLayout
@@ -45,10 +45,10 @@
             android:textSize="12sp"
             android:textColor="@color/white"
             android:text="@string/care"
+            android:visibility="gone"
             android:background="@drawable/bg_care"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
-            android:visibility="gone"
             android:gravity="center"/>
     </RelativeLayout>
 
@@ -76,7 +76,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:background="@color/white"
+        android:background="@color/white_30"
         android:gravity="center_vertical">
 
         <TextView

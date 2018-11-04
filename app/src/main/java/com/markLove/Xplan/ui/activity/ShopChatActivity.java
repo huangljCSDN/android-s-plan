@@ -31,9 +31,12 @@ import com.cjt2325.cameralibrary.util.FileUtil;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
 import com.markLove.Xplan.R;
+import com.markLove.Xplan.base.App;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.ChatUser;
+import com.markLove.Xplan.bean.GoNativeBean;
 import com.markLove.Xplan.bean.MerchantInfoBean;
+import com.markLove.Xplan.bean.UserBean;
 import com.markLove.Xplan.bean.msg.Message;
 import com.markLove.Xplan.bean.msg.body.FileMessageBody;
 import com.markLove.Xplan.bean.msg.body.TxtMessageBody;
@@ -63,6 +66,8 @@ import com.markLove.Xplan.utils.ToastUtils;
 import com.networkengine.controller.callback.ErrorResult;
 import com.networkengine.controller.callback.RouterCallback;
 import com.networkengine.controller.callback.XCacheCallback;
+import com.networkengine.database.table.Member;
+import com.networkengine.engine.LogicEngine;
 import com.networkengine.entity.IMSendResult;
 import com.networkengine.entity.MemEntity;
 import com.networkengine.entity.RequestGetMembersParam;
@@ -71,6 +76,7 @@ import com.xsimple.im.control.MessagerLoader;
 import com.xsimple.im.control.iable.IIMChatLogic;
 import com.xsimple.im.control.listener.IMChatCallBack;
 import com.xsimple.im.db.datatable.IMChat;
+import com.xsimple.im.db.datatable.IMFileInfo;
 import com.xsimple.im.db.datatable.IMGroupRemark;
 import com.xsimple.im.db.datatable.IMMessage;
 import com.xsimple.im.engine.IMEngine;
@@ -115,6 +121,8 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
     //    AutoCameraUtils autoCameraUtils;
     int me_user_id;
     int to_user_id;
+    String chatId; //聊天室id
+    int dataId; //商户id
     boolean isEnd = false;
     boolean isLikeAndUser = false;
     boolean isBlackUser = false;
@@ -212,8 +220,8 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 
     private void startMerchantMemberActivity() {
         Intent intent = new Intent(ShopChatActivity.this, MerchantMemberActivity.class);
-        intent.putExtra("chatId", to_user_id);
-        startActivity(intent);
+        intent.putExtra("dataId", dataId);
+        startActivityForResult(intent,Constants.REQUEST_CODE_CHAT_MEMBER);
     }
 
     protected void initData() {
@@ -237,7 +245,8 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 //            nickName = bundle.getString("nick_name");
 //            headImgUrl = bundle.getString("head_img_url");
 //        }
-        to_user_id = getIntent().getIntExtra("chatId", 0);
+        to_user_id = intent.getIntExtra("chatId", 0);
+        dataId = intent.getIntExtra("dataId", 0);
         me_user_id = PreferencesUtils.getInt(this, Constants.ME_USER_ID);
         LogUtils.i("me_user_id=" + me_user_id + " to_user_id=" + to_user_id);
 //        tvChatUser.setText(nickName);
@@ -622,6 +631,12 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
                     onImageReturn(null, media.path, isOrigin);
                 }
             }
+            if (requestCode == Constants.REQUEST_CODE_CHAT_MEMBER) {
+                GoNativeBean goNativeBean = (GoNativeBean) data.getSerializableExtra("goNativeBean");
+                if (goNativeBean.getCloseView() ==2){
+                    finish();
+                }
+            }
             if (resultCode == 102) {
                 Log.i("CJT", "video");
                 String path = data.getStringExtra("path");
@@ -840,14 +855,14 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 
     private void getMerchantInfo() {
         Map<String, String> map = new HashMap<>();
-        map.put("merchantId", String.valueOf(to_user_id));
+        map.put("merchantId", String.valueOf(dataId));
 //        map.put("merchantId", String.valueOf(22554));
         mPresenter.getMerchantInfo(map);
     }
 
     private void getUsersByGroup() {
         Map<String, String> map = new HashMap<>();
-        map.put("merchantId", String.valueOf(to_user_id));
+        map.put("merchantId", String.valueOf(dataId));
         map.put("page", "1");
         map.put("rows", "10");
         mPresenter.getUsersByGroup(map);
@@ -867,6 +882,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
         initIm(merchantInfoBean);
     }
 
+    //--------------------------新im---------------------------//
     /**
      * 聊天控制器
      */
@@ -921,14 +937,16 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 
     private void initIm(MerchantInfoBean merchantInfoBean){
         EventBus.getDefault().register(this);
-
+        initMember();
+//        chatId = String.valueOf(getIntent().getIntExtra("chatId", 1));
+        chatId = "1";
         mImEngine = IMEngine.getInstance(this);
         //聊天对象
 //        IMGroup group = mIMEngine.getIMGroup(id);
 //        IMChatActivity.startMe(getContext(), new MemEntity(group.getId(), group.getName(), group.getType()), null, null);
 
 //        final MemEntity memEntity = (MemEntity) getIntent().getSerializableExtra(EXTRA_TARGET);
-        final MemEntity memEntity = new MemEntity(1+"",merchantInfoBean.getGroupName(),1);
+        final MemEntity memEntity = new MemEntity(chatId,merchantInfoBean.getGroupName(),1);
         mImChatControl = new IMChatLogic.Build() {
             @Override
             public MemEntity setTargetMem() {
@@ -997,10 +1015,24 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
         mMessagerLoader.getFirstLoadMessager();
         this.mMessagesList = mMessagerLoader.getShowMessage();
         //刷新布局
+        chatMessageAdapter.setImChatControl(mImChatControl);
         chatMessageAdapter.setImData(mMessagesList);
         chatMessageAdapter.notifyDataSetChanged();
         chatView.initEvent(mImChatControl,mImEngine,mMessagerLoader);
         joinChatRoom();
+    }
+
+    private void initMember(){
+        if (LogicEngine.getInstance().getUser() == null){
+            String userToken = PreferencesUtils.getString(this,PreferencesUtils.KEY_USER_TOKEN);
+            UserBean userBean = App.getInstance().getUserBean();
+            Member member = new Member();
+            member.setId(String.valueOf(userBean.getUserInfo().getUserId()));
+            member.setUserId(String.valueOf(userBean.getUserInfo().getUserId()));
+            member.setUserName(userBean.getUserInfo().getNickName());
+            member.setUserToken(userToken);
+            LogicEngine.getInstance().setUser(member);
+        }
     }
 
     /**
@@ -1008,7 +1040,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
      *
      */
     private void joinChatRoom(){
-        RequestGetMembersParam requestGetMembersParam = new RequestGetMembersParam(1+"");
+        RequestGetMembersParam requestGetMembersParam = new RequestGetMembersParam(chatId);
         mImEngine.getIMController().joinChatRoom(requestGetMembersParam, new XCacheCallback<IMSendResult>() {
             @Override
             public void onLoaderCache(IMSendResult imSendResult) {
@@ -1018,7 +1050,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
             @Override
             public void onSuccess(IMSendResult result) {
                 LogUtils.i("ShopChatTestActivity","加入聊天室成功");
-                mImEngine.subscribeToTopic(1+"");
+                mImEngine.subscribeToTopic(chatId);
             }
 
             @Override
@@ -1032,7 +1064,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
      * 退出聊天室，并取消订阅聊天室消息
      */
     private void exitChatRoom(){
-        RequestGetMembersParam requestGetMembersParam = new RequestGetMembersParam(1+"");
+        RequestGetMembersParam requestGetMembersParam = new RequestGetMembersParam(chatId);
         mImEngine.getIMController().ownQuitChatRoom(requestGetMembersParam, new XCacheCallback<IMSendResult>() {
             @Override
             public void onLoaderCache(IMSendResult imSendResult) {

@@ -38,27 +38,10 @@ public class WebViewActivity extends BaseActivity {
         mWebView.loadUrl("file:///android_asset/"+url);
     }
 
-    // 继承自Object类
     public class JSInterface extends BaseJsInterface {
 
         public JSInterface(Activity mActivity) {
             super(mActivity);
-        }
-
-        // 被JS调用的方法必须加入@JavascriptInterface注解
-        @JavascriptInterface
-        public void goNative(String json) {
-            //{"chatType":1,"chatId":1}
-            LogUtils.i("huang", "goNative=" + json);
-            GoNativeBean goNativeBean = GsonUtils.json2Bean(json,GoNativeBean.class);
-            if (goNativeBean == null || goNativeBean.getCallFun().isEmpty()){
-                finish();
-            } else {
-                Intent intent = new Intent();
-                intent.putExtra("goNativeBean",goNativeBean);
-                setResult(RESULT_OK,intent);
-                finish();
-            }
         }
 
         @JavascriptInterface
@@ -71,14 +54,14 @@ public class WebViewActivity extends BaseActivity {
 
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        if (mWebView.canGoBack()){
-//            mWebView.goBack();
-//        } else {
-//            super.onBackPressed();
-//        }
-//    }
+    @Override
+    public void onBackPressed() {
+        if (mWebView.canGoBack()){
+            mWebView.goBack();
+        } else {
+            super.onBackPressed();
+        }
+    }
 
     @Override
     public void onDestroy() {

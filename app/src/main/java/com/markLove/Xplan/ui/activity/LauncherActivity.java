@@ -41,12 +41,10 @@ public class LauncherActivity extends BaseActivity implements View.OnClickListen
             case R.id.btn_login:
                 Intent intent = new Intent(this, LoginActivity.class);
                 startActivity(intent);
-                finish();
                 break;
             case R.id.btn_register:
                 Intent intent2 = new Intent(this, RegisterActivity.class);
                 startActivity(intent2);
-                finish();
                 break;
         }
     }

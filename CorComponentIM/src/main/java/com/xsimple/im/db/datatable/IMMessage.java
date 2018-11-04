@@ -1,5 +1,6 @@
 package com.xsimple.im.db.datatable;
 
+import com.networkengine.entity.FileInfo;
 import com.networkengine.entity.GetMsgsEntity;
 import com.xsimple.im.db.greendao.DaoSession;
 import com.xsimple.im.db.greendao.IMCallInfoDao;
@@ -1113,6 +1114,7 @@ public class IMMessage {
                 ", receiverName='" + receiverName + '\'' +
                 ", vId='" + vId + '\'' +
                 ", cId=" + cId +
+                ", fId=" + fId +
                 ", tagertId='" + tagertId + '\'' +
                 ", sendOrReceive=" + sendOrReceive +
                 ", groupName='" + groupName + '\'' +

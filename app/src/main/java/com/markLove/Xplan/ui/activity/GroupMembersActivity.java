@@ -31,37 +31,19 @@ public class GroupMembersActivity extends BaseActivity {
         LinearLayout mll = findViewById(R.id.rootView);
         mll.addView(mWebView);
 
-        id = getIntent().getIntExtra("chatId", 0);
-        mWebView.addJavascriptInterface(new JSInterface(this), "xplanfunc");
-        mWebView.loadUrl("file:///android_asset/package/main/index.html#/bureau/member/" + id + "");
+        id = getIntent().getIntExtra("dataId", 0);
+        mWebView.addJavascriptInterface(new BaseJsInterface(this), "xplanfunc");
+        mWebView.loadUrl(BaseJsInterface.GROUP_MEMBER_INFO_URL + id);
     }
 
-    public class JSInterface extends BaseJsInterface {
-
-        public JSInterface(Activity mActivity) {
-            super(mActivity);
-        }
-
-        // 被JS调用的方法必须加入@JavascriptInterface注解
-        @JavascriptInterface
-        public void exitGroup(String json) {
-            //{"chatType":1,"chatId":1}
-            LogUtils.i("huang", "exitGroup=" + json);
-            Intent intent = new Intent();
-            setResult(RESULT_OK, intent);
-            finish();
+    @Override
+    public void onBackPressed() {
+        if (mWebView.canGoBack()){
+            mWebView.goBack();
+        } else {
+            super.onBackPressed();
         }
     }
-
-
-//    @Override
-//    public void onBackPressed() {
-//        if (mWebView.canGoBack()){
-//            mWebView.goBack();
-//        } else {
-//            super.onBackPressed();
-//        }
-//    }
 
     @Override
     public void onDestroy() {

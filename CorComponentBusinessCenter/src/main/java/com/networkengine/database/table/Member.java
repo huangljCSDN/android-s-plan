@@ -494,6 +494,7 @@ public class Member implements Comparable<Member>, Cloneable{
                 ", userId='" + userId + '\'' +
                 ", userName='" + userName + '\'' +
                 ", userType='" + userType + '\'' +
+                ", userToken='" + userToken + '\'' +
                 ", userSystem='" + userSystem + '\'' +
                 ", imageAddress='" + imageAddress + '\'' +
                 ", companyName='" + companyName + '\'' +

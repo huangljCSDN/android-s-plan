@@ -99,7 +99,7 @@ public class App extends Application {
         IMEngine.getInstance(this).getLogicEngine().getMchlClient().logout(new RequestLogoutParam());
         Intent intent = new Intent(lastActivity, LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         lastActivity.finish();
     }

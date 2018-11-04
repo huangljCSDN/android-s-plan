@@ -36,6 +36,7 @@ import com.markLove.Xplan.base.App;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.BaseBean;
 import com.markLove.Xplan.bean.ChatUser;
+import com.markLove.Xplan.bean.GoNativeBean;
 import com.markLove.Xplan.bean.GroupDetailBean;
 import com.markLove.Xplan.bean.UserBean;
 import com.markLove.Xplan.bean.msg.Message;
@@ -104,7 +105,7 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * 组局聊天室
  */
-public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implements View.OnClickListener, ChatView,GroupChatContract.View,IMChatCallBack  {
+public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implements View.OnClickListener, ChatView, GroupChatContract.View, IMChatCallBack {
     private ArrayList<Media> select;
     private FrameLayout mFlMore;
     private RecyclerView rlChatMsgList;
@@ -113,7 +114,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     private RelativeLayout mRlRemove;
     private com.markLove.Xplan.ui.widget.ChatView chatView;
 
-    private TextView mTvJoinCount, mTvPlace, mTvTime, mTvRemark,mTvGroupName;
+    private TextView mTvJoinCount, mTvPlace, mTvTime, mTvRemark, mTvGroupName;
     private Button mBtnJoin;
     private TextView mTvInvitation; //邀请好友
     private ImageView mIvGroupHead;
@@ -127,7 +128,8 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     //    AutoCameraUtils autoCameraUtils;
     int me_user_id;
     int to_user_id;
-    int groupId; //组局id
+    int dataId; //组局id
+    String chatId; //聊天室id
     boolean isEnd = false;
     boolean isLikeAndUser = false;
     boolean isBlackUser = false;
@@ -147,7 +149,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     @Override
     protected void init(Bundle savedInstanceState) {
 //        StatusBarUtil.setStatusBarColor(this,R.color.colorPrimary);
-        StatusBarUtil.setStatusBarColor(this,R.color.color_190827);
+        StatusBarUtil.setStatusBarColor(this, R.color.color_190827);
         rlChatMsgList = findViewById(R.id.chat_msg_list);
         mFlMore = findViewById(R.id.fl_more);
         mRlTitleBar = findViewById(R.id.rl_title_bar);
@@ -179,11 +181,13 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         initData();
     }
 
-    private void setListener(){
+    private void setListener() {
         chatView.setOnSendMessageListener(new com.markLove.Xplan.ui.widget.ChatView.OnSendMessageListener() {
             @Override
             public void onSendMessage(Message message) {
-                judeBlackList(message);
+//                judeBlackList(message);
+                FileMessageBody fileMessageBody = (FileMessageBody) message.getBody();
+                sendVoice(fileMessageBody.getFilePath());
             }
         });
 
@@ -221,9 +225,9 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
                 showRemoveDialog();
                 break;
             case R.id.btn_enter:
-                if (groupBean != null){
-                    if (groupBean.getCurrentNum() == groupBean.getMaxNum()){
-                        ToastUtils.showLong(this,"该组局已满员");
+                if (groupBean != null) {
+                    if (groupBean.getCurrentNum() == groupBean.getMaxNum()) {
+                        ToastUtils.showLong(this, "该组局已满员");
                     } else {
                         applyGroup(groupBean.getId());
                     }
@@ -242,18 +246,18 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         }
     }
 
-    private void startGroupMembersActivity(){
-        Intent intent = new Intent(GroupChatActivity.this,GroupMembersActivity.class);
-        intent.putExtra("chatId",to_user_id);
-        startActivityForResult(intent,Constants.REQUEST_CODE_CHAT_MEMBER);
+    private void startGroupMembersActivity() {
+        Intent intent = new Intent(GroupChatActivity.this, GroupMembersActivity.class);
+        intent.putExtra("dataId", dataId);
+        startActivityForResult(intent, Constants.REQUEST_CODE_CHAT_MEMBER);
     }
 
     /**
      * 邀请好友
      */
-    private void startInvitingFriendsActivity(){
-        Intent intent = new Intent(GroupChatActivity.this,InvitingFriendsActivity.class);
-        intent.putExtra("chatId",to_user_id);
+    private void startInvitingFriendsActivity() {
+        Intent intent = new Intent(GroupChatActivity.this, InvitingFriendsActivity.class);
+        intent.putExtra("dataId", dataId);
         startActivity(intent);
     }
 
@@ -268,8 +272,8 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 ////            nickName = bundle.getString("nick_name");
 //            headImgUrl = bundle.getString("head_img_url");
 //        }
-        to_user_id = intent.getIntExtra("chatId",0);
-        groupId = intent.getIntExtra("dataId",0);
+        to_user_id = intent.getIntExtra("chatId", 0);
+        dataId = intent.getIntExtra("dataId", 0);
         me_user_id = PreferencesUtils.getInt(this, Constants.ME_USER_ID);
         LogUtils.d("me_user_id=" + me_user_id);
 //        tvChatUser.setText(nickName);
@@ -289,49 +293,52 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 
         chatPresenter = new ChatPresenterImpl();
         chatPresenter.setView(this);
-        chatView.setId(me_user_id,to_user_id);
+        chatView.setId(me_user_id, to_user_id);
 //        tvChatSendPrice.setText(gold + "");
 //        chatPresenter.getHistory(me_user_id, to_user_id);
 //        getGiftList();
         getChatOpen();
-        getGroupDetailData(to_user_id);
+        getGroupDetailData(dataId);
     }
 
     /**
      * 进入组局
-     * @param groupId
+     *
+     * @param dataId
      */
-    private void joinGroup(int groupId) {
+    private void joinGroup(int dataId) {
         Map<String, String> map = new HashMap<>();
-        map.put("groupId", String.valueOf(groupId));
+        map.put("groupId", String.valueOf(dataId));
         mPresenter.joinGroup(map);
     }
 
     /**
      * 报名参加组局
-     * @param groupId
+     *
+     * @param dataId
      */
-    private void applyGroup(int groupId) {
+    private void applyGroup(int dataId) {
         Map<String, String> map = new HashMap<>();
-        map.put("groupId", String.valueOf(groupId));
+        map.put("groupId", String.valueOf(dataId));
         mPresenter.applyGroup(map);
     }
 
     /**
      * 同意报名
+     *
      * @param targetUserId
-     * @param groupId
+     * @param dataId
      */
-    private void participateGroup(long targetUserId,int groupId) {
+    private void participateGroup(long targetUserId, int dataId) {
         Map<String, String> map = new HashMap<>();
         map.put("targetUserId", String.valueOf(targetUserId));
-        map.put("groupId", String.valueOf(groupId));
+        map.put("groupId", String.valueOf(dataId));
         mPresenter.participateGroup(map);
     }
 
-    private void getGroupDetailData(int groupId) {
+    private void getGroupDetailData(int dataId) {
         Map<String, String> map = new HashMap<>();
-        map.put("groupId", String.valueOf(groupId));
+        map.put("groupId", String.valueOf(dataId));
 //        map.put("page", String.valueOf(1));
 //        map.put("rows", String.valueOf(10));
         mPresenter.groupDetails(map);
@@ -429,7 +436,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
      */
     @Override
     public void addOneMessage(final Message msg) {
-        LogUtils.i("huang","msg"+msg.toString());
+        LogUtils.i("huang", "msg" + msg.toString());
         if ((msg.getToID() == me_user_id && msg.getFromID() == to_user_id)
                 || (msg.getToID() == to_user_id && msg.getFromID() == me_user_id)) {
             runOnUiThread(new Runnable() {
@@ -446,14 +453,14 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     //{packetLength=0, fromID=0, toID=0, msgID='frlT9vdj', type=CHAT, chatType=TXT, status=SENDING, packetOrder=0, packetCount=0,
     // body={"msg":"11","chatType":"TXT","dateTime":"2018/10/17 22:18:15","type":"CHAT","userName":""}, msgTime=0}
 
-    private Message getTestData(){
+    private Message getTestData() {
         TxtMessageBody txtMessageBody = new TxtMessageBody(Message.Type.CHAT, Message.ChatType.REQUEST_JOIN, "hahahha");
         Message txtMessage = new Message(0, 0, ChatUtils.generateShortUuid(), Message.Type.CHAT, Message.ChatType.REQUEST_JOIN, txtMessageBody);
         txtMessage.setStatus(Message.ChatStatus.SENDING);
 
         addOneMessage(txtMessage);
         return txtMessage;
-   }
+    }
 
     @Override
     public void updataMessage(final String msgID, final int errorCode) {
@@ -546,7 +553,8 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         imgMsg.setStatus(Message.ChatStatus.SENDING);
         isOrigin = true;
         if (isOrigin) {
-            judeBlackList(imgMsg);
+            sendImage(filePath);
+//            judeBlackList(imgMsg);
         } else {
             Observable.create(new ObservableOnSubscribe<Message>() {
                 @Override
@@ -719,16 +727,14 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
                 }
             }
 
-            if (requestCode == Constants.REQUEST_CODE_CHAT_MEMBER){
-                if (me_user_id == groupBean.getCreateBy()){
+            if (requestCode == Constants.REQUEST_CODE_CHAT_MEMBER) {
+                GoNativeBean goNativeBean = (GoNativeBean) data.getSerializableExtra("goNativeBean");
+                if (me_user_id == groupBean.getCreateBy() && goNativeBean.getCloseView() == 2) {
                     Intent intent = new Intent();
                     setResult(RESULT_OK, intent);
                     finish();
-                } else {
-                    getGroupDetailData(to_user_id);
-//                    mBtnJoin.setText(getString(R.string.enter));
-//                    mBtnJoin.setTextColor(getColor(R.color.white));
-//                    mBtnJoin.setClickable(true);
+                } else if (goNativeBean.getCloseView() == 2) {
+                    finish();
                 }
             }
             if (resultCode == 102) {
@@ -799,9 +805,9 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         }
     }
 
-    private void startCameraActivity2(){
+    private void startCameraActivity2() {
         Intent intent = new Intent(this, CameraActivity.class);
-        intent.putExtra("type",JCameraView.BUTTON_STATE_ONLY_CAPTURE);
+        intent.putExtra("type", JCameraView.BUTTON_STATE_ONLY_CAPTURE);
         startActivityForResult(intent, Constants.REQUEST_CODE_CAMERA);
     }
 
@@ -825,7 +831,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         });
     }
 
-    private void showExitTipDialog(){
+    private void showExitTipDialog() {
         ExitRoomDialog exitRoomDialog = new ExitRoomDialog(this);
         exitRoomDialog.setTipContent(getString(R.string.exit_group_chat_room));
         exitRoomDialog.setOnDialogCallBack(new ExitRoomDialog.OnDialogCallBack() {
@@ -955,71 +961,71 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 
         mTvPlace.setText(groupBean.getAddress());
         mTvGroupName.setText(groupBean.getTitle());
-        mTvJoinCount.setText(groupBean.getCurrentNum()+ "/"+groupBean.getMaxNum());
+        mTvJoinCount.setText(groupBean.getCurrentNum() + "/" + groupBean.getMaxNum());
         mTvTime.setText(DataUtils.getDateTime2(groupBean.getStartTime()));
-        String payType= "";
-        if (groupBean.getPaymentType() == 1){
+        String payType = "";
+        if (groupBean.getPaymentType() == 1) {
             payType = "AA制";
-        } else if (groupBean.getPaymentType() == 2){
+        } else if (groupBean.getPaymentType() == 2) {
             payType = "你买单";
         } else {
             payType = "我买单";
         }
         String reachType = "";
-        if (groupBean.getReachType() == 1){
+        if (groupBean.getReachType() == 1) {
             reachType = "各自抵达";
-        } else if (groupBean.getReachType() == 2){
+        } else if (groupBean.getReachType() == 2) {
             reachType = "需要接送";
         } else {
             reachType = "负责接送";
         }
-        String sex ="";
-        if (groupBean.getSex() == 0){
+        String sex = "";
+        if (groupBean.getSex() == 0) {
             sex = "不限";
-        } else if (groupBean.getSex() == 1){
+        } else if (groupBean.getSex() == 1) {
             sex = "仅限男生";
         } else {
             sex = "仅限女生";
         }
-        mTvRemark.setText(sex+"、"+payType+"、"+reachType);
+        mTvRemark.setText(sex + "、" + payType + "、" + reachType);
         //未开始
-        if (groupBean.getStatus() == 0){
+        if (groupBean.getStatus() == 0) {
             //组局创建人
-            if (me_user_id == groupBean.getId()){
+            if (me_user_id == groupBean.getId()) {
                 mTvInvitation.setVisibility(View.VISIBLE);
                 mBtnJoin.setVisibility(View.GONE);
             } else {
                 mBtnJoin.setVisibility(View.VISIBLE);
                 mTvInvitation.setVisibility(View.GONE);
 //                //已报名
-                if (groupBean.getUserStatus() == 1){
+                if (groupBean.getUserStatus() == 1) {
                     mBtnJoin.setText(getString(R.string.joined));
                     mBtnJoin.setTextColor(getColor(R.color.color_333333));
                     mBtnJoin.setBackgroundResource(R.drawable.bg_joined);
                     mBtnJoin.setClickable(false);
                     //报名成功
-                } else if (groupBean.getUserStatus() == 2){
+                } else if (groupBean.getUserStatus() == 2) {
                     mBtnJoin.setText(getString(R.string.joined_success));
                     mBtnJoin.setTextColor(getColor(R.color.white));
                     mBtnJoin.setBackgroundResource(R.drawable.bg_enter);
                     mBtnJoin.setClickable(false);
                     //自己退出组局
-                } else if (groupBean.getUserStatus() == 3){
+                } else if (groupBean.getUserStatus() == 3) {
                     mBtnJoin.setText(getString(R.string.enter));
                     mBtnJoin.setTextColor(getColor(R.color.white));
                     mBtnJoin.setBackgroundResource(R.drawable.bg_enter);
                     mBtnJoin.setClickable(false);
-                } else if (groupBean.getUserStatus() == 4){ //被踢出
+                } else if (groupBean.getUserStatus() == 4) { //被踢出
                     mBtnJoin.setText("被踢出");
                     mBtnJoin.setClickable(false);
                 }
             }
             //进行中
-        } else if (groupBean.getStatus() == 1){
+        } else if (groupBean.getStatus() == 1) {
             mBtnJoin.setText(getString(R.string.going));
             setBtnDisplayStatus();
             //已结束
-        } else if (groupBean.getStatus() == 2){
+        } else if (groupBean.getStatus() == 2) {
             mBtnJoin.setText(getString(R.string.finished));
             setBtnDisplayStatus();
             //已解散
@@ -1028,20 +1034,20 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
             setBtnDisplayStatus();
         }
         String urlHead = detailBean.getUserList().get(0).getHeadImageUrl();
-        ImageLoaderUtils.displayCircle(this,urlHead,mIvGroupHead);
+        ImageLoaderUtils.displayCircle(this, urlHead, mIvGroupHead);
 
         initIm(detailBean);
     }
 
-    private void setBtnDisplayStatus(){
+    private void setBtnDisplayStatus() {
         mBtnJoin.setTextColor(getColor(R.color.white));
         mBtnJoin.setBackgroundResource(R.drawable.bg_joined);
         mBtnJoin.setClickable(false);
     }
 
     private void addGroupPersonHead(List<GroupDetailBean.UserListBean> userList) {
-        if (userList != null && !userList.isEmpty()){
-            int size = userList.size() > 5 ? 5: userList.size();
+        if (userList != null && !userList.isEmpty()) {
+            int size = userList.size() > 5 ? 5 : userList.size();
             for (int i = 0; i < size; i++) {
                 View view = LayoutInflater.from(this).inflate(R.layout.layout_head_item, null);
                 ImageView imageHead = view.findViewById(R.id.chat_head_img);
@@ -1049,10 +1055,10 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
                         RelativeLayout.LayoutParams.WRAP_CONTENT);
                 layoutParams.leftMargin = i * DensityUtils.dip2px(this, 26);
                 view.setLayoutParams(layoutParams);
-                if (i == size-1) {
+                if (i == size - 1) {
                     Glide.with(this).load(R.drawable.ic_more_head).into(imageHead);
                 } else {
-                    ImageLoaderUtils.displayCircle(this,userList.get(i).getHeadImageUrl(),imageHead);
+                    ImageLoaderUtils.displayCircle(this, userList.get(i).getHeadImageUrl(), imageHead);
                 }
                 mRlHeads.addView(view);
             }
@@ -1061,7 +1067,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 
     @Override
     public void onParticipateGroup(BaseBean baseBean) {
-        if (baseBean.Status == 200){
+        if (baseBean.Status == 200) {
             mBtnJoin.setText(getString(R.string.joined_success));
             mBtnJoin.setTextColor(getColor(R.color.white));
             mBtnJoin.setBackgroundResource(R.drawable.bg_enter);
@@ -1071,14 +1077,13 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 
     @Override
     public void onApplyGroup(BaseBean baseBean) {
-        if (baseBean.Status == 200){
+        if (baseBean.Status == 200) {
             mBtnJoin.setText(getString(R.string.joined));
             mBtnJoin.setTextColor(getColor(R.color.color_333333));
             mBtnJoin.setBackgroundResource(R.drawable.bg_joined);
             mBtnJoin.setClickable(false);
         }
     }
-
 
 
     /**
@@ -1096,10 +1101,6 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
      */
     private IMChat mImChat;
     private List<IMMessage> mMessagesList;
-    /**
-     * 聊天室id
-     */
-    private String dataId;
 
     private static final String EXTRA_TARGET = "EXTRA_TARGET";
     private static final String EXTRA_SCROLL_TO_MESSAGE = "EXTRA_SCROLL_TO_MESSAGE";
@@ -1137,23 +1138,18 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         return intent;
     }
 
-    private void initIm(GroupDetailBean detailBean){
-        dataId =String.valueOf(getIntent().getIntExtra("dataId",1));
+    private void initIm(GroupDetailBean detailBean) {
+        chatId = String.valueOf(getIntent().getIntExtra("chatId", 1));
 
         EventBus.getDefault().register(this);
-        UserBean userBean = App.getInstance().getUserBean();
-        Member member = new Member();
-        member.setId(me_user_id+"");
-        member.setUserId(me_user_id+"");
-        member.setUserName(userBean.getUserInfo().getNickName());
-        LogicEngine.getInstance().setUser(member);
+        initMember();
         mImEngine = IMEngine.getInstance(this);
         //聊天对象
 //        IMGroup group = mIMEngine.getIMGroup(id);
 //        IMChatActivity.startMe(getContext(), new MemEntity(group.getId(), group.getName(), group.getType()), null, null);
 
 //        final MemEntity memEntity = (MemEntity) getIntent().getSerializableExtra(EXTRA_TARGET);
-        final MemEntity memEntity = new MemEntity(dataId,detailBean.getGroup().getTitle(),1);
+        final MemEntity memEntity = new MemEntity(chatId, detailBean.getGroup().getTitle(), 1);
         mImChatControl = new IMChatLogic.Build() {
             @Override
             public MemEntity setTargetMem() {
@@ -1219,18 +1215,32 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         //添加第一次加载的数据
         mMessagerLoader.getFirstLoadMessager();
         this.mMessagesList = mMessagerLoader.getShowMessage();
+        chatMessageAdapter.setImChatControl(mImChatControl);
         //刷新布局
         chatMessageAdapter.setImData(mMessagesList);
         chatMessageAdapter.notifyDataSetChanged();
-        chatView.initEvent(mImChatControl,mImEngine,mMessagerLoader);
+        chatView.initEvent(mImChatControl, mImEngine, mMessagerLoader);
         joinChatRoom();
+    }
+
+    private void initMember() {
+        if (LogicEngine.getInstance().getUser() == null) {
+            String userToken = PreferencesUtils.getString(this, PreferencesUtils.KEY_USER_TOKEN);
+            UserBean userBean = App.getInstance().getUserBean();
+            Member member = new Member();
+            member.setId(String.valueOf(userBean.getUserInfo().getUserId()));
+            member.setUserId(String.valueOf(userBean.getUserInfo().getUserId()));
+            member.setUserName(userBean.getUserInfo().getNickName());
+            member.setUserToken(userToken);
+            LogicEngine.getInstance().setUser(member);
+        }
     }
 
     /**
      * 加入聊天室，并订阅聊天室消息
      */
-    private void joinChatRoom(){
-        RequestGetMembersParam requestGetMembersParam = new RequestGetMembersParam(dataId);
+    private void joinChatRoom() {
+        RequestGetMembersParam requestGetMembersParam = new RequestGetMembersParam(chatId);
         mImEngine.getIMController().joinChatRoom(requestGetMembersParam, new XCacheCallback<IMSendResult>() {
             @Override
             public void onLoaderCache(IMSendResult imSendResult) {
@@ -1239,13 +1249,13 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 
             @Override
             public void onSuccess(IMSendResult result) {
-                LogUtils.i("ShopChatTestActivity","加入聊天室成功");
-                mImEngine.subscribeToTopic(dataId);
+                LogUtils.i("ShopChatTestActivity", "加入聊天室成功");
+                mImEngine.subscribeToTopic(chatId);
             }
 
             @Override
             public void onFail(ErrorResult error) {
-                LogUtils.i("ShopChatTestActivity","加入聊天室失败="+error.toString());
+                LogUtils.i("ShopChatTestActivity", "加入聊天室失败=" + error.toString());
             }
         });
     }
@@ -1253,8 +1263,8 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     /**
      * 退出聊天室，并取消订阅聊天室消息
      */
-    private void exitChatRoom(){
-        RequestGetMembersParam requestGetMembersParam = new RequestGetMembersParam(dataId);
+    private void exitChatRoom() {
+        RequestGetMembersParam requestGetMembersParam = new RequestGetMembersParam(chatId);
         mImEngine.getIMController().ownQuitChatRoom(requestGetMembersParam, new XCacheCallback<IMSendResult>() {
             @Override
             public void onLoaderCache(IMSendResult imSendResult) {
@@ -1263,19 +1273,19 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 
             @Override
             public void onSuccess(IMSendResult result) {
-                LogUtils.i("ShopChatTestActivity","退出聊天室成功");
-                mImEngine.unsubscribeToTopic(dataId);
+                LogUtils.i("ShopChatTestActivity", "退出聊天室成功");
+                mImEngine.unsubscribeToTopic(chatId);
             }
 
             @Override
             public void onFail(ErrorResult error) {
-                LogUtils.i("ShopChatTestActivity","退出聊天室失败");
+                LogUtils.i("ShopChatTestActivity", "退出聊天室失败");
             }
         });
     }
 
 
-    private void sendVoice(String path){
+    private void sendVoice(String path) {
         if (TextUtils.isEmpty(path) || !new File(path).exists()) {
             return;
         }
@@ -1306,6 +1316,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 
     /**
      * 发送视频
+     *
      * @param path
      */
     private void sendVideo(String path) {
@@ -1364,12 +1375,12 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 
     @Override
     public void onFileTransferSuccess(long localId) {
-        LogUtils.i("huang","onFileTransferSuccess=");
+        LogUtils.i("huang", "onFileTransferSuccess=");
     }
 
     @Override
     public void onFileTransferFailed(long localId) {
-        LogUtils.i("huang","onFileTransferFailed=");
+        LogUtils.i("huang", "onFileTransferFailed=");
     }
 
     @Override
@@ -1384,24 +1395,24 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 
     @Override
     public void onSendMessageSuccessCallBack(long localId) {
-        LogUtils.i("huang","onSendMessageSuccessCallBack=");
+        LogUtils.i("huang", "onSendMessageSuccessCallBack=");
     }
 
     @Override
     public void onSendMessageFaileCallBack(long localId) {
-        LogUtils.i("huang","onSendMessageFaileCallBack=");
+        LogUtils.i("huang", "onSendMessageFaileCallBack=");
     }
 
     @Override
     public void onAddMessagerCallBack(List<IMMessage> msgs) {
-        LogUtils.i("huang","onAddMessagerCallBack="+msgs.toString());
+        LogUtils.i("huang", "onAddMessagerCallBack=" + msgs.toString());
         onRefresfItemAddList(msgs);
     }
 
     @Override
     public void onAddMessagerCallBack(IMMessage message) {
 
-        LogUtils.i("huang","onAddMessagerCallBack2="+message.toString());
+        LogUtils.i("huang", "onAddMessagerCallBack2=" + message.toString());
         message.refresh();
         mMessagerLoader.addMessager(message);
         chatMessageAdapter.addOneImData(message);
@@ -1453,7 +1464,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         }
         mImChat.refresh();
         mImChatControl.updataUnReadCount(list);
-        addItem(list,true);
+        addItem(list, true);
     }
 
     /**

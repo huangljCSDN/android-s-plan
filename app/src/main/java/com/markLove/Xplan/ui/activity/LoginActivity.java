@@ -1,5 +1,7 @@
 package com.markLove.Xplan.ui.activity;
 
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,10 +14,12 @@ import android.widget.LinearLayout;
 
 import com.cjt2325.cameralibrary.util.LogUtil;
 import com.markLove.Xplan.R;
+import com.markLove.Xplan.base.BaseJsInterface;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.bean.UserBean;
 import com.markLove.Xplan.config.Constants;
 import com.markLove.Xplan.ui.widget.MyWebView;
+import com.markLove.Xplan.utils.AppManager;
 import com.markLove.Xplan.utils.GsonUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
 
@@ -72,31 +76,8 @@ public class LoginActivity extends BaseContractActivity {
                 return true;
             }
         });
-        mWebView.addJavascriptInterface(new JSInterface(), "xplanfunc");
+        mWebView.addJavascriptInterface(new BaseJsInterface(this), "xplanfunc");
         mWebView.loadUrl("file:///android_asset/package/main/index.html#/login/password");
-    }
-
-    // 继承自Object类
-    public class JSInterface{
-
-        /**
-         * 获取用户信息
-         *
-         * @param userInfo
-         */
-        @JavascriptInterface
-        public void toHomePage(String userInfo) {
-//            ToastUtils.showLong(LoginActivity.this, "toHomePage");
-            LogUtil.i("userInfo= "+userInfo);
-            PreferencesUtils.putString(LoginActivity.this,PreferencesUtils.KEY_USER,userInfo);
-            UserBean userBean = GsonUtils.json2Bean(userInfo,UserBean.class);
-            PreferencesUtils.putInt(LoginActivity.this,Constants.ME_USER_ID,userBean.getUserInfo().getUserId());
-            PreferencesUtils.putString(LoginActivity.this,Constants.ME_HEAD_IMG_URL,userBean.getUserInfo().getHeadImageUrl());
-            PreferencesUtils.putString(LoginActivity.this,Constants.TOKEN_KEY,userBean.getToken());
-            Intent intent = new Intent(LoginActivity.this,MainActivity.class);
-            LoginActivity.this.startActivity(intent);
-            finish();
-        }
     }
 
     @Override

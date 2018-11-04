@@ -39,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="visible"
-                android:layout_marginLeft="10dp"
+                android:layout_marginLeft="25dp"
                 android:src="@drawable/loading_anim_right"/>
         </LinearLayout>
 
@@ -48,8 +48,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:paddingTop="10dp"
-            android:textColor="#ffffff" />
+            android:paddingTop="20dp"
+            android:textSize="13sp"
+            android:textColor="#9da4b3" />
     </LinearLayout>
 
 </LinearLayout>

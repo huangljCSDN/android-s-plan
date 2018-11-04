@@ -2,6 +2,7 @@ package com.markLove.Xplan.ui.activity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -19,6 +20,7 @@ import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.SinglePickerActivity;
 import com.dmcbig.mediapicker.entity.Media;
 import com.markLove.Xplan.R;
+import com.markLove.Xplan.base.BaseJsInterface;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.GoImgLibraryBean;
 import com.markLove.Xplan.bean.GoPhotoBean;
@@ -29,6 +31,7 @@ import com.markLove.Xplan.config.Constants;
 import com.markLove.Xplan.mvp.contract.FileContract;
 import com.markLove.Xplan.mvp.presenter.FilePresenter;
 import com.markLove.Xplan.ui.widget.MyWebView;
+import com.markLove.Xplan.utils.AppManager;
 import com.markLove.Xplan.utils.GsonUtils;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
@@ -57,15 +60,14 @@ public class RegisterActivity extends BaseActivity<FilePresenter> implements Fil
         LinearLayout mll = findViewById(R.id.rootView);
         mll.addView(mWebView);
 
-        mWebView.addJavascriptInterface(new JSInterface(), "xplanfunc");
-        mWebView.loadUrl("file:///android_asset/package/main/index.html#/login/registration");
+        mWebView.addJavascriptInterface(new JSInterface(this), "xplanfunc");
+        mWebView.loadUrl(BaseJsInterface.REGISTER_URL);
     }
 
-    // 继承自Object类
-    public class JSInterface extends Object {
+    public class JSInterface extends BaseJsInterface {
 
-        @JavascriptInterface
-        public void goNative(String callFun) {
+        public JSInterface(Activity mActivity) {
+            super(mActivity);
         }
 
         /**
@@ -75,6 +77,7 @@ public class RegisterActivity extends BaseActivity<FilePresenter> implements Fil
          * sCallback photoFinish
          */
         @JavascriptInterface
+        @Override
         public void goPhoto(String json) {
             goPhotoBean = GsonUtils.json2Bean(json, GoPhotoBean.class);
             type = 1;
@@ -91,23 +94,12 @@ public class RegisterActivity extends BaseActivity<FilePresenter> implements Fil
          * sCallback  photoFinish
          */
         @JavascriptInterface
+        @Override
         public void fromImgLibrary(String json) {
             type = 2;
             goImgLibraryBean = GsonUtils.json2Bean(json, GoImgLibraryBean.class);
             PreferencesUtils.putString(RegisterActivity.this,Constants.TOKEN_KEY,goImgLibraryBean.getToken());
             startSinglePickerActivity();
-        }
-
-
-        /**
-         * isTrue     配合goNative的参数callFun一起用，为true：goNative支持返回时调用前端函数
-         * urlPort    前端页面路径（路由
-         * networkUrl 外网路径
-         * isBack     是否显示返回按钮，如果是打开外网链接的话，打开的页面就需要一个返回按钮了，可以悬浮在左下角，点击返回上一个页面
-         */
-        @JavascriptInterface
-        public void goView(String json) {
-            LogUtils.i("json=" + json);
         }
 
         /**
@@ -116,6 +108,7 @@ public class RegisterActivity extends BaseActivity<FilePresenter> implements Fil
          * @param userInfo
          */
         @JavascriptInterface
+        @Override
         public void toHomePage(String userInfo) {
 //            ToastUtils.showLong(RegisterActivity.this, "toHomePage");
             LogUtil.i("userInfo= "+userInfo);
@@ -126,6 +119,7 @@ public class RegisterActivity extends BaseActivity<FilePresenter> implements Fil
             PreferencesUtils.putString(RegisterActivity.this,Constants.TOKEN_KEY,userBean.getToken());
             Intent intent = new Intent(RegisterActivity.this,MainActivity.class);
             RegisterActivity.this.startActivity(intent);
+            AppManager.getAppManager().finishActivity(LauncherActivity.class);
             finish();
         }
     }
@@ -151,14 +145,14 @@ public class RegisterActivity extends BaseActivity<FilePresenter> implements Fil
         }
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        if (mWebView.canGoBack()){
-//            mWebView.goBack();
-//        } else {
-//            super.onBackPressed();
-//        }
-//    }
+    @Override
+    public void onBackPressed() {
+        if (mWebView.canGoBack()){
+            mWebView.goBack();
+        } else {
+            super.onBackPressed();
+        }
+    }
 
     @Override
     public void onDestroy() {

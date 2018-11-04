@@ -35,47 +35,19 @@ public class MerchantMemberActivity extends BaseActivity {
         LinearLayout mll = findViewById(R.id.rootView);
         mll.addView(mWebView);
 
-        id = getIntent().getIntExtra("chatId",0);
-        mWebView.addJavascriptInterface(new JSInterface(this), "xplanfunc");
-        mWebView.loadUrl("file:///android_asset/package/main/index.html#/find/store/member/{"+id+"}");
+        id = getIntent().getIntExtra("dataId",0);
+        mWebView.addJavascriptInterface(new BaseJsInterface(this), "xplanfunc");
+        mWebView.loadUrl(BaseJsInterface.MERCHANT_MEMBER_URL+id);
     }
 
-    public class JSInterface extends BaseJsInterface {
-
-        public JSInterface(Activity mActivity) {
-            super(mActivity);
-        }
-
-        @JavascriptInterface
-        public void exitGroup() {
-            LogUtils.i("huang", "exitGroup=");
-
-        }
-
-        @JavascriptInterface
-        public void goNative(String json) {
-            //{"chatType":1,"chatId":1}
-            LogUtils.i("huang", "goNative=" + json);
-            GoNativeBean goNativeBean = GsonUtils.json2Bean(json,GoNativeBean.class);
-            if (goNativeBean == null || goNativeBean.getCallFun().isEmpty()){
-                finish();
-            } else {
-                Intent intent = new Intent();
-                intent.putExtra("goNativeBean",goNativeBean);
-                setResult(RESULT_OK,intent);
-                finish();
-            }
+    @Override
+    public void onBackPressed() {
+        if (mWebView.canGoBack()){
+            mWebView.goBack();
+        } else {
+            super.onBackPressed();
         }
     }
-
-//    @Override
-//    public void onBackPressed() {
-//        if (mWebView.canGoBack()){
-//            mWebView.goBack();
-//        } else {
-//            super.onBackPressed();
-//        }
-//    }
 
     @Override
     public void onDestroy() {

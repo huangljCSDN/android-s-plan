@@ -11,6 +11,16 @@ public class GoNativeBean implements Serializable {
      */
     private String callFun;
     private int param;
+    //2表示退出聊天室
+    private int closeView;
+
+    public int getCloseView() {
+        return closeView;
+    }
+
+    public void setCloseView(int closeView) {
+        this.closeView = closeView;
+    }
 
     public void setCallFun(String callFun) {
         this.callFun = callFun;

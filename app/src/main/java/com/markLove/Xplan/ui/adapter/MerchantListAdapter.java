@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.bean.MerchantBean;
+import com.markLove.Xplan.config.Constants;
 import com.markLove.Xplan.ui.widget.GlideRoundImage;
 
 import java.util.ArrayList;
@@ -56,7 +57,11 @@ public class MerchantListAdapter extends RecyclerView.Adapter<MerchantListAdapte
             holder.tvShopName.setText(merchantBean.getShopName());
             holder.tvShopCount.setText(merchantBean.getGroupCount()+"");
 
-            Glide.with(context).load(merchantBean.getLogoUrl())
+            String picUrl = merchantBean.getLogoUrl();
+            if (!picUrl.startsWith("http")) {
+                picUrl = Constants.BASE_IMG_URL + picUrl;
+            }
+            Glide.with(context).load(picUrl)
                     .apply(RequestOptions.placeholderOf(R.drawable.bg_merchant))
                     .apply(RequestOptions.errorOf(R.drawable.bg_merchant))
                     .apply(RequestOptions.bitmapTransform(new GlideRoundImage(context)))

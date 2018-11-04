@@ -195,9 +195,12 @@ public class MsgParameterProcessor extends Processor<IMMsgRequestEntity, IMMessa
             imFileInfo.setSe_ReTime(System.currentTimeMillis());
             imFileInfo.setSendId(imMsgRequestEntity.getParam().getSender());
             imFileInfo.setSenderName(imMsgRequestEntity.getMsgContent().getSenderName());
+
+
             long l = mDbManager.insertIMFileInfo(imFileInfo);
             imMessage.setFId(l);
-            imMessage.setFileInfo(imFileInfo);
+            imMessage.setIMFileInfo(imFileInfo);
+//            imMessage.setFileInfo(imFileInfo);
 
         } else if (IMMessage.CONTENT_TYPE_MAP.equals(type)) {
             LocalInfo localInfo = msgContent.getLocationInfo();

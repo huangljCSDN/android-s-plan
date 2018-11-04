@@ -34,50 +34,10 @@ public class LoverActivity extends BaseActivity {
         mWebView = new MyWebView(this);
         LinearLayout mll = findViewById(R.id.rootView);
         mll.addView(mWebView);
-        mWebView.addJavascriptInterface(new JSInterface(this), "xplanfunc");
-        mWebView.loadUrl("file:///android_asset/package/main/index.html#/find/180cp");
+        mWebView.addJavascriptInterface(new BaseJsInterface(this), "xplanfunc");
+        mWebView.loadUrl(BaseJsInterface.CP_URL);
     }
 
-    public class JSInterface  extends BaseJsInterface {
-
-        public JSInterface(Activity mActivity) {
-            super(mActivity);
-        }
-
-        @JavascriptInterface
-        public void toChatRoom(String json) {
-            LogUtils.i("huang", "toChatRoom=" + json);
-            startCpChatActivity(json);
-        }
-
-        @JavascriptInterface
-        public void goNative(String json) {
-            //{"chatType":1,"chatId":1}
-            LogUtils.i("huang", "goNative=" + json);
-            GoNativeBean goNativeBean = GsonUtils.json2Bean(json,GoNativeBean.class);
-            if (goNativeBean == null || goNativeBean.getCallFun().isEmpty()){
-                finish();
-            } else {
-                Intent intent = new Intent();
-                intent.putExtra("goNativeBean",goNativeBean);
-                setResult(RESULT_OK,intent);
-                finish();
-            }
-        }
-
-        @JavascriptInterface
-        public void goNative() {
-            finish();
-        }
-    }
-
-    private void startCpChatActivity(final String json) {
-        ChatBean chatBean = GsonUtils.json2Bean(json, ChatBean.class);
-//        Intent intent = new Intent(this, ShopChatActivity.class);
-        Intent intent = new Intent(this, CpChatActivity.class);
-        intent.putExtra("chatId", chatBean.getChatId());
-        startActivity(intent);
-    }
 
 //    @Override
 //    public void onBackPressed() {

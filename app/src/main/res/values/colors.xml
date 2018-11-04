@@ -30,6 +30,7 @@
     <color name="color_yellow">#DFB741</color>
     <color name="color_red2">#F85159</color>
     <color name="white">#ffffff</color>
+    <color name="white_30">#30ffffff</color>
 
     //---------------------------
     <color name="transparent">#00000000</color>

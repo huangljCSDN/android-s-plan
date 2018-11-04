@@ -85,14 +85,6 @@ public class MineFragment extends BaseFragment<FilePresenter> implements FileCon
             startPublishActivity();
         }
 
-        @JavascriptInterface
-        public void goView(String json) {
-            LogUtils.i("json="+json);
-            goViewBeaan = GsonUtils.json2Bean(json,GoViewBeaan.class);
-            startWebViewActivity(goViewBeaan.getUrlPort());
-//            startPublishActivity();
-        }
-
         /**
          * 拍照
          * <p>
@@ -100,6 +92,7 @@ public class MineFragment extends BaseFragment<FilePresenter> implements FileCon
          * sCallback photoFinish
          */
         @JavascriptInterface
+        @Override
         public void goPhoto(String json) {
             goPhotoBean = GsonUtils.json2Bean(json, GoPhotoBean.class);
             type = 1;
@@ -115,6 +108,7 @@ public class MineFragment extends BaseFragment<FilePresenter> implements FileCon
          * sCallback  photoFinish
          */
         @JavascriptInterface
+        @Override
         public void fromImgLibrary(String json) {
             type = 2;
             goImgLibraryBean = GsonUtils.json2Bean(json, GoImgLibraryBean.class);
@@ -122,15 +116,10 @@ public class MineFragment extends BaseFragment<FilePresenter> implements FileCon
         }
     }
 
-    private void startWebViewActivity(String url) {
-        Intent intent = new Intent(getContext(), WebViewActivity.class);
-        intent.putExtra("url", url);
-        startActivityForResult(intent,200);
-    }
 
     private void startPublishActivity(){
         Intent intent = new Intent(getContext(),PublishActivity.class);
-        startActivityForResult(intent,1001);
+        startActivityForResult(intent,Constants.REQUEST_CODE_PUBLISH);
     }
 
     //    @Override
@@ -230,7 +219,7 @@ public class MineFragment extends BaseFragment<FilePresenter> implements FileCon
                 uploadFile();
             }
 
-            if (requestCode == 1001){
+            if (requestCode == Constants.REQUEST_CODE_PUBLISH){
                 //刷新轨迹列表
                 mWebView.loadUrl("javascript:refreshUserLocus()");
             }

@@ -4,6 +4,7 @@ package com.xsimple.im.control.iable;
 import android.animation.ValueAnimator;
 
 import com.networkengine.entity.MemEntity;
+import com.networkengine.networkutil.interfaces.SingNetFileTransferListener;
 import com.xsimple.im.bean.IMSendFileEntity;
 import com.xsimple.im.control.listener.ChatMenuClickListener;
 import com.xsimple.im.db.datatable.IMChat;
@@ -134,6 +135,8 @@ public interface IIMChatLogic extends ChatMenuClickListener, IPlayMediaControl {
      * @param imMessage
      */
     void downloadFilesAndOpen(IMMessage imMessage);
+
+    void downloadFilesAndOpen2(IMMessage imMessage, final SingNetFileTransferListener singNetFileTransferListener);
 
     /**
      * 当前消息的的附件，正在上传或者下载中

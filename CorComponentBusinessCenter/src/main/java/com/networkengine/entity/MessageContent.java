@@ -842,4 +842,46 @@ public class MessageContent {
     public void setOperateName(String operateName) {
         this.operateName = operateName;
     }
+
+    @Override
+    public String toString() {
+        return "MessageContent{" +
+                "mId=" + mId +
+                ", type='" + type + '\'' +
+                ", chatType='" + chatType + '\'' +
+                ", senderName='" + senderName + '\'' +
+                ", rids='" + rids + '\'' +
+                ", groupName='" + groupName + '\'' +
+                ", content='" + content + '\'' +
+                ", userId='" + userId + '\'' +
+                ", userName='" + userName + '\'' +
+                ", atInfo=" + atInfo +
+                ", user_id='" + user_id + '\'' +
+                ", time='" + time + '\'' +
+                ", virtualMsgId='" + virtualMsgId + '\'' +
+                ", receiveId='" + receiveId + '\'' +
+                ", senderId='" + senderId + '\'' +
+                ", inviter_id='" + inviter_id + '\'' +
+                ", inviter_name='" + inviter_name + '\'' +
+                ", createName='" + createName + '\'' +
+                ", invited_id='" + invited_id + '\'' +
+                ", invited_name='" + invited_name + '\'' +
+                ", groupId='" + groupId + '\'' +
+                ", groupType='" + groupType + '\'' +
+                ", g_id='" + g_id + '\'' +
+                ", g_name='" + g_name + '\'' +
+                ", receiverName='" + receiverName + '\'' +
+                ", createDatetime='" + createDatetime + '\'' +
+                ", name='" + name + '\'' +
+                ", fId=" + fId +
+                ", fileInfo=" + fileInfo +
+                ", lId=" + lId +
+                ", replyId=" + replyId +
+                ", replyInfo=" + replyInfo +
+                ", recordId=" + recordId +
+                ", chatRecordInfo=" + chatRecordInfo +
+                ", msgType='" + msgType + '\'' +
+                ", url='" + url + '\'' +
+                '}';
+    }
 }

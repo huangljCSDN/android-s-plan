@@ -79,4 +79,19 @@ public class FileInfo {
     public void setHeight(int height) {
         this.height = height;
     }
+
+    @Override
+    public String toString() {
+        return "FileInfo{" +
+                "fId=" + fId +
+                ", type='" + type + '\'' +
+                ", sha='" + sha + '\'' +
+                ", status='" + status + '\'' +
+                ", size='" + size + '\'' +
+                ", name='" + name + '\'' +
+                ", path='" + path + '\'' +
+                ", width=" + width +
+                ", height=" + height +
+                '}';
+    }
 }

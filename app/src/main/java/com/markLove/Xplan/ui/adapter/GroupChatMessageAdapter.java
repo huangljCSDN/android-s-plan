@@ -11,6 +11,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -42,10 +43,16 @@ import com.markLove.Xplan.ui.dialog.CoupleGiftPopupWindow;
 import com.markLove.Xplan.utils.AudioUtils;
 import com.markLove.Xplan.utils.DensityUtils;
 import com.markLove.Xplan.utils.FileUtils;
+import com.markLove.Xplan.utils.ImageDisplayUtil;
 import com.markLove.Xplan.utils.ImageLoaderUtils;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
 import com.markLove.Xplan.utils.ScreenUtils;
+import com.networkengine.engine.LogicEngine;
+import com.networkengine.entity.FileSubPackage;
+import com.networkengine.networkutil.interfaces.SingNetFileTransferListener;
+import com.xsimple.im.control.iable.IIMChatLogic;
+import com.xsimple.im.db.datatable.IMFileInfo;
 import com.xsimple.im.db.datatable.IMMessage;
 
 import java.io.File;
@@ -614,15 +621,17 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
                 } else if (new File(imgPath3).exists()) { //原图
                     setImageResource(imgPath3);
                 } else {
-                    int me_user_id = PreferencesUtils.getInt(context, Constants.ME_USER_ID);
-                    int damageImg;
-                    if (msg.getFromID() == me_user_id) {
-                        damageImg = R.mipmap.send_file_damage;
-                    } else {
-                        damageImg = R.mipmap.receiver_file_damage;
+                    int damageImg = R.drawable.bg_icon_default;
+                    String url = imgPath3;
+                    if (TextUtils.isEmpty(url) || !new File(url).exists()) {
+                        if (!TextUtils.isEmpty(imgMessageBody.getSha())) {
+                            url = LogicEngine.getMchlDownLoadPath(imgMessageBody.getSha());
+                        } else {
+                            url = "";
+                        }
                     }
-//                    ImageLoaderUtils.display(context, damageImg, imgMsg, 200, 200);
-                    ImageLoaderUtils.displayRoundImage(context, damageImg, imgMsg, 200, 200);
+                    LogUtils.i("huang","boody11111111111 ="+ body);
+                    ImageDisplayUtil.setImgByUrl(imgMsg,url,null,ImageDisplayUtil.IMAGE_SIZE.L,damageImg,null);
                 }
             }
         }
@@ -885,31 +894,31 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
             if (body instanceof FileMessageBody) {
                 final FileMessageBody voiceMessageBody = (FileMessageBody) msg.getBody();
                 final Context context = rootView.getContext();
-                final String voicePath = Constants.LOCAL_VOICE_PATH + voiceMessageBody.getFileName();
-                final String voicePath1 = context.getExternalFilesDir("voice").getAbsolutePath() + File.separator + voiceMessageBody.getFileName();
+                String voicePath= "";
+                final String voicePath1 = Constants.LOCAL_VOICE_PATH + voiceMessageBody.getFileName();
+                final String voicePath2 = context.getExternalFilesDir("voice").getAbsolutePath() + File.separator + voiceMessageBody.getFileName();
+                final String voicePath3 = voiceMessageBody.getFilePath();
                 if (new File(voicePath1).exists()) {
-                    setVoiceResource(msg, voicePath1);
-                } else if (new File(voicePath).exists()) {
-                    setVoiceResource(msg, voicePath);
-                } else {
-                    ViewGroup.LayoutParams layoutParams = voiceContent.getLayoutParams();
-                    layoutParams.width = DensityUtils.dip2px(context, 142);
-                    voiceContent.setLayoutParams(layoutParams);
-                    voiceTime.setText(0 + "\"");
-                    voiceDamage.setVisibility(View.VISIBLE);
-                    voicePlayer.setTag(false);
-                    if (msg.getFromID() == PreferencesUtils.getInt(context, Constants.ME_USER_ID)) {
-                        voicePlayer.setImageResource(R.drawable.send_voice_05);
-                    } else {
-                        voicePlayer.setImageResource(R.drawable.group_received_voice_5);
-                    }
+                    voicePath = voicePath1;
+                } else if (new File(voicePath2).exists()) {
+                    voicePath = voicePath2;
+                } else if (new File(voicePath3).exists()) {
+                    voicePath = voicePath3;
                 }
+                setVoiceResource(msg,voicePath);
             }
         }
 
         private void setVoiceResource(Message msg, String voicePath) {
             final Context context = rootView.getContext();
-            int duration = FileUtils.getAmrDuration(voicePath);
+            int duration = 0;
+            if (!TextUtils.isEmpty(msg.getImMessage().getIMFileInfo().getTime())){
+                LogUtils.i("huang","time="+msg.getImMessage().getIMFileInfo().getTime());
+                duration = Integer.valueOf(msg.getImMessage().getIMFileInfo().getTime());
+            } else if (!TextUtils.isEmpty(voicePath)){
+                duration = FileUtils.getAmrDuration(voicePath);
+            }
+            voiceTime.setText((duration > 60 ? 60 : duration) + "\"");
             ViewGroup.LayoutParams layoutParams = voiceContent.getLayoutParams();
             if (duration >= 0 && duration <= 10) {
                 layoutParams.width = DensityUtils.dip2px(context, 64 + duration * 4);
@@ -917,11 +926,11 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
                 layoutParams.width = DensityUtils.dip2px(context, (100 + 10 * (((duration - 10) / 5) + 1)));
             }
             voiceContent.setLayoutParams(layoutParams);
-            voiceTime.setText((duration > 60 ? 60 : duration) + "\"");
+
             voiceDamage.setVisibility(View.GONE);
             voicePlayer.setTag(false);
             if (msg.getFromID() == PreferencesUtils.getInt(context, Constants.ME_USER_ID)) {
-                voicePlayer.setImageResource(R.drawable.send_voice_05);
+                voicePlayer.setImageResource(R.drawable.received_voice_05);
             } else {
                 voicePlayer.setImageResource(R.drawable.group_received_voice_5);
             }
@@ -1169,7 +1178,7 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
 
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
-            Message msg = mDatas.get(mGestureDetector.getPosition());
+            final Message msg = mDatas.get(mGestureDetector.getPosition());
             switch (msg.getChatType()) {
                 case IMAGE:
                     FileMessageBody imgMessageBody = (FileMessageBody) msg.getBody();
@@ -1186,69 +1195,35 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
                     String voicePath;
                     String voicePath1 = Constants.LOCAL_VOICE_PATH + voiceMessageBody.getFileName();
                     String voicePath2 = context.getExternalFilesDir("voice").getAbsolutePath() + File.separator + voiceMessageBody.getFileName();
+                    String voicePath3 = voiceMessageBody.getFilePath();
                     if (new File(voicePath1).exists()) {
                         voicePath = voicePath1;
+                        playVoice(msg,voicePath);
                     } else if (new File(voicePath2).exists()) {
                         voicePath = voicePath2;
+                        playVoice(msg,voicePath);
+                    } else if (new File(voicePath3).exists()) {
+                        voicePath = voicePath3;
+                        playVoice(msg,voicePath);
                     } else {
+                        mImChatControl.downloadFilesAndOpen2(msg.getImMessage(), new SingNetFileTransferListener() {
+                            @Override
+                            public void onFileTransferLoading(FileSubPackage packages) {
+
+                            }
+
+                            @Override
+                            public void onFileTransferSuccess(FileSubPackage packages) {
+                                String path = packages.getLocalPath();
+                                playVoice(msg,path);
+                            }
+
+                            @Override
+                            public void onFileTransferFailed(FileSubPackage packages) {
+
+                            }
+                        });
                         return false;
-                    }
-                    final ImageView voicePlayer = (ImageView) mGestureDetector.getTouchView().findViewById(R.id.chat_voice_player);
-                    if (msg.getFromID() == PreferencesUtils.getInt(context, Constants.ME_USER_ID)) {
-                        voicePlayer.setImageResource(R.drawable.send_voice_05);
-                        final AnimationDrawable drawable = (AnimationDrawable) ContextCompat.getDrawable(context, R.drawable.send_voice_anim);
-                        if (!(boolean) voicePlayer.getTag()) {
-                            AudioUtils.getInstance().play(voicePath, new AudioUtils.PlayStatusListener() {
-                                @Override
-                                public void playEnd() {
-                                    drawable.stop();
-                                    drawable.selectDrawable(1);
-                                    voicePlayer.setImageResource(R.drawable.send_voice_05);
-                                    voicePlayer.setTag(false);
-                                }
-
-                                @Override
-                                public void playStart() {
-                                    voicePlayer.setImageDrawable(drawable);
-                                    drawable.start();
-                                    voicePlayer.setTag(true);
-                                }
-                            });
-                        } else {
-                            AudioUtils.getInstance().stop();
-                            drawable.stop();
-                            drawable.selectDrawable(1);
-                            voicePlayer.setImageResource(R.drawable.send_voice_05);
-                            voicePlayer.setTag(false);
-                        }
-                    } else {
-                        voicePlayer.setImageResource(R.drawable.group_received_voice_5);
-                        final AnimationDrawable drawable = (AnimationDrawable) ContextCompat.getDrawable(context, R.drawable.group_received_voice_anim);
-                        if (!(boolean) voicePlayer.getTag()) {
-
-                            AudioUtils.getInstance().play(voicePath, new AudioUtils.PlayStatusListener() {
-                                @Override
-                                public void playEnd() {
-                                    voicePlayer.setTag(false);
-                                    drawable.stop();
-                                    drawable.selectDrawable(1);
-                                    voicePlayer.setImageResource(R.drawable.group_received_voice_5);
-                                }
-
-                                @Override
-                                public void playStart() {
-                                    voicePlayer.setImageDrawable(drawable);
-                                    drawable.start();
-                                    voicePlayer.setTag(true);
-                                }
-                            });
-                        } else {
-                            AudioUtils.getInstance().stop();
-                            drawable.stop();
-                            drawable.selectDrawable(1);
-                            voicePlayer.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.group_received_voice_5));
-                            voicePlayer.setTag(false);
-                        }
                     }
                     break;
                 case GIFT:
@@ -1345,6 +1320,66 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
                 mGestureDetector.removeTouchView();
             }
         }
+
+        private void playVoice(Message msg,String voicePath){
+            final ImageView voicePlayer = (ImageView) mGestureDetector.getTouchView().findViewById(R.id.chat_voice_player);
+            if (msg.getFromID() == PreferencesUtils.getInt(context, Constants.ME_USER_ID)) {
+                voicePlayer.setImageResource(R.drawable.send_voice_05);
+                final AnimationDrawable drawable = (AnimationDrawable) ContextCompat.getDrawable(context, R.drawable.send_voice_anim);
+                if (!(boolean) voicePlayer.getTag()) {
+                    AudioUtils.getInstance().play(voicePath, new AudioUtils.PlayStatusListener() {
+                        @Override
+                        public void playEnd() {
+                            drawable.stop();
+                            drawable.selectDrawable(1);
+                            voicePlayer.setImageResource(R.drawable.send_voice_05);
+                            voicePlayer.setTag(false);
+                        }
+
+                        @Override
+                        public void playStart() {
+                            voicePlayer.setImageDrawable(drawable);
+                            drawable.start();
+                            voicePlayer.setTag(true);
+                        }
+                    });
+                } else {
+                    AudioUtils.getInstance().stop();
+                    drawable.stop();
+                    drawable.selectDrawable(1);
+                    voicePlayer.setImageResource(R.drawable.send_voice_05);
+                    voicePlayer.setTag(false);
+                }
+            } else {
+                voicePlayer.setImageResource(R.drawable.group_send_voice_5);
+                final AnimationDrawable drawable = (AnimationDrawable) ContextCompat.getDrawable(context, R.drawable.group_received_voice_anim);
+                if (!(boolean) voicePlayer.getTag()) {
+
+                    AudioUtils.getInstance().play(voicePath, new AudioUtils.PlayStatusListener() {
+                        @Override
+                        public void playEnd() {
+                            voicePlayer.setTag(false);
+                            drawable.stop();
+                            drawable.selectDrawable(1);
+                            voicePlayer.setImageResource(R.drawable.group_send_voice_5);
+                        }
+
+                        @Override
+                        public void playStart() {
+                            voicePlayer.setImageDrawable(drawable);
+                            drawable.start();
+                            voicePlayer.setTag(true);
+                        }
+                    });
+                } else {
+                    AudioUtils.getInstance().stop();
+                    drawable.stop();
+                    drawable.selectDrawable(1);
+                    voicePlayer.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.group_send_voice_5));
+                    voicePlayer.setTag(false);
+                }
+            }
+        }
     }
 
     class MyGestureDetector extends GestureDetector {
@@ -1424,6 +1459,14 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
     }
 
     //---------------------------新IM方法---------------------------//
+    /**
+     * 聊天控制器
+     */
+    private IIMChatLogic mImChatControl;
+
+    public void setImChatControl(IIMChatLogic mImChatControl){
+        this.mImChatControl = mImChatControl;
+    }
 
     public void setImData(List<IMMessage> imMessageList){
         mDatas = changeListIMMessageToListMessage(imMessageList);
@@ -1444,6 +1487,7 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
         List<Message> list = new ArrayList<>();
         if (imMessageList != null || !imMessageList.isEmpty()){
             for (IMMessage imMessage : imMessageList){
+                LogUtils.i("huang","iiimessage="+imMessage.toString());
                 Message message = changeIMMessageToMessage(imMessage);
                 list.add(message);
             }
@@ -1457,22 +1501,60 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
                 IMMessage.CONTENT_TYPE_VOICE_CHAT.equals(imMessage.getContentType())){
             String path="";
             String fileName = "";
-            if (imMessage.getFileInfo() != null){
-                path = imMessage.getFileInfo().getPath();
-                fileName = imMessage.getFileInfo().getName();
+            if (imMessage.getIMFileInfo() != null){
+                path = imMessage.getIMFileInfo().getPath();
+                fileName = imMessage.getIMFileInfo().getName();
             }
             message = Message.createVoiceMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()), fileName, path);
+            message.setImMessage(imMessage);
         } else if (IMMessage.CONTENT_TYPE_IMG.equals(imMessage.getContentType())){
             String path="";
             String fileName = "";
-            if (imMessage.getFileInfo() != null){
-                path = imMessage.getFileInfo().getPath();
-                fileName = imMessage.getFileInfo().getName();
+            String sha = "";
+            if (imMessage.getIMFileInfo() != null){
+                path = imMessage.getIMFileInfo().getPath();
+                fileName = imMessage.getIMFileInfo().getName();
+                sha = imMessage.getIMFileInfo().getSha();
             }
             message = Message.createImageMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()), fileName, path);
+            FileMessageBody fileMessageBody = (FileMessageBody) message.getBody();
+            fileMessageBody.setSha(sha);
         } else {
             message = Message.createTxtMessage(Message.Type.CHAT,Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()),imMessage.getContent());
         }
+//        onAutoDownload(imMessage);
         return message;
+    }
+
+    /**
+     * 文件附件需要自动下载的
+     *
+     * @param imMessage
+     */
+    private void onAutoDownload(IMMessage imMessage) {
+        String contentType = imMessage.getContentType();
+
+        if (IMMessage.CONTENT_TYPE_IMG.equals(contentType)//图片
+                || IMMessage.CONTENT_TYPE_SHORT_VOICE.equals(contentType)//短语音
+                || IMMessage.CONTENT_TYPE_VIDEO.equals(contentType)
+                ) {
+            IMFileInfo imFileInfo = imMessage.getIMFileInfo();
+            if (imFileInfo == null) {
+                return;
+            }
+//            //非gif 图片
+//            if (IMMessage.CONTENT_TYPE_IMG.equals(contentType) && !imFileInfo.getName().endsWith(".gif")) {
+//                return;
+//            }
+            //失败的次数大于2次，不再主动下载
+            if (imFileInfo.getFailedCount() > 2) {
+                return;
+            }
+            String path = imFileInfo.getPath();
+            boolean isDownlod = TextUtils.isEmpty(path) || (!new File(path).exists());
+            if (isDownlod) {
+                mImChatControl.downloadFiles(imMessage);
+            }
+        }
     }
 }

@@ -34,64 +34,23 @@ public class GoodPlayActivity extends BaseActivity {
         mWebView = new MyWebView(this);
         LinearLayout mll = findViewById(R.id.rootView);
         mll.addView(mWebView);
-        mWebView.addJavascriptInterface(new GoodPlayActivity.JSInterface(this), "xplanfunc");
-        mWebView.loadUrl("file:///android_asset/package/main/index.html#/find/interesting");
+        mWebView.addJavascriptInterface(new BaseJsInterface(this), "xplanfunc");
+        mWebView.loadUrl(BaseJsInterface.PLAY_INFO_URL);
     }
 
-    public class JSInterface extends BaseJsInterface {
-
-        public JSInterface(Activity mActivity) {
-            super(mActivity);
-        }
-
-        @JavascriptInterface
-        public void toChatRoom(String json) {
-            LogUtils.i("huang", "toChatRoom=" + json);
-            startShopChatActivity(json);
-        }
-
-        @JavascriptInterface
-        public void goNative(String json) {
-            //{"chatType":1,"chatId":1}
-            LogUtils.i("huang", "goNative=" + json);
-            GoNativeBean goNativeBean = GsonUtils.json2Bean(json,GoNativeBean.class);
-            if (goNativeBean == null || goNativeBean.getCallFun().isEmpty()){
-                finish();
-            } else {
-                Intent intent = new Intent();
-                intent.putExtra("goNativeBean",goNativeBean);
-                setResult(RESULT_OK,intent);
-                finish();
-            }
+    @Override
+    public void onBackPressed() {
+        if (mWebView.canGoBack()){
+            mWebView.goBack();
+        } else {
+            super.onBackPressed();
         }
     }
-
-    private void startShopChatActivity(final String json) {
-        ChatBean chatBean = GsonUtils.json2Bean(json, ChatBean.class);
-        Intent intent = new Intent(this, ShopChatActivity.class);
-        intent.putExtra("chatId", chatBean.getChatId());
-        intent.putExtra("dataId", chatBean.getDataId());
-        startActivity(intent);
-    }
-
-
-//    @Override
-//    public void onBackPressed() {
-//        if (mWebView.canGoBack()){
-//            mWebView.goBack();
-//        } else {
-//            super.onBackPressed();
-//        }
-//    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mWebView.removeAllViews();
-        mWebView.stopLoading();
-        mWebView.clearHistory();
-        mWebView.clearCache(true);
-        mWebView.destroy();
+        mWebView.onDestroy();
     }
 
     @Override

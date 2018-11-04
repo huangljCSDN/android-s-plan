@@ -6,6 +6,7 @@ import android.webkit.JavascriptInterface;
 import android.widget.LinearLayout;
 
 import com.markLove.Xplan.R;
+import com.markLove.Xplan.base.BaseJsInterface;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.GoNativeBean;
@@ -31,50 +32,23 @@ public class PlayersActivity extends BaseActivity {
         mWebView = new MyWebView(this);
         LinearLayout mll = findViewById(R.id.rootView);
         mll.addView(mWebView);
-        mWebView.addJavascriptInterface(new JSInterface(), "xplanfunc");
-        mWebView.loadUrl("file:///android_asset/package/main/index.html#/find/playmate");
+        mWebView.addJavascriptInterface(new BaseJsInterface(this), "xplanfunc");
+        mWebView.loadUrl(BaseJsInterface.PLAYMATE_URL);
     }
 
-    public class JSInterface {
-
-        @JavascriptInterface
-        public void goNative(String json) {
-            //{"chatType":1,"chatId":1}
-            LogUtils.i("huang", "goNative=" + json);
-            GoNativeBean goNativeBean = GsonUtils.json2Bean(json,GoNativeBean.class);
-            if (goNativeBean == null || goNativeBean.getCallFun().isEmpty()){
-                finish();
-            } else {
-                Intent intent = new Intent();
-                intent.putExtra("goNativeBean",goNativeBean);
-                setResult(RESULT_OK,intent);
-                finish();
-            }
-        }
-
-        @JavascriptInterface
-        public void goNative() {
-            finish();
+    @Override
+    public void onBackPressed() {
+        if (mWebView.canGoBack()){
+            mWebView.goBack();
+        } else {
+            super.onBackPressed();
         }
     }
-
-//    @Override
-//    public void onBackPressed() {
-//        if (mWebView.canGoBack()){
-//            mWebView.goBack();
-//        } else {
-//            super.onBackPressed();
-//        }
-//    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mWebView.removeAllViews();
-        mWebView.stopLoading();
-        mWebView.clearHistory();
-        mWebView.clearCache(true);
-        mWebView.destroy();
+        mWebView.onDestroy();
     }
 
     @Override

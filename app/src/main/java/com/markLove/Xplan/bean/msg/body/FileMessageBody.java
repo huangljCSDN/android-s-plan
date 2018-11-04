@@ -23,6 +23,9 @@ public class FileMessageBody extends MessageBody {
     String filePath;
     //下载网络图片用的
     String sha;
+    //语音时长
+    String time;
+
 
     private String file;
 
@@ -34,6 +37,13 @@ public class FileMessageBody extends MessageBody {
         setDateTime(DataUtils.getDatetime());
     }
 
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
 
     public String getSha() {
         return sha;

@@ -9,6 +9,7 @@ import com.markLove.Xplan.bean.msg.body.MessageBody;
 import com.markLove.Xplan.bean.msg.body.ResultMessageBody;
 import com.markLove.Xplan.bean.msg.body.TxtMessageBody;
 import com.markLove.Xplan.utils.ChatUtils;
+import com.xsimple.im.db.datatable.IMMessage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,6 +34,18 @@ public class Message {
     private MessageBody body;
     private long msgTime;
     public static final short PAKCET_END = (short) 0xfffe;
+    /**
+     * Im原始消息，为了兼容两套框架，要保存
+     */
+    private IMMessage imMessage;
+
+    public IMMessage getImMessage() {
+        return imMessage;
+    }
+
+    public void setImMessage(IMMessage imMessage) {
+        this.imMessage = imMessage;
+    }
 
     public Message() {
 

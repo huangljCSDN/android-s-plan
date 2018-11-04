@@ -7,10 +7,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -18,7 +21,11 @@ import com.bumptech.glide.load.Transformation;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
 import com.bumptech.glide.request.FutureTarget;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.Transition;
+import com.markLove.Xplan.ui.widget.GlideRoundImage;
 import com.networkengine.R;
 import com.networkengine.database.table.Member;
 import com.networkengine.engine.EngineParameter;
@@ -163,48 +170,54 @@ public class ImageDisplayUtil {
             setImgByLocPath(imageView, loc, sign, defaultImg, null);
             return;
         }
-
+//        imageView.setTag(url);
+//        imageView.setBackground(null);
         setImgByResource(imageView, defaultImg);
-        imageView.setTag(url);
-        new AsyncTask<String, Void, String>() {
-            String originalUrl;
-            String sign;
+        try {
+            File file = dowloadPic(imageView.getContext(), url, sign,imageView);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
 
-            @Override
-            protected String doInBackground(String... url) {
-                originalUrl = url[0];
-                sign = url[1];
-                try {
-                    File file = dowloadPic(imageView.getContext(), originalUrl, sign);
-
-                    if (originalUrl.equals(getOriginalPath(originalUrl))) { // 下载的是原图，删中图和小图
-                        new File(getDiskPath(getMPath(originalUrl))).delete();
-                        new File(getDiskPath(getSPath(originalUrl))).delete();
-                    } else if (originalUrl.equals(getMPath(originalUrl))) { // 下载的是中图，删小图
-                        new File(getDiskPath(getSPath(originalUrl))).delete();
-                    }
-
-                    if (originalUrl.equals(imageView.getTag())) {
-                        return file.getAbsolutePath();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(String s) {
-                if (TextUtils.isEmpty(s)) {
-                    return;
-                }
-                setImgByLocPath(imageView, s, sign, defaultImg, null);
-                super.onPostExecute(s);
-            }
-        }.execute(url, sign);
+//        new AsyncTask<String, Void, String>() {
+//            String originalUrl;
+//            String sign;
+//
+//            @Override
+//            protected String doInBackground(String... url) {
+//                originalUrl = url[0];
+//                sign = url[1];
+//                try {
+//                    File file = dowloadPic(imageView.getContext(), originalUrl, sign,imageView);
+//
+//                    if (originalUrl.equals(getOriginalPath(originalUrl))) { // 下载的是原图，删中图和小图
+//                        new File(getDiskPath(getMPath(originalUrl))).delete();
+//                        new File(getDiskPath(getSPath(originalUrl))).delete();
+//                    } else if (originalUrl.equals(getMPath(originalUrl))) { // 下载的是中图，删小图
+//                        new File(getDiskPath(getSPath(originalUrl))).delete();
+//                    }
+//
+//                    if (originalUrl.equals(imageView.getTag())) {
+//                        return file.getAbsolutePath();
+//                    }
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//                return null;
+//            }
+//
+//            @Override
+//            protected void onPostExecute(String s) {
+//                if (TextUtils.isEmpty(s)) {
+//                    return;
+//                }
+////                setImgByLocPath(imageView, s, sign, defaultImg, null);
+//                super.onPostExecute(s);
+//            }
+//        }.execute(url, sign);
     }
 
-    public static File dowloadPic(Context context, String originalUrl, String sign) throws ExecutionException, InterruptedException {
+    public static File dowloadPic(Context context, String originalUrl, String sign, final ImageView imageView) throws ExecutionException, InterruptedException {
         String signUrl = originalUrl;
         if (!TextUtils.isEmpty(sign)) {
             // 加个参数，改变图片的路径
@@ -214,7 +227,6 @@ public class ImageDisplayUtil {
                 signUrl = originalUrl + "?glideSign=" + sign;
             }
         }
-
         GlideUrl glideUrl = new GlideUrl(signUrl);
         if (originalUrl.startsWith(LogicEngine.getMchlUrl()) || originalUrl.startsWith(LogicEngine.getMxmUrl())) { // 我们的文件服务器才加上头参数
             EngineParameter engineParameter = LogicEngine.getInstance().getEngineParameter();
@@ -230,6 +242,38 @@ public class ImageDisplayUtil {
             glideUrl = new GlideUrl(signUrl, lazyHeaders);
         }
 
+        Glide.with(imageView.getContext())
+                .load(glideUrl)
+                .apply(RequestOptions.placeholderOf(com.markLove.Xplan.R.drawable.bg_icon_default))
+                .apply(RequestOptions.errorOf(com.markLove.Xplan.R.drawable.bg_icon_default))
+                .apply(RequestOptions.bitmapTransform(new GlideRoundImage(imageView.getContext())))
+                .into(new SimpleTarget<Drawable>() {
+                    @Override
+                    public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
+                        BitmapDrawable bitmapDrawable = (BitmapDrawable) resource;
+                        Bitmap bitmap = bitmapDrawable.getBitmap();
+                        //获取原图的宽高
+                        int width = bitmap.getWidth();
+                        int height = bitmap.getHeight();
+
+                        if (width <= 0 || height <= 0) {
+                            width = 100;
+                            height = 100;
+                        } else if (width > 400 || height > 400) {
+                            float inSampleSize = (float) 400 / (float) Math.max(width, height);
+                            width = (int) (inSampleSize * width);
+                            height = (int) (inSampleSize * height);
+                        }
+
+                        ViewGroup.LayoutParams params = imageView.getLayoutParams();
+                        params.height = height;
+                        params.width = width;
+                        imageView.setLayoutParams(params);
+
+                        imageView.setImageDrawable(resource);
+                    }
+                });
+
         FutureTarget<File> future = Glide.with(context)
                 .load(glideUrl)
                 .downloadOnly(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL);
@@ -239,7 +283,8 @@ public class ImageDisplayUtil {
             targetFile.delete(); // 如果已存在，删除
         }
         cacheFile.renameTo(targetFile);
-        return targetFile;
+//        return targetFile;
+        return cacheFile;
     }
 
     /**
@@ -253,7 +298,7 @@ public class ImageDisplayUtil {
      */
     private static void setImgByLocPath(ImageView imageView, String locPath, String sign, int defaultImg
             , final Transformation<Bitmap> transformation) {
-        imageView.setTag(null);
+//        imageView.setTag(null);
         try {
             // 页页关闭时再显示图片的话，会闪退，直接抛弃这异常
             if (-1 == defaultImg) {
@@ -261,8 +306,24 @@ public class ImageDisplayUtil {
                         .load(locPath)
                         .into(imageView);
             } else {
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = true;
+                BitmapFactory.decodeFile(locPath, options);
+                int width = options.outWidth;
+                int height = options.outHeight;
+                if (width <= 0 || height <= 0) {
+                    width = 100;
+                    height = 100;
+                } else if (width > 400 || height > 400) {
+                    float inSampleSize = (float) 400 / (float) Math.max(width, height);
+                    width = (int) (inSampleSize * width);
+                    height = (int) (inSampleSize * height);
+                }
                 Glide.with(imageView.getContext())
                         .load(locPath)
+                        .apply(RequestOptions.placeholderOf(com.markLove.Xplan.R.drawable.bg_icon_default))
+                        .apply(RequestOptions.errorOf(com.markLove.Xplan.R.drawable.bg_icon_default))
+                        .apply(RequestOptions.bitmapTransform(new GlideRoundImage(imageView.getContext())))
                         .into(imageView);
             }
         } catch (Exception e) {

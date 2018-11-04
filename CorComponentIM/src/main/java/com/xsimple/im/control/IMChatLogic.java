@@ -420,8 +420,7 @@ public class IMChatLogic implements IIMChatLogic, IMObserver, Handler.Callback {
         }
         IMMsgRequest localMsg = mImEngine.createLocalMsg(msgType, content, mTargetMem, atInfos, unreadCount);
         mIMChatCallBack.onAddMessagerCallBack(localMsg.getIMessage());
-//        mImEngine.senIMTextMessage(localMsg, mIMChatCallBack);
-        sendMessage2(mIMChatCallBack);
+        mImEngine.senIMTextMessage(localMsg, mIMChatCallBack);
         //  sendMsgAndCallUi(message, imMsgRequestEntity);
     }
 
@@ -689,6 +688,42 @@ public class IMChatLogic implements IIMChatLogic, IMObserver, Handler.Callback {
                     openImg(imMessage.getIMFileInfo());
                 } else {
                     openFile(imMessage.getIMFileInfo());
+                }
+
+            }
+
+            @Override
+            public void onFileTransferFailed(FileSubPackage packages) {
+
+            }
+        });
+
+    }
+
+    @Override
+    public void downloadFilesAndOpen2(final IMMessage imMessage, final SingNetFileTransferListener singNetFileTransferListener) {
+        if (imMessage == null) {
+            return;
+        }
+
+        Map<String, String> map = new HashMap<>();
+        if (imMessage.getContentType().equals(CONTENT_TYPE_IMG)) {
+            map.put("size", "l");
+        }
+
+        singDownloadIMFile(imMessage, map, new SingNetFileTransferListener() {
+            @Override
+            public void onFileTransferLoading(FileSubPackage packages) {
+
+            }
+
+            @Override
+            public void onFileTransferSuccess(FileSubPackage packages) {
+                if (packages.getLocalPath().endsWith("jpg") || packages.getLocalPath().endsWith("png")) {
+//                    openImg(imMessage.getIMFileInfo());
+                } else {
+                    singNetFileTransferListener.onFileTransferSuccess(packages);
+//                    openFile(imMessage.getIMFileInfo());
                 }
 
             }
@@ -1373,7 +1408,7 @@ public class IMChatLogic implements IIMChatLogic, IMObserver, Handler.Callback {
 //                    .show();
 //            return;
 //        }
-//
+
 //        Collections.reverse(list);
 //        IMImageViewPagerActivity.startMe(mContext, list, list.size() - 1 - index, null);
 

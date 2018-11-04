@@ -109,7 +109,7 @@
                 android:layout_marginLeft="10dp"
                 android:background="@drawable/btn_sex_selector"
                 android:gravity="center"
-                android:text="@string/all"
+                android:text="@string/reset"
                 android:textColor="@color/btn_sex_color_selector"
                 android:textSize="9sp" />
 

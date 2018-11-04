@@ -59,5 +59,22 @@ public class GetMsgsResult{
         public void setData(List<GetMsgsEntity> data) {
             this.data = data;
         }
+
+        @Override
+        public String toString() {
+            return "GetMsgsDetail{" +
+                    "clientMaxMsgId='" + clientMaxMsgId + '\'' +
+                    ", data=" + data +
+                    '}';
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "GetMsgsResult{" +
+                "code='" + code + '\'' +
+                ", msg='" + msg + '\'' +
+                ", data=" + data +
+                '}';
     }
 }

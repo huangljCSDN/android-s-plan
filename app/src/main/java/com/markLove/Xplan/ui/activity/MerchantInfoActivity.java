@@ -36,39 +36,18 @@ public class MerchantInfoActivity extends BaseActivity {
         mll.addView(mWebView);
 
         id = getIntent().getIntExtra("chatId",0);
-        mWebView.addJavascriptInterface(new JSInterface(this), "xplanfunc");
+        mWebView.addJavascriptInterface(new BaseJsInterface(this), "xplanfunc");
         mWebView.loadUrl("file:///android_asset/package/main/index.html#/find/store/"+id+"");
     }
 
-    public class JSInterface extends BaseJsInterface {
-
-        public JSInterface(Activity mActivity) {
-            super(mActivity);
-        }
-
-        @JavascriptInterface
-        public void toChatRoom(String json) {
-            LogUtils.i("huang", "toChatRoom=" + json);
-            startShopChatActivity(json);
+    @Override
+    public void onBackPressed() {
+        if (mWebView.canGoBack()){
+            mWebView.goBack();
+        } else {
+            super.onBackPressed();
         }
     }
-
-    private void startShopChatActivity(final String json) {
-        ChatBean chatBean = GsonUtils.json2Bean(json, ChatBean.class);
-        Intent intent = new Intent(this, ShopChatActivity.class);
-        intent.putExtra("chatId", chatBean.getChatId());
-        intent.putExtra("dataId", chatBean.getChatId());
-        startActivity(intent);
-    }
-
-//    @Override
-//    public void onBackPressed() {
-//        if (mWebView.canGoBack()){
-//            mWebView.goBack();
-//        } else {
-//            super.onBackPressed();
-//        }
-//    }
 
     @Override
     public void onDestroy() {

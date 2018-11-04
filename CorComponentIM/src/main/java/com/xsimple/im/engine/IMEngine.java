@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -816,6 +817,7 @@ public class IMEngine implements Handler.Callback {
                     }
 
                     GetMsgsResult loadMsgsResult = loadMsgsResponse.body();
+                    LogUtil.i("GetMsgsResult=="+loadMsgsResult.toString());
                     if (!loadMsgsResponse.isSuccessful() || null == loadMsgsResult || !"0".equals(loadMsgsResult.getCode()) || null == loadMsgsResult.getData()) {
                         return new Loadresult(Loadresult.RESULT_CODE_LOAD_FAIL, null, null);
                     }
@@ -2080,17 +2082,17 @@ public class IMEngine implements Handler.Callback {
             content = mContext.getString(R.string.im_record_message);
         }
         String time = "";
-//        if (IMMessage.CONTENT_TYPE_VIDEO.equals(msgType) || IMMessage.CONTENT_TYPE_SHORT_VOICE.equals(msgType)) {
-//            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-//            try {
-//                mmr.setDataSource(content);
-//                time = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            } finally {
-//                mmr.release();
-//            }
-//        }
+        if (IMMessage.CONTENT_TYPE_VIDEO.equals(msgType) || IMMessage.CONTENT_TYPE_SHORT_VOICE.equals(msgType)) {
+            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+            try {
+                mmr.setDataSource(content);
+                time = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                mmr.release();
+            }
+        }
 
         //语音的消息需要把时间格式化，视频的就不用，没错，后台就是那么坑
         if (IMMessage.CONTENT_TYPE_SHORT_VOICE.equals(msgType)) {

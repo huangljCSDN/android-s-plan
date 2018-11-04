@@ -355,6 +355,9 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
         refreshLayoutMerchant.setRefreshing(false);
         refreshLayoutUser.setEnabled(true);
         if (list != null && !list.isEmpty()) {
+            if(currentMerchantPage == 0){
+                merchantBeanList.clear();
+            }
             currentMerchantPage += 1;
             int size = list.size();
             for (int i = size - 1; i >= 0; i--) {
@@ -381,6 +384,12 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
         refreshLayoutUser.setRefreshing(false);
         refreshLayoutMerchant.setEnabled(true);
         if (list != null && !list.isEmpty()) {
+            if (currentUserPage == 0){
+                userBeanList.clear();
+                if (isTouchAll){
+                    merchantBeanList.clear();
+                }
+            }
             currentUserPage += 1;
             int size = list.size();
             for (int i = size - 1; i >= 0; i--) {

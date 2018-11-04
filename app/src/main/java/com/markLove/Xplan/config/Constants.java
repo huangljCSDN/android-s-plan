@@ -39,6 +39,10 @@ public class Constants {
     public static final int REQUEST_CODE_VISIBLE = 104; //发布动态权限
     public static final int REQUEST_CODE_CHAT_MEMBER = 105; //聊天室成员
 
+    public static final int REQUEST_CODE_GROUP_CHAT = 1001; //组局聊天室
+    public static final int REQUEST_CODE_MERCHANT_CHAT = 1002; //店铺聊天室
+    public static final int REQUEST_CODE_WEB = 1003; //通用的webviewActivity
+    public static final int REQUEST_CODE_PUBLISH = 1004; //发布轨迹
 
     /**
      * 个人中心图片地址,及文件服务器地址

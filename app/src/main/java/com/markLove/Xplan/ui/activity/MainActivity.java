@@ -30,6 +30,7 @@ import com.markLove.Xplan.ui.fragment.MineFragment;
 import com.markLove.Xplan.ui.fragment.MsgFragment;
 import com.markLove.Xplan.ui.fragment.SearchFragment;
 import com.markLove.Xplan.utils.AMapClient;
+import com.markLove.Xplan.utils.AppManager;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
 import com.markLove.Xplan.utils.StatusBarUtil;
@@ -78,7 +79,6 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
         initMapClient();
         myHandler = new MyHandler(this);
         myHandler.sendEmptyMessageDelayed(1,1000*40);
-
         login();
     }
 

@@ -481,6 +481,7 @@ public class IMFileInfo {
                 ", receiverName='" + receiverName + '\'' +
                 ", width=" + width +
                 ", height=" + height +
+                ", failedCount=" + failedCount +
                 '}';
     }
 }

@@ -20,6 +20,7 @@ import com.markLove.Xplan.utils.StatusBarUtil;
 public class InvitingFriendsActivity extends BaseActivity {
     private MyWebView mWebView;
     private int id;
+
     @Override
     protected int getContentViewId() {
         return R.layout.activity_register;
@@ -33,9 +34,9 @@ public class InvitingFriendsActivity extends BaseActivity {
         LinearLayout mll = findViewById(R.id.rootView);
         mll.addView(mWebView);
 
-        id = getIntent().getIntExtra("chatId",0);
+        id = getIntent().getIntExtra("dataId", 0);
         mWebView.addJavascriptInterface(new BaseJsInterface(this), "xplanfunc");
-        mWebView.loadUrl("file:///android_asset/package/main/index.html#/bureau/invitation/{"+id+"}");
+        mWebView.loadUrl(BaseJsInterface.IMVITATION_URL + id);
     }
 
 

@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -31,6 +32,8 @@ import com.markLove.Xplan.base.App;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.BaseBean;
 import com.markLove.Xplan.bean.ChatUser;
+import com.markLove.Xplan.bean.MerchantInfoBean;
+import com.markLove.Xplan.bean.UserBean;
 import com.markLove.Xplan.bean.msg.Message;
 import com.markLove.Xplan.bean.msg.body.FileMessageBody;
 import com.markLove.Xplan.bean.msg.body.TxtMessageBody;
@@ -53,8 +56,31 @@ import com.markLove.Xplan.utils.DensityUtils;
 import com.markLove.Xplan.utils.ImageUtils;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
+import com.markLove.Xplan.utils.StatusBarUtil;
 import com.markLove.Xplan.utils.ToastUtils;
+import com.networkengine.controller.callback.ErrorResult;
+import com.networkengine.controller.callback.RouterCallback;
+import com.networkengine.controller.callback.XCacheCallback;
+import com.networkengine.database.table.Member;
+import com.networkengine.engine.LogicEngine;
+import com.networkengine.entity.IMSendResult;
+import com.networkengine.entity.MemEntity;
+import com.networkengine.entity.RequestGetMembersParam;
+import com.xsimple.im.control.IMChatLogic;
+import com.xsimple.im.control.MessagerLoader;
+import com.xsimple.im.control.iable.IIMChatLogic;
+import com.xsimple.im.control.listener.IMChatCallBack;
+import com.xsimple.im.db.datatable.IMChat;
+import com.xsimple.im.db.datatable.IMGroupRemark;
+import com.xsimple.im.db.datatable.IMMessage;
+import com.xsimple.im.engine.IMEngine;
+import com.xsimple.im.event.ExitGroupEvent;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +96,7 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * 私聊
  */
-public class SingleChatActivity extends BaseActivity<UserOperationPresenter> implements View.OnClickListener, ChatView, UserOperationContract.View {
+public class SingleChatActivity extends BaseActivity<UserOperationPresenter> implements View.OnClickListener, ChatView, UserOperationContract.View,IMChatCallBack   {
 
     private ArrayList<Media> select;
     private TextView mTvCare, mTvTitle;
@@ -107,6 +133,8 @@ public class SingleChatActivity extends BaseActivity<UserOperationPresenter> imp
 
     @Override
     protected void init(Bundle savedInstanceState) {
+        StatusBarUtil.setStatusBarColor(this, R.color.white);
+        StatusBarUtil.StatusBarLightMode(this);
         rlChatMsgList = findViewById(R.id.chat_msg_list);
         mFlMore = findViewById(R.id.fl_more);
         mRlTitleBar = findViewById(R.id.rl_title_bar);
@@ -126,13 +154,17 @@ public class SingleChatActivity extends BaseActivity<UserOperationPresenter> imp
         setListener();
         initSoftKeyboard();
         initData();
+        initIm();
     }
 
     private void setListener() {
         chatView.setOnSendMessageListener(new com.markLove.Xplan.ui.widget.ChatView.OnSendMessageListener() {
             @Override
             public void onSendMessage(Message message) {
-                judeBlackList(message);
+//                judeBlackList(message);
+                FileMessageBody fileMessageBody = (FileMessageBody) message.getBody();
+
+                sendVoice(fileMessageBody.getFilePath());
             }
         });
 
@@ -485,9 +517,10 @@ public class SingleChatActivity extends BaseActivity<UserOperationPresenter> imp
         String fileName = filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length());
         final Message imgMsg = Message.createImageMessage(Message.Type.CHAT, me_user_id, to_user_id, fileName, filePath);
         imgMsg.setStatus(Message.ChatStatus.SENDING);
-
+        isOrigin = true;
         if (isOrigin) {
-            judeBlackList(imgMsg);
+            sendImage(filePath);
+//            judeBlackList(imgMsg);
         } else {
             Observable.create(new ObservableOnSubscribe<Message>() {
                 @Override
@@ -916,5 +949,353 @@ public class SingleChatActivity extends BaseActivity<UserOperationPresenter> imp
             int me_user_id = PreferencesUtils.getInt(App.getInstance(), Constants.ME_USER_ID);
             DBDao.getDbDao(App.getInstance()).insertMessage(me_user_id, sendMsg);
         }
+    }
+
+
+    //--------------------------新im---------------------------//
+    /**
+     * 聊天控制器
+     */
+    private IIMChatLogic mImChatControl;
+
+    /**
+     * Im　消息引擎
+     */
+    private IMEngine mImEngine;
+    private MessagerLoader mMessagerLoader;
+    /**
+     * 会话
+     */
+    private IMChat mImChat;
+    private List<IMMessage> mMessagesList;
+
+    private static final String EXTRA_TARGET = "EXTRA_TARGET";
+    private static final String EXTRA_SCROLL_TO_MESSAGE = "EXTRA_SCROLL_TO_MESSAGE";
+    String chatId; //聊天室id
+
+    /**
+     * 直接跳转到某条记录的消息virtualId
+     */
+    public static final String ACTION_SCROLL_TO_MESSAGE = "im_virtual_id";
+
+    /**
+     * 打开聊天界面
+     *
+     * @param context     上下文
+     * @param memEntity   对象
+     * @param scrollToMsg 打开界面同时跳转到指定消息
+     */
+    public static void startMe(Context context, MemEntity memEntity, String scrollToMsg, RouterCallback callback) {
+//        routerCallback = callback;
+        Intent intent = getStartIntent(context, memEntity);
+        intent.putExtra(EXTRA_SCROLL_TO_MESSAGE, scrollToMsg);
+        context.startActivity(intent);
+    }
+
+    /**
+     * 获取跳转Intent
+     *
+     * @param context   上下文
+     * @param memEntity 对象
+     * @return 跳转Intent
+     */
+    public static Intent getStartIntent(Context context, MemEntity memEntity) {
+        Intent intent = new Intent(context, ShopChatActivity.class);
+        intent.putExtra(EXTRA_TARGET, memEntity);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        return intent;
+    }
+
+    private void initIm(){
+        EventBus.getDefault().register(this);
+        initMember();
+//        chatId = String.valueOf(to_user_id);
+        chatId = "369101"; //刘杰的
+//        chatId = "369105";
+        mImEngine = IMEngine.getInstance(this);
+
+        final MemEntity memEntity = new MemEntity(chatId,"",0);
+        mImChatControl = new IMChatLogic.Build() {
+            @Override
+            public MemEntity setTargetMem() {
+                return memEntity;
+            }
+
+            @Override
+            public IMChatCallBack setIMChatCallBack() {
+                return SingleChatActivity.this;
+            }
+
+
+            @Override
+            public int setRegistCode() {
+                return IMEngine.IMENGINE_RIGIST_CODE_CHAT_ACYIVITY;
+            }
+
+            @Override
+            public String setEventCode() {
+                return IMEngine.EVENT_RIGIST_CODE_CHAT_ACYIVITY;
+            }
+
+        }.build(this);
+        //异常处理
+        if (mImChatControl == null) {
+            Toast.makeText(this, "启动聊天页面失败", Toast.LENGTH_SHORT).show();
+            LogUtils.e("聊天器控制器 is null");
+            finish();
+            return;
+        }
+        if (mImChatControl.getMyUid() == null) {
+            LogUtils.e("启动聊天页面失败>>>>用户为空----> 自己");
+            finish();
+            return;
+        }
+
+//        if (memEntity.getType() != 0) {
+//            IMGroup imGroup = mImChatControl.getIMGroup();
+//            if (imGroup == null) {
+//                LogUtils.e("启动聊天页面失败>>>>群主为空---->");
+//                finish();
+//                return;
+//            }
+//        }
+        //设置草稿
+//        IMChat imChat = mChatControl.getIMChat();
+//        if (imChat != null) {
+//            mImChatViewHolder.setDrafts(imChat.getDrafts());
+//        }
+
+        mImChat = mImChatControl.getIMChat();
+        //刷新会话
+        if (mImChat == null) {
+            mImChat = mImChatControl.getOrCreateChat();
+        }
+
+        LogUtils.i("hhuang",mImChat.toString());
+        mMessagerLoader = new MessagerLoader(this, mImChat, mImChatControl);
+        //未读数量
+//        mUnReadCount = mImChat.getUnReadCount();
+//        //获取未读和＠我的消息的本地id的集合
+//        unReadOrAitMeIdlist = mMessagerLoader.getUnReadOrAitMeIdlist();
+//        //修改消息的阅读状态 发送服务器请求
+//        mImChatControl.updataUnReadCount(mMessagerLoader.getCacheMessage());
+        //添加第一次加载的数据
+        mMessagerLoader.getFirstLoadMessager();
+        this.mMessagesList = mMessagerLoader.getShowMessage();
+        //刷新布局
+        chatMessageAdapter.setImChatControl(mImChatControl);
+        chatMessageAdapter.setImData(mMessagesList);
+        chatMessageAdapter.notifyDataSetChanged();
+        chatView.initEvent(mImChatControl,mImEngine,mMessagerLoader);
+    }
+
+    private void initMember(){
+        if (LogicEngine.getInstance().getUser() == null){
+            String userToken = PreferencesUtils.getString(this,PreferencesUtils.KEY_USER_TOKEN);
+            UserBean userBean = App.getInstance().getUserBean();
+            Member member = new Member();
+            member.setId(String.valueOf(userBean.getUserInfo().getUserId()));
+            member.setUserId(String.valueOf(userBean.getUserInfo().getUserId()));
+            member.setUserName(userBean.getUserInfo().getNickName());
+            member.setUserToken(userToken);
+            LogicEngine.getInstance().setUser(member);
+        }
+    }
+
+    private void sendVoice(String path){
+        if (TextUtils.isEmpty(path) || !new File(path).exists()) {
+            return;
+        }
+        List<String> list = new ArrayList<>();
+        list.add(path);
+        mImChatControl.uploadLocalFiles(list, IMMessage.CONTENT_TYPE_SHORT_VOICE);
+    }
+
+    /**
+     * 发送照片
+     */
+    private void sendImage(String path) {
+        if (TextUtils.isEmpty(path))
+            return;
+        File file = new File(path);
+        if (!file.exists())
+            return;
+        mImChatControl.singUploadLocalFiles(path, IMMessage.CONTENT_TYPE_IMG);
+
+//        if (IMMessage.CONTENT_TYPE_IMG.equals(type)) {
+//
+//        } else {
+//            //压缩
+////            compressVide(path, type);
+//            // mChatControl.singUploadLocalFiles(path, type);
+//        }
+    }
+
+    /**
+     * 发送视频
+     * @param path
+     */
+    private void sendVideo(String path) {
+        if (TextUtils.isEmpty(path))
+            return;
+        File file = new File(path);
+        if (!file.exists())
+            return;
+        mImChatControl.singUploadLocalFiles(path, IMMessage.CONTENT_TYPE_VIDEO);
+    }
+
+    @Override
+    public void setAtView(String atString) {
+
+    }
+
+    @Override
+    public void showVoiceHFOrHook() {
+
+    }
+
+    @Override
+    public void hideVoiceHFOrHook() {
+
+    }
+
+    @Override
+    public void playNextMedia(int posstion) {
+
+    }
+
+    @Override
+    public void changeSelectedMode(IMMessage imMessage, boolean isSelectedMode) {
+
+    }
+
+    @Override
+    public void showGroupRemarkDialog(IMGroupRemark imGroupRemark) {
+
+    }
+
+    @Override
+    public void onReply(IMMessage imMessage) {
+
+    }
+
+    @Override
+    public void scrollToMsg(String msgId) {
+
+    }
+
+    @Override
+    public void onFileTransferLoading(long localId) {
+
+    }
+
+    @Override
+    public void onFileTransferSuccess(long localId) {
+        LogUtils.i("huang","onFileTransferSuccess=");
+    }
+
+    @Override
+    public void onFileTransferFailed(long localId) {
+        LogUtils.i("huang","onFileTransferFailed=");
+    }
+
+    @Override
+    public void onFileTransferOnPause(long localId) {
+
+    }
+
+    @Override
+    public void onFileTransferOnStart(long localId) {
+
+    }
+
+    @Override
+    public void onSendMessageSuccessCallBack(long localId) {
+        LogUtils.i("huang","onSendMessageSuccessCallBack=");
+    }
+
+    @Override
+    public void onSendMessageFaileCallBack(long localId) {
+        LogUtils.i("huang","onSendMessageFaileCallBack=");
+    }
+
+    @Override
+    public void onAddMessagerCallBack(List<IMMessage> msgs) {
+        LogUtils.i("huang","onAddMessagerCallBack="+msgs.toString());
+        onRefresfItemAddList(msgs);
+    }
+
+    @Override
+    public void onAddMessagerCallBack(IMMessage message) {
+
+        LogUtils.i("huang","onAddMessagerCallBack2="+message.toString());
+        message.refresh();
+        mMessagerLoader.addMessager(message);
+        chatMessageAdapter.addOneImData(message);
+    }
+
+    @Override
+    public void onDeleteMessageCallBack(IMMessage message) {
+
+    }
+
+    @Override
+    public void onUpdateMessageCallBack(long localId) {
+
+    }
+
+    @Override
+    public void onDeleteMessagesCallback(List<IMMessage> imMessageList) {
+
+    }
+
+//    @Subscribe(threadMode = ThreadMode.MAIN)
+//    public void onTranspondMsgToCurrent(TranspondToCurrentEvent transpondToCurrentEvent) {
+//        //mProcessorFactory.processorAddMsg(transpondToCurrentEvent.getMessage());
+//        mImChatViewHolder.onRefresfItemAdd(transpondToCurrentEvent.getMessage());
+//    }
+//
+//    @Subscribe(threadMode = ThreadMode.MAIN)
+//    public void onTranspondMsgToCurrentSuccess(TranspondToCurrentSuccessEvent event) {
+//        // mProcessorFactory.processorUpdateMsg(event.getOld(), event.getNew());
+//        mImChatViewHolder.onRefreshItem(event.getOld().getLocalId());
+//    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void exitGroup(ExitGroupEvent e) {
+        //删除会话
+        IMChat imChat = mImChatControl.getIMChat();
+        if (imChat != null) {
+            imChat.delete();
+        }
+        finish();
+    }
+
+    public void onRefresfItemAddList(List<IMMessage> list) {
+        if (list == null || list.isEmpty())
+            return;
+        //刷新会话
+        if (mImChat == null) {
+            mImChat = mImChatControl.getOrCreateChat();
+        }
+        mImChat.refresh();
+        mImChatControl.updataUnReadCount(list);
+        addItem(list,true);
+    }
+
+    /**
+     * 添加视图
+     */
+    private void addItem(List<IMMessage> list, boolean isBottom) {
+        if (list == null || list.isEmpty())
+            return;
+
+        mMessagerLoader.addMessager(list, isBottom);
+        chatMessageAdapter.addListImData(list);
+
+//        if (isBottom) {
+//            mLinearLayoutManager.scrollToPositionWithOffset(0, 100);
+//        }
+
     }
 }

@@ -95,4 +95,11 @@ public class GetMsgsEntity {
 //    }
 
 
+    @Override
+    public String toString() {
+        return "GetMsgsEntity{" +
+                "param=" + param +
+                ", msgContent=" + msgContent +
+                '}';
+    }
 }
