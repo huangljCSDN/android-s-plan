@@ -2,15 +2,16 @@ package com.markLove.Xplan.ui.widget;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.net.http.SslError;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.SslErrorHandler;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 
 public class MyWebView extends WebView {
@@ -46,6 +47,18 @@ public class MyWebView extends WebView {
         settings.setJavaScriptEnabled(true);
         // 支持缩放
         settings.setSupportZoom(true);
+        //在Android 5.0之后，WebView默认不允许Https + Http的混合使用方式，所以当Url是Https的，图片资源是Http时，导致页面加载失败
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        }
+
+        this.setWebViewClient(new WebViewClient(){
+            @Override
+            public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+                handler.proceed();
+                super.onReceivedSslError(view, handler, error);
+            }
+        });
     }
 
     public void onDestroy(){

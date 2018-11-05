@@ -549,7 +549,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     public void onImageReturn(Uri uri, String filePath, boolean isOrigin) {
 //        String filePath = autoCameraUtils.getPath(this, uri);
         String fileName = filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length());
-        final Message imgMsg = Message.createImageMessage(Message.Type.CHAT, me_user_id, to_user_id, fileName, filePath);
+        final Message imgMsg = Message.createImageMessage(Message.Type.CHAT, me_user_id, to_user_id, fileName,"",filePath);
         imgMsg.setStatus(Message.ChatStatus.SENDING);
         isOrigin = true;
         if (isOrigin) {

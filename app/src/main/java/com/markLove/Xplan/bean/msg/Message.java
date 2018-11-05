@@ -368,9 +368,9 @@ public class Message {
         }
     }
 
-    public static Message createTxtMessage(Type type, int fromID, int toID, String msg) {
+    public static Message createTxtMessage(Type type, int fromID, int toID, String msgId,String msg) {
         TxtMessageBody txtMessageBody = new TxtMessageBody(type, ChatType.TXT, msg);
-        Message txtMessage = new Message(fromID, toID, ChatUtils.generateShortUuid(), type, ChatType.TXT, txtMessageBody);
+        Message txtMessage = new Message(fromID, toID,msgId, type, ChatType.TXT, txtMessageBody);
         txtMessage.setStatus(ChatStatus.SENDING);
         return txtMessage;
     }
@@ -387,16 +387,16 @@ public class Message {
         return superLikeMessage;
     }
 
-    public static Message createImageMessage(Type type, int fromID, int toID, String fileName, String filePath) {
+    public static Message createImageMessage(Type type, int fromID, int toID, String msgId, String fileName, String filePath) {
         FileMessageBody fileMessageBody = new FileMessageBody(type, ChatType.IMAGE, fileName, filePath);
-        Message imageMessage = new Message(fromID, toID, ChatUtils.generateShortUuid(), type, ChatType.IMAGE, fileMessageBody);
+        Message imageMessage = new Message(fromID, toID, msgId, type, ChatType.IMAGE, fileMessageBody);
         imageMessage.setStatus(ChatStatus.SENDING);
         return imageMessage;
     }
 
-    public static Message createVoiceMessage(Type type, int fromID, int toID, String fileName, String filePath) {
+    public static Message createVoiceMessage(Type type, int fromID, int toID, String msgId, String fileName, String filePath) {
         FileMessageBody fileMessageBody = new FileMessageBody(type, ChatType.VOICE, fileName, filePath);
-        Message voiceMessage = new Message(fromID, toID, ChatUtils.generateShortUuid(), type, ChatType.VOICE, fileMessageBody);
+        Message voiceMessage = new Message(fromID, toID, msgId, type, ChatType.VOICE, fileMessageBody);
         voiceMessage.setStatus(ChatStatus.SENDING);
         return voiceMessage;
     }

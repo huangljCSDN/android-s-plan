@@ -92,6 +92,10 @@
         <item name="android:button">@drawable/selector_chat_style</item>
     </style>
 
+    <style name="chat_check_box_black" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/selector_chat_style_black</item>
+    </style>
+
     <!--聊天-->
     <!--加载进度Dialog-->
     <style name="CustomDialog" parent="@android:style/Theme.Dialog">

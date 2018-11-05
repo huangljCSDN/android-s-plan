@@ -203,6 +203,7 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
     private void initCrMerchant(View view) {
         mItemViewMode = new CircularViewMode();
         ((CircularViewMode) mItemViewMode).setxOffset(450);
+        ((CircularViewMode) mItemViewMode).setOffset11(100);
 
         mCircleRecyclerView = (CircleRecyclerView) view.findViewById(R.id.cr_one);
         mLayoutManager = new LinearLayoutManager(getContext());
@@ -239,8 +240,8 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
 
     private void initCrUser(View view) {
         mItemViewMode2 = new CircularViewMode();
-        ((CircularViewMode) mItemViewMode2).setxOffset(100);
-        ((CircularViewMode) mItemViewMode2).setOffset11(150);
+        ((CircularViewMode) mItemViewMode2).setxOffset(10);
+        ((CircularViewMode) mItemViewMode2).setOffset11(250);
         mCircleRecyclerView2 = (CircleRecyclerView) view.findViewById(R.id.cr_two);
         mLayoutManager2 = new LinearLayoutManager(getContext());
         mCircleRecyclerView2.setLayoutManager(mLayoutManager2);

@@ -217,7 +217,7 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
         if (!TextUtils.isEmpty(msg)) {
             Message message;
 
-            message = Message.createTxtMessage(Message.Type.CHAT, me_user_id, to_user_id, msg);
+            message = Message.createTxtMessage(Message.Type.CHAT, me_user_id, to_user_id,"", msg);
             LogUtils.e("fromId=" + message.getFromID() + ",toId=" + message.getToID() + ",msg=" + msg);
             message.setStatus(Message.ChatStatus.SENDING);
 //            //判断是否被拉黑
@@ -514,7 +514,7 @@ public class ChatViewForPublish extends FrameLayout implements View.OnClickListe
             File file = new File(voicePath);
             if (file.exists() && file.length() > 0) {
                 String voiceName = voicePath.substring(voicePath.lastIndexOf("/") + 1, voicePath.length());
-                voiceMessage = Message.createVoiceMessage(Message.Type.CHAT, me_user_id, to_user_id, voiceName, voicePath);
+                voiceMessage = Message.createVoiceMessage(Message.Type.CHAT, me_user_id, to_user_id,"", voiceName, voicePath);
                 voiceMessage.setStatus(Message.ChatStatus.SENDING);
 //                judeBlackList(voiceMessage);
             } else {

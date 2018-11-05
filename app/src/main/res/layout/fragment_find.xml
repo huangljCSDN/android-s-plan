@@ -10,7 +10,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="35dp"
+        android:layout_marginTop="25dp"
         android:orientation="horizontal">
 
         <TextView
@@ -69,12 +69,12 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="30dp">
+        android:layout_height="match_parent">
 
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/refresh_layout_one"
             android:layout_width="match_parent"
+            android:layout_marginTop="20dp"
             android:layout_height="match_parent">
 
             <com.markLove.Xplan.module.CircleRecyclerView.CircleRecyclerView
@@ -86,8 +86,9 @@
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/refresh_layout_two"
             android:layout_width="235dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="5dp"
             android:layout_height="match_parent">
-
             <com.markLove.Xplan.module.CircleRecyclerView.CircleRecyclerView
                 android:id="@+id/cr_two"
                 android:layout_width="235dp"
@@ -99,18 +100,19 @@
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="185dp"
+            android:layout_marginBottom="10dp"
             android:layout_centerVertical="true">
 
             <Button
                 android:id="@+id/btn_all"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_centerVertical="true"
                 android:layout_marginLeft="10dp"
                 android:background="@drawable/btn_sex_selector"
                 android:gravity="center"
                 android:text="@string/reset"
                 android:textColor="@color/btn_sex_color_selector"
+                android:layout_marginTop="58dp"
                 android:textSize="9sp" />
 
             <Button

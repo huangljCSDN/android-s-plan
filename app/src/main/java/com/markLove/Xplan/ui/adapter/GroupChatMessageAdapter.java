@@ -69,6 +69,7 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
 
     Context context;
     List<Message> mDatas;
+    List<IMMessage> iMMsgList = new ArrayList<>();
     MyGestureDetector mGestureDetector;
     int select = 0;//0默认显示,1显示选中删除,2删除选中
     List<String> selectPositionList;
@@ -257,17 +258,7 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
         if (null != holder.userHead) {
             if (PreferencesUtils.getInt(context, Constants.ME_USER_ID) == msg.getFromID()) {
                 ImageLoaderUtils.displayCircle(context, fromHeadImgUrl, holder.userHead);
-//                Glide.with(context).load(fromHeadImgUrl).
-//                        .placeholder(R.mipmap.agent_user_pho)
-//                        .error(R.mipmap.agent_user_pho)
-//                        .transform(new GlideCircleTransform(context))
-//                        .into(holder.userHead);
             } else {
-/*                Glide.with(context).load(toHeadImgUrl)
-                        .placeholder(R.mipmap.agent_user_pho)
-                        .error(R.mipmap.agent_user_pho)
-                        .transform(new GlideCircleTransform(context))
-                        .into(holder.userHead);*/
                 ImageLoaderUtils.displayCircle(context, toHeadImgUrl, holder.userHead);
             }
             holder.userHead.setOnClickListener(new View.OnClickListener() {
@@ -1121,11 +1112,13 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
                 .setOnClickListener(R.id.custom_dialog_define, new BecomeLovesDialog.DialogViewOnClick() {
                     @Override
                     public void onClick() {
-                        Message msg = mDatas.get(position);
-                        int me_user_id = PreferencesUtils.getInt(context, Constants.ME_USER_ID);
-                        DBDao.getDbDao(context).delectMessage(me_user_id, msg.getMsgID());
+                        IMMessage imMessage = iMMsgList.get(position);
+                        mImChatControl.onDeleteMessage(imMessage);
                         mDatas.remove(position);
+                        iMMsgList.remove(position);
                         notifyItemRemoved(position);
+                        //必须调用这行代码
+                        notifyItemRangeChanged(position, mDatas.size());
                     }
                 });
         builder.create().show();
@@ -1147,14 +1140,23 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
 
     public void removeSelecPosition() {
         if (!selectPositionList.isEmpty()) {
-            int me_user_id = PreferencesUtils.getInt(context, Constants.ME_USER_ID);
+//            int me_user_id = PreferencesUtils.getInt(context, Constants.ME_USER_ID);
             for (String msgID : selectPositionList) {
                 Iterator<Message> iterator = mDatas.iterator();
                 while (iterator.hasNext()) {
                     Message msg = iterator.next();
-                    if (msg.getMsgID().equals(msgID)) {
-                        iterator.remove();
-                        DBDao.getDbDao(context).delectMessage(me_user_id, msg.getMsgID());
+//                    LogUtils.i("iddd===",msg.getMsgID());
+//                    if (msg.getMsgID().equals(msgID)) {
+//                        iterator.remove();
+//                        break;
+//                    }
+                }
+                Iterator<IMMessage> iteratorMMsgList = iMMsgList.iterator();
+                while (iteratorMMsgList.hasNext()) {
+                    IMMessage imMessage = iteratorMMsgList.next();
+                    if (imMessage.getMsgID().equals(msgID)) {
+                        mImChatControl.onDeleteMessage(imMessage);
+                        iteratorMMsgList.remove();
                         break;
                     }
                 }
@@ -1458,7 +1460,7 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
         mListener = listener;
     }
 
-    //---------------------------新IM方法---------------------------//
+    //---------------------------新IM方法 ,蛋疼的兼容 IMMessage 转成Message，脑壳疼------------------------------//
     /**
      * 聊天控制器
      */
@@ -1470,16 +1472,19 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
 
     public void setImData(List<IMMessage> imMessageList){
         mDatas = changeListIMMessageToListMessage(imMessageList);
+        iMMsgList.addAll(imMessageList);
         notifyDataSetChanged();
     }
 
     public void addListImData(List<IMMessage> imMessageList){
         mDatas.addAll(changeListIMMessageToListMessage(imMessageList));
+        iMMsgList.addAll(imMessageList);
         notifyDataSetChanged();
     }
 
     public void addOneImData(IMMessage imMessage){
         mDatas.add(changeIMMessageToMessage(imMessage));
+        iMMsgList.add(imMessage);
         notifyDataSetChanged();
     }
 
@@ -1487,7 +1492,7 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
         List<Message> list = new ArrayList<>();
         if (imMessageList != null || !imMessageList.isEmpty()){
             for (IMMessage imMessage : imMessageList){
-                LogUtils.i("huang","iiimessage="+imMessage.toString());
+                LogUtils.i("huang","imessage="+imMessage.toString());
                 Message message = changeIMMessageToMessage(imMessage);
                 list.add(message);
             }
@@ -1505,7 +1510,7 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
                 path = imMessage.getIMFileInfo().getPath();
                 fileName = imMessage.getIMFileInfo().getName();
             }
-            message = Message.createVoiceMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()), fileName, path);
+            message = Message.createVoiceMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()),imMessage.getMsgID(), fileName, path);
             message.setImMessage(imMessage);
         } else if (IMMessage.CONTENT_TYPE_IMG.equals(imMessage.getContentType())){
             String path="";
@@ -1516,13 +1521,13 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
                 fileName = imMessage.getIMFileInfo().getName();
                 sha = imMessage.getIMFileInfo().getSha();
             }
-            message = Message.createImageMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()), fileName, path);
+            message = Message.createImageMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()),imMessage.getMsgID(), fileName, path);
             FileMessageBody fileMessageBody = (FileMessageBody) message.getBody();
             fileMessageBody.setSha(sha);
         } else {
-            message = Message.createTxtMessage(Message.Type.CHAT,Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()),imMessage.getContent());
+            message = Message.createTxtMessage(Message.Type.CHAT,Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()),imMessage.getMsgID(),imMessage.getContent());
         }
-//        onAutoDownload(imMessage);
+        onAutoDownload(imMessage);
         return message;
     }
 
