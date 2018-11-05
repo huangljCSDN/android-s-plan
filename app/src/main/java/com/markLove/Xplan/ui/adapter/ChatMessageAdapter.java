@@ -1330,7 +1330,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHolder>
                 path = imMessage.getIMFileInfo().getPath();
                 fileName = imMessage.getIMFileInfo().getName();
             }
-            message = Message.createVoiceMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()), fileName, path);
+            message = Message.createVoiceMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()),imMessage.getMsgID(),fileName, path);
             message.setImMessage(imMessage);
         } else if (IMMessage.CONTENT_TYPE_IMG.equals(imMessage.getContentType())){
             String path="";
@@ -1341,11 +1341,11 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHolder>
                 fileName = imMessage.getIMFileInfo().getName();
                 sha = imMessage.getIMFileInfo().getSha();
             }
-            message = Message.createImageMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()), fileName, path);
+            message = Message.createImageMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()),imMessage.getMsgID(), fileName, path);
             FileMessageBody fileMessageBody = (FileMessageBody) message.getBody();
             fileMessageBody.setSha(sha);
         } else {
-            message = Message.createTxtMessage(Message.Type.CHAT,Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()),imMessage.getContent());
+            message = Message.createTxtMessage(Message.Type.CHAT,Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()),imMessage.getMsgID(),imMessage.getContent());
         }
 //        onAutoDownload(imMessage);
         return message;

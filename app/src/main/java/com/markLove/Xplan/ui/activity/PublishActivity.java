@@ -462,7 +462,7 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
     public void onImageReturn(Uri uri, String filePath, boolean isOrigin) {
 //        String filePath = autoCameraUtils.getPath(this, uri);
         String fileName = filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length());
-        final Message imgMsg = Message.createImageMessage(Message.Type.CHAT, 0, 0, fileName, filePath);
+        final Message imgMsg = Message.createImageMessage(Message.Type.CHAT, 0, 0,"", fileName, filePath);
         imgMsg.setStatus(Message.ChatStatus.SENDING);
         isOrigin = true;
         LogUtils.i("huang","filePath="+filePath);

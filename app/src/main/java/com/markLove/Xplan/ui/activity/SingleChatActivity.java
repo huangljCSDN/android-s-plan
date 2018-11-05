@@ -32,7 +32,6 @@ import com.markLove.Xplan.base.App;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.BaseBean;
 import com.markLove.Xplan.bean.ChatUser;
-import com.markLove.Xplan.bean.MerchantInfoBean;
 import com.markLove.Xplan.bean.UserBean;
 import com.markLove.Xplan.bean.msg.Message;
 import com.markLove.Xplan.bean.msg.body.FileMessageBody;
@@ -58,14 +57,10 @@ import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
 import com.markLove.Xplan.utils.StatusBarUtil;
 import com.markLove.Xplan.utils.ToastUtils;
-import com.networkengine.controller.callback.ErrorResult;
 import com.networkengine.controller.callback.RouterCallback;
-import com.networkengine.controller.callback.XCacheCallback;
 import com.networkengine.database.table.Member;
 import com.networkengine.engine.LogicEngine;
-import com.networkengine.entity.IMSendResult;
 import com.networkengine.entity.MemEntity;
-import com.networkengine.entity.RequestGetMembersParam;
 import com.xsimple.im.control.IMChatLogic;
 import com.xsimple.im.control.MessagerLoader;
 import com.xsimple.im.control.iable.IIMChatLogic;
@@ -515,7 +510,7 @@ public class SingleChatActivity extends BaseActivity<UserOperationPresenter> imp
     public void onImageReturn(Uri uri, String filePath, boolean isOrigin) {
 //        String filePath = autoCameraUtils.getPath(this, uri);
         String fileName = filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length());
-        final Message imgMsg = Message.createImageMessage(Message.Type.CHAT, me_user_id, to_user_id, fileName, filePath);
+        final Message imgMsg = Message.createImageMessage(Message.Type.CHAT, me_user_id, to_user_id,"", fileName, filePath);
         imgMsg.setStatus(Message.ChatStatus.SENDING);
         isOrigin = true;
         if (isOrigin) {

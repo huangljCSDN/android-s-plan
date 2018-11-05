@@ -76,7 +76,6 @@ import com.xsimple.im.control.MessagerLoader;
 import com.xsimple.im.control.iable.IIMChatLogic;
 import com.xsimple.im.control.listener.IMChatCallBack;
 import com.xsimple.im.db.datatable.IMChat;
-import com.xsimple.im.db.datatable.IMFileInfo;
 import com.xsimple.im.db.datatable.IMGroupRemark;
 import com.xsimple.im.db.datatable.IMMessage;
 import com.xsimple.im.engine.IMEngine;
@@ -432,7 +431,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
     public void onImageReturn(Uri uri, String filePath, boolean isOrigin) {
 //        String filePath = autoCameraUtils.getPath(this, uri);
         String fileName = filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length());
-        final Message imgMsg = Message.createImageMessage(Message.Type.CHAT, me_user_id, to_user_id, fileName, filePath);
+        final Message imgMsg = Message.createImageMessage(Message.Type.CHAT, me_user_id, to_user_id,"",fileName, filePath);
         imgMsg.setStatus(Message.ChatStatus.SENDING);
         isOrigin = true;
         if (isOrigin) {

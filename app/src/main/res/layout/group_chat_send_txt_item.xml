@@ -7,7 +7,7 @@
 
     <CheckBox
         android:id="@+id/chat_select_view"
-        style="@style/chat_check_box"
+        style="@style/chat_check_box_black"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_alignParentBottom="true"
