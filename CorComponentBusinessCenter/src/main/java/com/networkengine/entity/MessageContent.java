@@ -37,6 +37,23 @@ public class MessageContent {
     public static final  String MSG_TYPE_DEVICE_ERASE="device_erase";
     public static final String MSG_TYPE_LIGHT_APP = "funcNotice";
 
+    //--------------------xplan----新加代码----------------------------//
+    //盒子小助手
+    public static final String MSG_TYPE_BOX = "box";
+    //官方消息
+    public static final String MSG_TYPE_OFFICIAL = "official";
+
+    /**
+     * 图片地址
+     */
+    private String imgUrl;
+    /**
+     * 连接
+     */
+    private String netUrl;
+
+    //--------------------xplan----新加代码----------------------------//
+
     private Long mId;
 
     private String type;
@@ -212,6 +229,22 @@ public class MessageContent {
     private String signType;
 
     private int unreadCount;
+
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
+
+    public String getNetUrl() {
+        return netUrl;
+    }
+
+    public void setNetUrl(String netUrl) {
+        this.netUrl = netUrl;
+    }
 
     public String getMessage() {
         return message;

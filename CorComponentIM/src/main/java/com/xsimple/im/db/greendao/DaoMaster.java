@@ -35,6 +35,8 @@ public class DaoMaster extends AbstractDaoMaster {
         IMShareInfoDao.createTable(db, ifNotExists);
         IMSysMessageDao.createTable(db, ifNotExists);
         IMUserDao.createTable(db, ifNotExists);
+        IMBoxMessageDao.createTable(db, ifNotExists);
+        IMOfficialMessageDao.createTable(db, ifNotExists);
     }
 
     /** Drops underlying database table using DAOs. */
@@ -53,6 +55,8 @@ public class DaoMaster extends AbstractDaoMaster {
         IMShareInfoDao.dropTable(db, ifExists);
         IMSysMessageDao.dropTable(db, ifExists);
         IMUserDao.dropTable(db, ifExists);
+        IMBoxMessageDao.dropTable(db, ifExists);
+        IMOfficialMessageDao.dropTable(db, ifExists);
     }
 
     /**
@@ -85,6 +89,8 @@ public class DaoMaster extends AbstractDaoMaster {
         registerDaoClass(IMShareInfoDao.class);
         registerDaoClass(IMSysMessageDao.class);
         registerDaoClass(IMUserDao.class);
+        registerDaoClass(IMBoxMessageDao.class);
+        registerDaoClass(IMOfficialMessageDao.class);
     }
 
     public DaoSession newSession() {

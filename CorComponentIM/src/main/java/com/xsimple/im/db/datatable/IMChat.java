@@ -20,6 +20,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.List;
+import com.xsimple.im.db.greendao.IMOfficialMessageDao;
+import com.xsimple.im.db.greendao.IMBoxMessageDao;
 
 
 /**
@@ -34,6 +36,10 @@ public class IMChat {
     public static final int SESSION_GROUP_DISCUSSION = 2;// 讨论组
     public static final int SESSION_SYSTEM_MSG = 3;// 系统消息
     public static final int SESSION_LIGHT_MSG = 4;// 轻应用消息
+
+
+    public static final int SESSION_BOX_MSG = 5;// 消息盒子
+    public static final int SESSION_OFFICIAL_MSG = 6;// 官方消息
 
     @IntDef({SESSION_PERSON, SESSION_GROUP_CLUSTER, SESSION_GROUP_DISCUSSION, SESSION_SYSTEM_MSG, SESSION_LIGHT_MSG})
     @Retention(RetentionPolicy.SOURCE)
@@ -120,6 +126,22 @@ public class IMChat {
             @JoinProperty(name = "id", referencedName = "cId")
     })
     private List<IMSysMessage> IMSysMessage;
+
+    /**
+     * 盒子小助手消息
+     */
+    @ToMany(joinProperties = {
+            @JoinProperty(name = "id", referencedName = "cId")
+    })
+    private List<IMBoxMessage> IMBoxMessage;
+
+    /**
+     * 官方消息消息
+     */
+    @ToMany(joinProperties = {
+            @JoinProperty(name = "id", referencedName = "cId")
+    })
+    private List<IMOfficialMessage> IMOfficialMessage;
 
     /**
      * Used for active entity operations.
@@ -438,5 +460,65 @@ public class IMChat {
                 ", myDao=" + myDao +
                 ", daoSession=" + daoSession +
                 '}';
+    }
+
+
+    /**
+     * To-many relationship, resolved on first access (and after reset).
+     * Changes to to-many relations are not persisted, make changes to the target entity.
+     */
+    @Generated(hash = 941858358)
+    public List<IMBoxMessage> getIMBoxMessage() {
+        if (IMBoxMessage == null) {
+            final DaoSession daoSession = this.daoSession;
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            IMBoxMessageDao targetDao = daoSession.getIMBoxMessageDao();
+            List<IMBoxMessage> IMBoxMessageNew = targetDao._queryIMChat_IMBoxMessage(id);
+            synchronized (this) {
+                if (IMBoxMessage == null) {
+                    IMBoxMessage = IMBoxMessageNew;
+                }
+            }
+        }
+        return IMBoxMessage;
+    }
+
+
+    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
+    @Generated(hash = 1431968648)
+    public synchronized void resetIMBoxMessage() {
+        IMBoxMessage = null;
+    }
+
+
+    /**
+     * To-many relationship, resolved on first access (and after reset).
+     * Changes to to-many relations are not persisted, make changes to the target entity.
+     */
+    @Generated(hash = 1146339301)
+    public List<IMOfficialMessage> getIMOfficialMessage() {
+        if (IMOfficialMessage == null) {
+            final DaoSession daoSession = this.daoSession;
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            IMOfficialMessageDao targetDao = daoSession.getIMOfficialMessageDao();
+            List<IMOfficialMessage> IMOfficialMessageNew = targetDao._queryIMChat_IMOfficialMessage(id);
+            synchronized (this) {
+                if (IMOfficialMessage == null) {
+                    IMOfficialMessage = IMOfficialMessageNew;
+                }
+            }
+        }
+        return IMOfficialMessage;
+    }
+
+
+    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
+    @Generated(hash = 1174372829)
+    public synchronized void resetIMOfficialMessage() {
+        IMOfficialMessage = null;
     }
 }

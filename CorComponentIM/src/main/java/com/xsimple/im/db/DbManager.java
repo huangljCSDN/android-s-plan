@@ -5,6 +5,7 @@ import android.text.TextUtils;
 
 import com.networkengine.util.LogUtil;
 import com.xsimple.im.db.datatable.IMBHelper;
+import com.xsimple.im.db.datatable.IMBoxMessage;
 import com.xsimple.im.db.datatable.IMCallInfo;
 import com.xsimple.im.db.datatable.IMChat;
 import com.xsimple.im.db.datatable.IMChatRecordInfo;
@@ -15,11 +16,13 @@ import com.xsimple.im.db.datatable.IMGroupRemark;
 import com.xsimple.im.db.datatable.IMGroupUser;
 import com.xsimple.im.db.datatable.IMLocationInfo;
 import com.xsimple.im.db.datatable.IMMessage;
+import com.xsimple.im.db.datatable.IMOfficialMessage;
 import com.xsimple.im.db.datatable.IMReplyInfo;
 import com.xsimple.im.db.datatable.IMSysMessage;
 import com.xsimple.im.db.datatable.IMUser;
 import com.xsimple.im.db.greendao.DaoMaster;
 import com.xsimple.im.db.greendao.DaoSession;
+import com.xsimple.im.db.greendao.IMBoxMessageDao;
 import com.xsimple.im.db.greendao.IMCallInfoDao;
 import com.xsimple.im.db.greendao.IMChatDao;
 import com.xsimple.im.db.greendao.IMChatRecordInfoDao;
@@ -30,6 +33,7 @@ import com.xsimple.im.db.greendao.IMGroupRemarkDao;
 import com.xsimple.im.db.greendao.IMGroupUserDao;
 import com.xsimple.im.db.greendao.IMLocationInfoDao;
 import com.xsimple.im.db.greendao.IMMessageDao;
+import com.xsimple.im.db.greendao.IMOfficialMessageDao;
 import com.xsimple.im.db.greendao.IMReplyInfoDao;
 import com.xsimple.im.db.greendao.IMSysMessageDao;
 import com.xsimple.im.db.greendao.IMUserDao;
@@ -84,6 +88,10 @@ public class DbManager {
 
     private IMChatRecordInfoDao mIMChatRecordInfoDao;
 
+    private IMBoxMessageDao mImBoxMessageDao;
+
+    private IMOfficialMessageDao mImOfficialMessageDao;
+
     private static DbManager mDbManager;
 
     private DbManager(Context context) {
@@ -122,6 +130,10 @@ public class DbManager {
         mImReplyInfoDao = mDaoSession.getIMReplyInfoDao();
 
         mIMChatRecordInfoDao = mDaoSession.getIMChatRecordInfoDao();
+
+        mImBoxMessageDao = mDaoSession.getIMBoxMessageDao();
+
+        mImOfficialMessageDao = mDaoSession.getIMOfficialMessageDao();
     }
 
     public static DbManager getInstance(Context ct) {
@@ -292,6 +304,18 @@ public class DbManager {
     public void insertSysMessage(IMSysMessage sysMessage) {
         if (sysMessage != null) {
             mSysMessageDao.insertOrReplace(sysMessage);
+        }
+    }
+
+    public void insertBoxMessage(IMBoxMessage boxMessage) {
+        if (boxMessage != null) {
+            mImBoxMessageDao.insertOrReplace(boxMessage);
+        }
+    }
+
+    public void insertOfficailMessage(IMOfficialMessage officialMessage) {
+        if (officialMessage != null) {
+            mImOfficialMessageDao.insertOrReplace(officialMessage);
         }
     }
 
@@ -743,6 +767,87 @@ public class DbManager {
 
         /*将消息插入数据库*/
         insertSysMessage(imSysMessage);
+        return true;
+
+    }
+
+    /**
+     * 向会话中添加盒子消息
+     */
+    public boolean addOrUpdateBoxMsgToChat(IMBoxMessage imBoxMessage) {
+
+        if (imBoxMessage == null) {
+            return false;
+        }
+
+
+        //获取系统消息的会话
+        List<IMChat> iMChats = mChatDao.queryBuilder().where(IMChatDao.Properties.Type.eq(IMChat.SESSION_BOX_MSG)).build().list();
+
+
+        IMChat chat = null;
+
+        if (iMChats != null && !iMChats.isEmpty()) {
+            chat = iMChats.get(0);
+        }
+
+        /*是否为新会话要加入本地数据库*/
+        if (chat == null) {
+            String chatName = "盒子小助手";
+            IMChat newIMChat = new IMChat(imBoxMessage.getUserId(), "", IMChat.SESSION_BOX_MSG, chatName, 1, imBoxMessage.getSendTimer(), "", "", "");
+            Long chatId = mChatDao.insert(newIMChat);
+            imBoxMessage.setCId(chatId);
+        } else {
+            imBoxMessage.setCId(chat.getId());
+            if (!imBoxMessage.getIsRead()) {
+                chat.setUnReadCount(chat.getUnReadCount() + 1);
+            }
+            chat.setTime(imBoxMessage.getSendTimer());
+            chat.update();
+        }
+
+        /*将消息插入数据库*/
+        insertBoxMessage(imBoxMessage);
+        return true;
+    }
+
+    /**
+     * 向会话中添加官方消息
+     */
+    public boolean addOrUpdateOfficialMsgToChat(IMOfficialMessage imOfficialMessage) {
+
+        if (imOfficialMessage == null) {
+            return false;
+        }
+
+
+        //获取系统消息的会话
+        List<IMChat> iMChats = mChatDao.queryBuilder().where(IMChatDao.Properties.Type.eq(IMChat.SESSION_OFFICIAL_MSG)).build().list();
+
+
+        IMChat chat = null;
+
+        if (iMChats != null && !iMChats.isEmpty()) {
+            chat = iMChats.get(0);
+        }
+
+        /*是否为新会话要加入本地数据库*/
+        if (chat == null) {
+            String chatName = "官方消息";
+            IMChat newIMChat = new IMChat(imOfficialMessage.getUserId(), "", IMChat.SESSION_OFFICIAL_MSG, chatName, 1, imOfficialMessage.getSendTimer(), "", "", "");
+            Long chatId = mChatDao.insert(newIMChat);
+            imOfficialMessage.setCId(chatId);
+        } else {
+            imOfficialMessage.setCId(chat.getId());
+            if (!imOfficialMessage.getIsRead()) {
+                chat.setUnReadCount(chat.getUnReadCount() + 1);
+            }
+            chat.setTime(imOfficialMessage.getSendTimer());
+            chat.update();
+        }
+
+        /*将消息插入数据库*/
+        insertOfficailMessage(imOfficialMessage);
         return true;
 
     }
