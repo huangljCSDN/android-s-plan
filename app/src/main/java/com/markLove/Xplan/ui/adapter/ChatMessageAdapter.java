@@ -1442,8 +1442,8 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHolder>
                 imMessage.setStatus(status);
                 if (fileStatus == IMMessage.STATUS_FAIL && imMessage.getIMFileInfo() != null){
                     imMessage.getIMFileInfo().setStatus(IMMessage.STATUS_FAIL);
-                    break;
                 }
+                break;
             }
         }
     }

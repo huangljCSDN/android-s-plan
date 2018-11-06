@@ -79,6 +79,7 @@ import com.xsimple.im.db.datatable.IMChat;
 import com.xsimple.im.db.datatable.IMGroupRemark;
 import com.xsimple.im.db.datatable.IMMessage;
 import com.xsimple.im.engine.IMEngine;
+import com.xsimple.im.engine.protocol.IMCommand;
 import com.xsimple.im.event.ExitGroupEvent;
 
 import org.greenrobot.eventbus.EventBus;
@@ -269,7 +270,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 
         chatPresenter = new ChatPresenterImpl();
         chatPresenter.setView(this);
-        chatView.setId(me_user_id,to_user_id);
+        chatView.setId(me_user_id,dataId);
 //        tvChatSendPrice.setText(gold + "");
 //        chatPresenter.getHistory(me_user_id, to_user_id);
 //        getGiftList();
@@ -309,7 +310,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
             @Override
             public void onMenuClick() {
                 updataMessage(resendMessage.getMsgID(), Message.ChatStatus.SENDING.ordinal());
-                judeBlackList(resendMessage);
+
             }
         });
         resendMsgDialog.show();
@@ -382,22 +383,6 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
                 }
             }
         });
-    }
-
-    /**
-     * 判断是否被拉黑
-     *
-     * @param msg
-     */
-    private void judeBlackList(final Message msg) {
-        if (null != msg) {
-            int sendCount = PreferencesUtils.getInt(this, Constants.SEND_MESSAGE_COUNT + to_user_id, 0);
-            //原计数+1
-            PreferencesUtils.putInt(this, Constants.SEND_MESSAGE_COUNT + to_user_id, ++sendCount);
-            msg.setStatus(Message.ChatStatus.SENDING);
-            addOneMessage(msg);
-        }
-        sendMessage(msg);
     }
 
     /**
@@ -477,7 +462,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 
                         @Override
                         public void onNext(Message message) {
-                            judeBlackList(message);
+
                         }
 
                         @Override
@@ -858,7 +843,6 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
     private void getMerchantInfo() {
         Map<String, String> map = new HashMap<>();
         map.put("merchantId", String.valueOf(dataId));
-//        map.put("merchantId", String.valueOf(22554));
         mPresenter.getMerchantInfo(map);
     }
 

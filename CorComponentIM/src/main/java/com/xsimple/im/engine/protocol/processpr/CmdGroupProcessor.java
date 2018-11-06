@@ -42,7 +42,8 @@ public abstract class CmdGroupProcessor extends Processor<MsgEntity, IMCommand> 
         IMMessage imMessage = new IMMessage();
 
         setContentType(imMessage, msgEntity);
-        imMessage.setTagertId(messageContent.getG_id());
+//        imMessage.setTagertId(messageContent.getG_id());
+        imMessage.setTagertId(messageContent.getUserId());
         imMessage.setSenderId(msgEntity.getParam().getSenderId());
         imMessage.setSenderName(messageContent.getSenderName());
         imMessage.setStatus(IMMessage.STATUS_SUCCESS);

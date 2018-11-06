@@ -947,7 +947,7 @@ public class IMChatLogic implements IIMChatLogic, IMObserver, Handler.Callback {
             }
             handlerOrder(next);
         }
-        // mIMChatCallBack.onOrderReceived(orders);
+//         mIMChatCallBack.onOrderReceived(orders);
 
     }
 

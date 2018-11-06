@@ -53,19 +53,20 @@ public class IMMessageDao extends AbstractDao<IMMessage, Long> {
         public final static Property Content = new Property(13, String.class, "content", false, "content");
         public final static Property Status = new Property(14, int.class, "status", false, "status");
         public final static Property IsRead = new Property(15, boolean.class, "isRead", false, "read");
-        public final static Property ReadCount = new Property(16, int.class, "readCount", false, "read_count");
-        public final static Property UnReadCount = new Property(17, int.class, "unReadCount", false, "un_read_count");
-        public final static Property Mk = new Property(18, String.class, "mk", false, "mk");
-        public final static Property IsDisturb = new Property(19, String.class, "isDisturb", false, "IS_DISTURB");
-        public final static Property IsAiteMe = new Property(20, boolean.class, "isAiteMe", false, "IS_AITE_ME");
-        public final static Property FId = new Property(21, Long.class, "fId", false, "F_ID");
-        public final static Property CallId = new Property(22, Long.class, "callId", false, "CALL_ID");
-        public final static Property LId = new Property(23, Long.class, "lId", false, "L_ID");
-        public final static Property SId = new Property(24, Long.class, "sId", false, "S_ID");
-        public final static Property RId = new Property(25, Long.class, "rId", false, "R_ID");
-        public final static Property ReplyId = new Property(26, Long.class, "replyId", false, "REPLY_ID");
-        public final static Property RecordId = new Property(27, Long.class, "recordId", false, "RECORD_ID");
-        public final static Property AtInfo = new Property(28, String.class, "AtInfo", false, "AT_INFO");
+        public final static Property IsAgree = new Property(16, boolean.class, "isAgree", false, "agree");
+        public final static Property ReadCount = new Property(17, int.class, "readCount", false, "read_count");
+        public final static Property UnReadCount = new Property(18, int.class, "unReadCount", false, "un_read_count");
+        public final static Property Mk = new Property(19, String.class, "mk", false, "mk");
+        public final static Property IsDisturb = new Property(20, String.class, "isDisturb", false, "IS_DISTURB");
+        public final static Property IsAiteMe = new Property(21, boolean.class, "isAiteMe", false, "IS_AITE_ME");
+        public final static Property FId = new Property(22, Long.class, "fId", false, "F_ID");
+        public final static Property CallId = new Property(23, Long.class, "callId", false, "CALL_ID");
+        public final static Property LId = new Property(24, Long.class, "lId", false, "L_ID");
+        public final static Property SId = new Property(25, Long.class, "sId", false, "S_ID");
+        public final static Property RId = new Property(26, Long.class, "rId", false, "R_ID");
+        public final static Property ReplyId = new Property(27, Long.class, "replyId", false, "REPLY_ID");
+        public final static Property RecordId = new Property(28, Long.class, "recordId", false, "RECORD_ID");
+        public final static Property AtInfo = new Property(29, String.class, "AtInfo", false, "AT_INFO");
     }
 
     private DaoSession daoSession;
@@ -101,19 +102,20 @@ public class IMMessageDao extends AbstractDao<IMMessage, Long> {
                 "\"content\" TEXT," + // 13: content
                 "\"status\" INTEGER NOT NULL ," + // 14: status
                 "\"read\" INTEGER NOT NULL ," + // 15: isRead
-                "\"read_count\" INTEGER NOT NULL ," + // 16: readCount
-                "\"un_read_count\" INTEGER NOT NULL ," + // 17: unReadCount
-                "\"mk\" TEXT," + // 18: mk
-                "\"IS_DISTURB\" TEXT," + // 19: isDisturb
-                "\"IS_AITE_ME\" INTEGER NOT NULL ," + // 20: isAiteMe
-                "\"F_ID\" INTEGER," + // 21: fId
-                "\"CALL_ID\" INTEGER," + // 22: callId
-                "\"L_ID\" INTEGER," + // 23: lId
-                "\"S_ID\" INTEGER," + // 24: sId
-                "\"R_ID\" INTEGER," + // 25: rId
-                "\"REPLY_ID\" INTEGER," + // 26: replyId
-                "\"RECORD_ID\" INTEGER," + // 27: recordId
-                "\"AT_INFO\" TEXT);"); // 28: AtInfo
+                "\"agree\" INTEGER NOT NULL ," + // 16: isAgree
+                "\"read_count\" INTEGER NOT NULL ," + // 17: readCount
+                "\"un_read_count\" INTEGER NOT NULL ," + // 18: unReadCount
+                "\"mk\" TEXT," + // 19: mk
+                "\"IS_DISTURB\" TEXT," + // 20: isDisturb
+                "\"IS_AITE_ME\" INTEGER NOT NULL ," + // 21: isAiteMe
+                "\"F_ID\" INTEGER," + // 22: fId
+                "\"CALL_ID\" INTEGER," + // 23: callId
+                "\"L_ID\" INTEGER," + // 24: lId
+                "\"S_ID\" INTEGER," + // 25: sId
+                "\"R_ID\" INTEGER," + // 26: rId
+                "\"REPLY_ID\" INTEGER," + // 27: replyId
+                "\"RECORD_ID\" INTEGER," + // 28: recordId
+                "\"AT_INFO\" TEXT);"); // 29: AtInfo
     }
 
     /** Drops the underlying database table. */
@@ -185,58 +187,59 @@ public class IMMessageDao extends AbstractDao<IMMessage, Long> {
         }
         stmt.bindLong(15, entity.getStatus());
         stmt.bindLong(16, entity.getIsRead() ? 1L: 0L);
-        stmt.bindLong(17, entity.getReadCount());
-        stmt.bindLong(18, entity.getUnReadCount());
+        stmt.bindLong(17, entity.getIsAgree() ? 1L: 0L);
+        stmt.bindLong(18, entity.getReadCount());
+        stmt.bindLong(19, entity.getUnReadCount());
  
         String mk = entity.getMk();
         if (mk != null) {
-            stmt.bindString(19, mk);
+            stmt.bindString(20, mk);
         }
  
         String isDisturb = entity.getIsDisturb();
         if (isDisturb != null) {
-            stmt.bindString(20, isDisturb);
+            stmt.bindString(21, isDisturb);
         }
-        stmt.bindLong(21, entity.getIsAiteMe() ? 1L: 0L);
+        stmt.bindLong(22, entity.getIsAiteMe() ? 1L: 0L);
  
         Long fId = entity.getFId();
         if (fId != null) {
-            stmt.bindLong(22, fId);
+            stmt.bindLong(23, fId);
         }
  
         Long callId = entity.getCallId();
         if (callId != null) {
-            stmt.bindLong(23, callId);
+            stmt.bindLong(24, callId);
         }
  
         Long lId = entity.getLId();
         if (lId != null) {
-            stmt.bindLong(24, lId);
+            stmt.bindLong(25, lId);
         }
  
         Long sId = entity.getSId();
         if (sId != null) {
-            stmt.bindLong(25, sId);
+            stmt.bindLong(26, sId);
         }
  
         Long rId = entity.getRId();
         if (rId != null) {
-            stmt.bindLong(26, rId);
+            stmt.bindLong(27, rId);
         }
  
         Long replyId = entity.getReplyId();
         if (replyId != null) {
-            stmt.bindLong(27, replyId);
+            stmt.bindLong(28, replyId);
         }
  
         Long recordId = entity.getRecordId();
         if (recordId != null) {
-            stmt.bindLong(28, recordId);
+            stmt.bindLong(29, recordId);
         }
  
         String AtInfo = entity.getAtInfo();
         if (AtInfo != null) {
-            stmt.bindString(29, AtInfo);
+            stmt.bindString(30, AtInfo);
         }
     }
 
@@ -303,58 +306,59 @@ public class IMMessageDao extends AbstractDao<IMMessage, Long> {
         }
         stmt.bindLong(15, entity.getStatus());
         stmt.bindLong(16, entity.getIsRead() ? 1L: 0L);
-        stmt.bindLong(17, entity.getReadCount());
-        stmt.bindLong(18, entity.getUnReadCount());
+        stmt.bindLong(17, entity.getIsAgree() ? 1L: 0L);
+        stmt.bindLong(18, entity.getReadCount());
+        stmt.bindLong(19, entity.getUnReadCount());
  
         String mk = entity.getMk();
         if (mk != null) {
-            stmt.bindString(19, mk);
+            stmt.bindString(20, mk);
         }
  
         String isDisturb = entity.getIsDisturb();
         if (isDisturb != null) {
-            stmt.bindString(20, isDisturb);
+            stmt.bindString(21, isDisturb);
         }
-        stmt.bindLong(21, entity.getIsAiteMe() ? 1L: 0L);
+        stmt.bindLong(22, entity.getIsAiteMe() ? 1L: 0L);
  
         Long fId = entity.getFId();
         if (fId != null) {
-            stmt.bindLong(22, fId);
+            stmt.bindLong(23, fId);
         }
  
         Long callId = entity.getCallId();
         if (callId != null) {
-            stmt.bindLong(23, callId);
+            stmt.bindLong(24, callId);
         }
  
         Long lId = entity.getLId();
         if (lId != null) {
-            stmt.bindLong(24, lId);
+            stmt.bindLong(25, lId);
         }
  
         Long sId = entity.getSId();
         if (sId != null) {
-            stmt.bindLong(25, sId);
+            stmt.bindLong(26, sId);
         }
  
         Long rId = entity.getRId();
         if (rId != null) {
-            stmt.bindLong(26, rId);
+            stmt.bindLong(27, rId);
         }
  
         Long replyId = entity.getReplyId();
         if (replyId != null) {
-            stmt.bindLong(27, replyId);
+            stmt.bindLong(28, replyId);
         }
  
         Long recordId = entity.getRecordId();
         if (recordId != null) {
-            stmt.bindLong(28, recordId);
+            stmt.bindLong(29, recordId);
         }
  
         String AtInfo = entity.getAtInfo();
         if (AtInfo != null) {
-            stmt.bindString(29, AtInfo);
+            stmt.bindString(30, AtInfo);
         }
     }
 
@@ -388,19 +392,20 @@ public class IMMessageDao extends AbstractDao<IMMessage, Long> {
             cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // content
             cursor.getInt(offset + 14), // status
             cursor.getShort(offset + 15) != 0, // isRead
-            cursor.getInt(offset + 16), // readCount
-            cursor.getInt(offset + 17), // unReadCount
-            cursor.isNull(offset + 18) ? null : cursor.getString(offset + 18), // mk
-            cursor.isNull(offset + 19) ? null : cursor.getString(offset + 19), // isDisturb
-            cursor.getShort(offset + 20) != 0, // isAiteMe
-            cursor.isNull(offset + 21) ? null : cursor.getLong(offset + 21), // fId
-            cursor.isNull(offset + 22) ? null : cursor.getLong(offset + 22), // callId
-            cursor.isNull(offset + 23) ? null : cursor.getLong(offset + 23), // lId
-            cursor.isNull(offset + 24) ? null : cursor.getLong(offset + 24), // sId
-            cursor.isNull(offset + 25) ? null : cursor.getLong(offset + 25), // rId
-            cursor.isNull(offset + 26) ? null : cursor.getLong(offset + 26), // replyId
-            cursor.isNull(offset + 27) ? null : cursor.getLong(offset + 27), // recordId
-            cursor.isNull(offset + 28) ? null : cursor.getString(offset + 28) // AtInfo
+            cursor.getShort(offset + 16) != 0, // isAgree
+            cursor.getInt(offset + 17), // readCount
+            cursor.getInt(offset + 18), // unReadCount
+            cursor.isNull(offset + 19) ? null : cursor.getString(offset + 19), // mk
+            cursor.isNull(offset + 20) ? null : cursor.getString(offset + 20), // isDisturb
+            cursor.getShort(offset + 21) != 0, // isAiteMe
+            cursor.isNull(offset + 22) ? null : cursor.getLong(offset + 22), // fId
+            cursor.isNull(offset + 23) ? null : cursor.getLong(offset + 23), // callId
+            cursor.isNull(offset + 24) ? null : cursor.getLong(offset + 24), // lId
+            cursor.isNull(offset + 25) ? null : cursor.getLong(offset + 25), // sId
+            cursor.isNull(offset + 26) ? null : cursor.getLong(offset + 26), // rId
+            cursor.isNull(offset + 27) ? null : cursor.getLong(offset + 27), // replyId
+            cursor.isNull(offset + 28) ? null : cursor.getLong(offset + 28), // recordId
+            cursor.isNull(offset + 29) ? null : cursor.getString(offset + 29) // AtInfo
         );
         return entity;
     }
@@ -423,19 +428,20 @@ public class IMMessageDao extends AbstractDao<IMMessage, Long> {
         entity.setContent(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
         entity.setStatus(cursor.getInt(offset + 14));
         entity.setIsRead(cursor.getShort(offset + 15) != 0);
-        entity.setReadCount(cursor.getInt(offset + 16));
-        entity.setUnReadCount(cursor.getInt(offset + 17));
-        entity.setMk(cursor.isNull(offset + 18) ? null : cursor.getString(offset + 18));
-        entity.setIsDisturb(cursor.isNull(offset + 19) ? null : cursor.getString(offset + 19));
-        entity.setIsAiteMe(cursor.getShort(offset + 20) != 0);
-        entity.setFId(cursor.isNull(offset + 21) ? null : cursor.getLong(offset + 21));
-        entity.setCallId(cursor.isNull(offset + 22) ? null : cursor.getLong(offset + 22));
-        entity.setLId(cursor.isNull(offset + 23) ? null : cursor.getLong(offset + 23));
-        entity.setSId(cursor.isNull(offset + 24) ? null : cursor.getLong(offset + 24));
-        entity.setRId(cursor.isNull(offset + 25) ? null : cursor.getLong(offset + 25));
-        entity.setReplyId(cursor.isNull(offset + 26) ? null : cursor.getLong(offset + 26));
-        entity.setRecordId(cursor.isNull(offset + 27) ? null : cursor.getLong(offset + 27));
-        entity.setAtInfo(cursor.isNull(offset + 28) ? null : cursor.getString(offset + 28));
+        entity.setIsAgree(cursor.getShort(offset + 16) != 0);
+        entity.setReadCount(cursor.getInt(offset + 17));
+        entity.setUnReadCount(cursor.getInt(offset + 18));
+        entity.setMk(cursor.isNull(offset + 19) ? null : cursor.getString(offset + 19));
+        entity.setIsDisturb(cursor.isNull(offset + 20) ? null : cursor.getString(offset + 20));
+        entity.setIsAiteMe(cursor.getShort(offset + 21) != 0);
+        entity.setFId(cursor.isNull(offset + 22) ? null : cursor.getLong(offset + 22));
+        entity.setCallId(cursor.isNull(offset + 23) ? null : cursor.getLong(offset + 23));
+        entity.setLId(cursor.isNull(offset + 24) ? null : cursor.getLong(offset + 24));
+        entity.setSId(cursor.isNull(offset + 25) ? null : cursor.getLong(offset + 25));
+        entity.setRId(cursor.isNull(offset + 26) ? null : cursor.getLong(offset + 26));
+        entity.setReplyId(cursor.isNull(offset + 27) ? null : cursor.getLong(offset + 27));
+        entity.setRecordId(cursor.isNull(offset + 28) ? null : cursor.getLong(offset + 28));
+        entity.setAtInfo(cursor.isNull(offset + 29) ? null : cursor.getString(offset + 29));
      }
     
     @Override

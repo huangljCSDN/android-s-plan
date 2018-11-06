@@ -54,7 +54,7 @@ public class GroupChatPresenter extends GroupChatContract.Presenter {
             public void onSuccess(BaseBean baseBean) {
                 LogUtils.i("GroupChatPresenter",baseBean.toString());
                 getView().hideLoading();
-//                getView().onParticipateGroup(baseBean);
+                getView().onParticipateGroup(baseBean);
             }
 
             @Override

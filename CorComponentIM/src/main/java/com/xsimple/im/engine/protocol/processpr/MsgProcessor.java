@@ -225,7 +225,13 @@ public class MsgProcessor extends Processor<MsgEntity, IMMessage> {
                 (mUid.equals(msgEntity.getParam().getSenderId())
                         ? IMMessage.FLAG_MSG_SENDER : IMMessage.FLAG_MSG_RECEIVER));
         imMessage.setStatus(IMMessage.STATUS_SUCCESS);
-        imMessage.setTagertId(msgEntity.getMsgContent().getRids());
+        //局长同意报名的目标id
+        if (IMMessage.GROUP_OFFICE_AGREE.equals(contentType) || IMMessage.GROUP_OFFICE_APPLY.equals(contentType)){
+            imMessage.setTagertId(msgEntity.getMsgContent().getUserId());
+        } else {
+            imMessage.setTagertId(msgEntity.getMsgContent().getRids());
+        }
+
         imMessage.setTime(Long.valueOf(msgEntity.getParam().getSendTime()));
         imMessage.setType(getMsgType(msgEntity.getMsgContent().getChatType()));
         imMessage.setIsDisturb(msgEntity.getParam().isDisturb);

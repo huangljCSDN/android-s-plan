@@ -11,7 +11,7 @@ import org.greenrobot.greendao.annotation.Property;
 /**
  * Description：官方消息
  */
-@Entity(nameInDb = "im_box_message")
+@Entity(nameInDb = "im_official_message")
 public class IMOfficialMessage {
 
     @Id(autoincrement = true)

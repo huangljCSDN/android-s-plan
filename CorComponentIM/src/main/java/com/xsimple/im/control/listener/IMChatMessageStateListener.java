@@ -1,6 +1,7 @@
 package com.xsimple.im.control.listener;
 
 import com.xsimple.im.db.datatable.IMMessage;
+import com.xsimple.im.engine.protocol.IMCommand;
 
 import java.util.List;
 

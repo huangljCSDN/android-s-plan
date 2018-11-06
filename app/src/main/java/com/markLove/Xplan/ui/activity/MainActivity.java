@@ -41,7 +41,9 @@ import com.networkengine.database.table.Member;
 import com.networkengine.engine.LogicEngine;
 import com.networkengine.util.CoracleSdk;
 import com.xsimple.im.db.datatable.IMBoxMessage;
+import com.xsimple.im.db.datatable.IMChat;
 import com.xsimple.im.db.datatable.IMOfficialMessage;
+import com.xsimple.im.engine.IMEngine;
 import com.xsimple.im.engine.LoginLogic;
 
 import java.lang.ref.WeakReference;
@@ -82,14 +84,19 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
         initMapClient();
         myHandler = new MyHandler(this);
         myHandler.sendEmptyMessageDelayed(1,1000*40);
+        login();
+//        test();
+    }
 
+    private void test(){
         IMBoxMessage imBoxMessage = new IMBoxMessage(Long.parseLong("0"),Long.parseLong("0"),"366930", (long)213123,false,false,"box","","你被提出组局了");
         LogUtils.i("huang",GsonUtils.obj2Json(imBoxMessage));
         IMOfficialMessage imOfficialMessage = new IMOfficialMessage((long)0,(long)0,"356665","das15564789.png","http://www.baidu.com",(long)1515588845,false,false,"official","这是标题","给你送了大礼包了");
         LogUtils.i("huang",GsonUtils.obj2Json(imOfficialMessage));
-        login();
-    }
+        IMEngine mImEngine = IMEngine.getInstance(getApplication());
+        List<IMChat> chats = mImEngine.getChats(App.getInstance().getUserId());
 
+    }
 
     private void initMapClient(){
         aMapClient = new AMapClient(this);

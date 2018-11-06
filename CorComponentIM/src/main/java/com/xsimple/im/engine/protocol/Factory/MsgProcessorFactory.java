@@ -37,6 +37,8 @@ public class MsgProcessorFactory extends ProcessorFactory<String, MsgEntity, IMM
         processorMap.put(IMMessage.CONTENT_TYPE_VIDEO_CHAT, msgProcessor);
         processorMap.put(IMMessage.CONTENT_TYPE_REJECT, msgProcessor);
         processorMap.put(IMMessage.CONTENT_TYPE_CANCEL, msgProcessor);
+        processorMap.put(IMMessage.GROUP_OFFICE_AGREE, msgProcessor);
+        processorMap.put(IMMessage.GROUP_OFFICE_APPLY, msgProcessor);
 
     }
 

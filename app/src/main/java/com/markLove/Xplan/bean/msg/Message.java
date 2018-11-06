@@ -38,6 +38,18 @@ public class Message {
      * Im原始消息，为了兼容两套框架，要保存
      */
     private IMMessage imMessage;
+    /**
+     * 是否同意
+     */
+    private boolean isAgree;
+
+    public boolean isAgree() {
+        return isAgree;
+    }
+
+    public void setAgree(boolean agree) {
+        isAgree = agree;
+    }
 
     public IMMessage getImMessage() {
         return imMessage;
@@ -192,7 +204,7 @@ public class Message {
     public enum ChatType {
         //8和9代表图片描述和语音描述
         NULL(0), TXT(1), VOICE(2), VIDEO(3), IMAGE(4), LOVE(5), SUPERLIKE(6), GIFT(7), VOICE_DESC(8), IMAGE_DESC(9), VIDEO_DESC(10), ORDER(11) ,CIRCLE_GIFT(12),
-        NOTIFICATION(13),REQUEST_JOIN(4);
+        NOTIFICATION(13),REQUEST_JOIN(14);
         public int flag;
 
         ChatType(int chatType) {

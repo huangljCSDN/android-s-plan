@@ -6,6 +6,7 @@ import com.xsimple.im.db.DbManager;
 import com.xsimple.im.db.datatable.IMMessage;
 import com.xsimple.im.engine.protocol.IMCommand;
 import com.xsimple.im.engine.protocol.MsgEntity;
+import com.xsimple.im.engine.protocol.processpr.CmdChatRoomAgreeProcessor;
 import com.xsimple.im.engine.protocol.processpr.CmdFixGroupActiveProcessor;
 import com.xsimple.im.engine.protocol.processpr.CmdFixGroupAddProcessor;
 import com.xsimple.im.engine.protocol.processpr.CmdFixGroupAdminProcessor;
@@ -79,6 +80,8 @@ public class CmdProcessorFactory extends ProcessorFactory<String, MsgEntity, IMC
         processorMap.put(IMMessage.GROUP_UPDATE_NAME, new CmdGroupUpdateName(mCt, mDbManager));
         processorMap.put(IMMessage.SCAN_QRCODE_JOIN_GROUP, new CmdScanJoinGroupProcessor(mCt, mDbManager));
 
+        processorMap.put(IMMessage.GROUP_OFFICE_AGREE, new CmdChatRoomAgreeProcessor(mCt, mDbManager));
+        processorMap.put(IMMessage.GROUP_OFFICE_APPLY, new CmdChatRoomAgreeProcessor(mCt, mDbManager));
 
     }
 

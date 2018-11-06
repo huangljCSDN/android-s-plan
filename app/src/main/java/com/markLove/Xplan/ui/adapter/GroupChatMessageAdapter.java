@@ -37,6 +37,7 @@ import com.markLove.Xplan.bean.msg.body.TxtMessageBody;
 import com.markLove.Xplan.config.Constants;
 import com.markLove.Xplan.db.DBDao;
 import com.markLove.Xplan.module.emoji.EmojiUtils;
+import com.markLove.Xplan.ui.activity.GroupChatActivity;
 import com.markLove.Xplan.ui.activity.ZoomImageActivity;
 import com.markLove.Xplan.ui.dialog.BecomeLovesDialog;
 import com.markLove.Xplan.ui.dialog.CoupleGiftPopupWindow;
@@ -84,6 +85,11 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
 
     private String fromHeadImgUrl;
     private String toHeadImgUrl;
+    private int me_user_id;
+
+    public void setMe_user_id(int me_user_id) {
+        this.me_user_id = me_user_id;
+    }
 
     public void setToHeadImgUrl(String url) {
         if (TextUtils.isEmpty(url)) return;
@@ -208,7 +214,9 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
             viewHolder.btnAgree.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    resetButton((Button) view);
+                    if (mAdapterCallBack != null){
+                        mAdapterCallBack.onAgree(msg.getToID(),Integer.valueOf(msg.getMsgID()));
+                    }
                 }
             });
         }
@@ -481,14 +489,16 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
                 final String bodyTxt = ((TxtMessageBody) body).getMsg();
                 txtMsg.setText(EmojiUtils.parseEmoji(txtMsg.getContext(), bodyTxt));
             }
+            if (msg.isAgree()){
+                Context context = rootView.getContext();
+                btnAgree.setText("已同意");
+                btnAgree.setTextColor(Color.parseColor("#333333"));
+                btnAgree.setBackground(context.getDrawable(R.drawable.bg_joined));
+                btnAgree.setClickable(false);
+            }
         }
     }
 
-    private void resetButton(Button button) {
-        button.setText("已同意");
-        button.setTextColor(Color.parseColor("#333333"));
-        button.setBackground(context.getDrawable(R.drawable.bg_joined));
-    }
 
     /**
      * 加入聊天室通知消息
@@ -1453,15 +1463,15 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
         }
     }
 
-    public interface OnRejectCoupleListener {
-        void onRejectCouple(String rejectContactsId);
+    public interface OnAdapterCallBack {
+        void onAgree(int userId,int msgId);
     }
 
-    private OnRejectCoupleListener mListener;
+    private OnAdapterCallBack mAdapterCallBack;
 
 
-    public void setOnRejectCoupleListener(OnRejectCoupleListener listener) {
-        mListener = listener;
+    public void setOnOnAdapterCallBack(OnAdapterCallBack listener) {
+        mAdapterCallBack = listener;
     }
 
     //---------------------------新IM方法,IMMessage转成Message，整合两套框架的结果，蛋疼的代码，被逼无奈，时间太紧，根本没时间重写，整套框架脑壳疼------------------------------//
@@ -1536,9 +1546,23 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
             fileMessageBody.setSha(sha);
             message.setImMessage(imMessage);
             message.setStatus(changeStatus(imMessage.getStatus()));
-        } else {
+        } else if (IMMessage.CONTENT_TYPE_TXT.equals(imMessage.getContentType())) {
             message = Message.createTxtMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()), imMessage.getLocalId() + "", imMessage.getContent());
             message.setImMessage(imMessage);
+            message.setStatus(changeStatus(imMessage.getStatus()));
+        } else if (IMMessage.GROUP_OFFICE_AGREE.equals(imMessage.getContentType())) {
+            TxtMessageBody txtMessageBody = new TxtMessageBody(Message.Type.CHAT, Message.ChatType.TXT, imMessage.getContent());
+            message = new Message(Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()),String.valueOf(imMessage.getLocalId()),Message.Type.CHAT, Message.ChatType.REQUEST_JOIN,txtMessageBody);
+            message.setImMessage(imMessage);
+            message.setStatus(changeStatus(imMessage.getStatus()));
+            if (Integer.valueOf(imMessage.getTagertId()) == me_user_id){
+                ((GroupChatActivity)context).showJoinSuccess();
+            }
+        } else if (IMMessage.GROUP_OFFICE_APPLY.equals(imMessage.getContentType())) {
+            TxtMessageBody txtMessageBody = new TxtMessageBody(Message.Type.CHAT, Message.ChatType.TXT, imMessage.getContent());
+            message = new Message(Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()),String.valueOf(imMessage.getLocalId()),Message.Type.CHAT, Message.ChatType.NOTIFICATION,txtMessageBody);
+            message.setImMessage(imMessage);
+            message.setAgree(imMessage.getIsAgree());
             message.setStatus(changeStatus(imMessage.getStatus()));
         }
         onAutoDownload(imMessage);
@@ -1612,8 +1636,25 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
                 imMessage.setStatus(status);
                 if (fileStatus == IMMessage.STATUS_FAIL && imMessage.getIMFileInfo() != null){
                     imMessage.getIMFileInfo().setStatus(IMMessage.STATUS_FAIL);
-                    break;
                 }
+                break;
+            }
+        }
+    }
+
+    public void refreshAgreeMessageStatus(long localId) {
+        for (int i = 0; i < mDatas.size(); i++) {
+            Message message = mDatas.get(i);
+            if (message.getMsgID().equals(String.valueOf(localId))) {
+                message.setAgree(true);
+                notifyItemChanged(i);
+                break;
+            }
+        }
+        for (IMMessage imMessage : iMMsgList) {
+            if (imMessage.getLocalId() == localId) {
+                imMessage.setIsAgree(true);
+                break;
             }
         }
     }

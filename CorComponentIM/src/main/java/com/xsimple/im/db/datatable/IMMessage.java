@@ -215,6 +215,14 @@ public class IMMessage {
      */
     public static final String GROUP_UPDATE = "GROUP_UPDATE";
 
+    //-----------------------xplan-----------------------------//
+    //局长同意加入组局
+    public static final String GROUP_OFFICE_AGREE = "GROUP_OFFICE_AGREE";
+
+    //申请加入组局
+    public static final String GROUP_OFFICE_APPLY = "GROUP_OFFICE_APPLY";
+    //-----------------------xplan-----------------------------//
+
     /**
      * 更新群组名称
      */
@@ -367,6 +375,12 @@ public class IMMessage {
     private boolean isRead;
 
     /**
+     * 是否同意
+     */
+    @Property(nameInDb = "agree")
+    private boolean isAgree;
+
+    /**
      * 已读人数
      */
     @Property(nameInDb = "read_count")
@@ -446,12 +460,13 @@ public class IMMessage {
     @Generated(hash = 450159840)
     private transient IMMessageDao myDao;
 
-    @Generated(hash = 1298365402)
+    @Generated(hash = 1050909129)
     public IMMessage(Long localId, String msgID, String receiverName, String vId, Long cId,
             String tagertId, int sendOrReceive, String groupName, String senderId, String senderName,
             long time, int type, String contentType, String content, int status, boolean isRead,
-            int readCount, int unReadCount, String mk, String isDisturb, boolean isAiteMe, Long fId,
-            Long callId, Long lId, Long sId, Long rId, Long replyId, Long recordId, String AtInfo) {
+            boolean isAgree, int readCount, int unReadCount, String mk, String isDisturb,
+            boolean isAiteMe, Long fId, Long callId, Long lId, Long sId, Long rId, Long replyId,
+            Long recordId, String AtInfo) {
         this.localId = localId;
         this.msgID = msgID;
         this.receiverName = receiverName;
@@ -468,6 +483,7 @@ public class IMMessage {
         this.content = content;
         this.status = status;
         this.isRead = isRead;
+        this.isAgree = isAgree;
         this.readCount = readCount;
         this.unReadCount = unReadCount;
         this.mk = mk;
@@ -1128,5 +1144,15 @@ public class IMMessage {
                 ", status=" + status +
                 ", IMFileInfo=" + IMFileInfo +
                 '}';
+    }
+
+
+    public boolean getIsAgree() {
+        return this.isAgree;
+    }
+
+
+    public void setIsAgree(boolean isAgree) {
+        this.isAgree = isAgree;
     }
 }

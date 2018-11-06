@@ -79,10 +79,12 @@ import com.xsimple.im.control.IMChatLogic;
 import com.xsimple.im.control.MessagerLoader;
 import com.xsimple.im.control.iable.IIMChatLogic;
 import com.xsimple.im.control.listener.IMChatCallBack;
+import com.xsimple.im.db.DbManager;
 import com.xsimple.im.db.datatable.IMChat;
 import com.xsimple.im.db.datatable.IMGroupRemark;
 import com.xsimple.im.db.datatable.IMMessage;
 import com.xsimple.im.engine.IMEngine;
+import com.xsimple.im.engine.protocol.IMCommand;
 import com.xsimple.im.event.ExitGroupEvent;
 
 import org.greenrobot.eventbus.EventBus;
@@ -127,9 +129,11 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     GroupDetailBean.GroupBean groupBean;
     //    AutoCameraUtils autoCameraUtils;
     int me_user_id;
-    int to_user_id;
+    int to_user_id;  //聊天室id
     int dataId; //组局id
     String chatId; //聊天室id
+    int agreeMsgId;  //同意报名的消息id
+
     boolean isEnd = false;
     boolean isLikeAndUser = false;
     boolean isBlackUser = false;
@@ -176,9 +180,9 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 
         chatView = findViewById(R.id.chatView);
         chatView.setActivity(this);
+        initData();
         setListener();
         initSoftKeyboard();
-        initData();
     }
 
     private void setListener() {
@@ -214,6 +218,13 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
                 return false;
             }
         });
+        chatMessageAdapter.setOnOnAdapterCallBack(new GroupChatMessageAdapter.OnAdapterCallBack() {
+            @Override
+            public void onAgree(int userId,int msgId) {
+                agreeMsgId = msgId;
+                participateGroup(userId,dataId);
+            }
+        });
     }
 
     @Override
@@ -236,7 +247,6 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
                         applyGroup(groupBean.getId());
                     }
                 }
-//               participateGroup(369033,26);
                 break;
             case R.id.rl_heads:
                 startGroupMembersActivity();
@@ -297,7 +307,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 
         chatPresenter = new ChatPresenterImpl();
         chatPresenter.setView(this);
-        chatView.setId(me_user_id, to_user_id);
+        chatView.setId(me_user_id, dataId);
 //        tvChatSendPrice.setText(gold + "");
 //        chatPresenter.getHistory(me_user_id, to_user_id);
 //        getGiftList();
@@ -1057,11 +1067,11 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 
     @Override
     public void onParticipateGroup(BaseBean baseBean) {
-        if (baseBean.Status == 200) {
-            mBtnJoin.setText(getString(R.string.joined_success));
-            mBtnJoin.setTextColor(getColor(R.color.white));
-            mBtnJoin.setBackgroundResource(R.drawable.bg_enter);
-            mBtnJoin.setClickable(false);
+        if (baseBean.Status == 200){
+           IMMessage imMessage = DbManager.getInstance(this).loadIMMessageByLocalId(agreeMsgId);
+           imMessage.setIsAgree(true);
+           imMessage.update();
+           chatMessageAdapter.refreshAgreeMessageStatus(agreeMsgId);
         }
     }
 
@@ -1073,6 +1083,16 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
             mBtnJoin.setBackgroundResource(R.drawable.bg_joined);
             mBtnJoin.setClickable(false);
         }
+    }
+
+    /**
+     * 报名成功
+     */
+    public void showJoinSuccess(){
+        mBtnJoin.setText(getString(R.string.joined_success));
+        mBtnJoin.setTextColor(getColor(R.color.white));
+        mBtnJoin.setBackgroundResource(R.drawable.bg_enter);
+        mBtnJoin.setClickable(false);
     }
 
 
