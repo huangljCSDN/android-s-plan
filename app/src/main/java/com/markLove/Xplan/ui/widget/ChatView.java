@@ -188,8 +188,8 @@ public class ChatView extends FrameLayout implements View.OnClickListener{
                 showEmojiView();
                 break;
             case R.id.btn_send:
-//                send();
-                sendTextMessage();
+                send();
+//                sendTextMessage();
                 break;
         }
     }
@@ -209,8 +209,6 @@ public class ChatView extends FrameLayout implements View.OnClickListener{
             message = Message.createTxtMessage(Message.Type.CHAT, me_user_id, to_user_id,"", msg);
             LogUtils.e("fromId=" + message.getFromID() + ",toId=" + message.getToID() + ",msg=" + msg);
             message.setStatus(Message.ChatStatus.SENDING);
-//            //判断是否被拉黑
-//            judeBlackList(message);
             if (onSendMessageListener != null){
                 onSendMessageListener.onSendMessage(message);
             }
@@ -218,6 +216,24 @@ public class ChatView extends FrameLayout implements View.OnClickListener{
         } else {
             ToastUtils.showCenter(getContext(), "发送内容不能为空", 0);
         }
+    }
+
+    /**
+     * 发送消息，没用到
+     */
+    private void sendTextMessage() {
+        String trim = mEditTextView.getText().toString();
+        if (TextUtils.isEmpty(trim)) {
+            return;
+        }
+        mEditTextView.setText("");
+        //草稿置空
+        IMChat imChat = mImChatControl.getIMChat();
+        if (imChat != null && !TextUtils.isEmpty(imChat.getDrafts())) {
+            imChat.setDrafts("");
+            imChat.update();
+        }
+        mImChatControl.sendMessage(IMMessage.CONTENT_TYPE_TXT, trim);
     }
 
     public void showRlRecord() {
@@ -739,46 +755,6 @@ public class ChatView extends FrameLayout implements View.OnClickListener{
         this.mImChatControl = mChatControl;
         this.mImEngine = mImEngine;
         this.mMessagerLoader = mMessagerLoader;
-    }
-
-    /**
-     * 发送消息
-     */
-    private void sendTextMessage() {
-        String trim = mEditTextView.getText().toString();
-        if (TextUtils.isEmpty(trim)) {
-            return;
-        }
-        mEditTextView.setText("");
-        //草稿置空
-        IMChat imChat = mImChatControl.getIMChat();
-        if (imChat != null && !TextUtils.isEmpty(imChat.getDrafts())) {
-            imChat.setDrafts("");
-            imChat.update();
-        }
-        //没有回复消息这种需求
-//        if (null != imMessageOnReply) {
-//            IMReplyInfo replyInfo = new IMReplyInfo();
-//            replyInfo.setVirtualMsgId(imMessageOnReply.getVId());
-//            replyInfo.setMsgSenderId(imMessageOnReply.getSenderId());
-//            replyInfo.setMsgSender(imMessageOnReply.getSenderName());
-//            if (IMMessage.CONTENT_TYPE_GROUP_REMARK.equals(imMessageOnReply.getContentType())) {
-//                IMGroupRemark imGroupRemark = imMessageOnReply.getIMGroupRemark();
-//                String content = imGroupRemark.getTitle()
-//                        + "\n"
-//                        + imGroupRemark.getContent();
-//                replyInfo.setMsgContent(content);
-//            } else if (IMMessage.CONTENT_TYPE_REPLY.equals(imMessageOnReply.getContentType())) {
-//                replyInfo.setMsgContent(imMessageOnReply.getIMReplyInfo().getContent());
-//            } else {
-//                replyInfo.setMsgContent(imMessageOnReply.getContent());
-//            }
-//            replyInfo.setContent(trim);
-//            mImChatControl.sendMessage(IMMessage.CONTENT_TYPE_REPLY, new Gson().toJson(replyInfo));
-//        } else {
-//            mImChatControl.sendMessage(IMMessage.CONTENT_TYPE_TXT, trim);
-//        }
-        mImChatControl.sendMessage(IMMessage.CONTENT_TYPE_TXT, trim);
     }
 
     /**

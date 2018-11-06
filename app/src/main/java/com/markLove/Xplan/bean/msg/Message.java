@@ -206,7 +206,9 @@ public class Message {
      * 发送成功，发送失败，已读，未读
      */
     public enum ChatStatus {
-        DEFAULT(0), SENDING(1), SUCCESS(2), FAIL(3), READ(4), UNREAD(5), REJECTED(6);
+//        DEFAULT(0), SENDING(1), SUCCESS(2), FAIL(3), READ(4), UNREAD(5), REJECTED(6);
+        //兼容消息状态
+        DEFAULT(-3), SENDING(0), SUCCESS(1), FAIL(-1), READ(4), UNREAD(5), REJECTED(6);
         public int status;
 
         ChatStatus(int status) {

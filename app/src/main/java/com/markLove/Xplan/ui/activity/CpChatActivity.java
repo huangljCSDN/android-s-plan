@@ -34,12 +34,13 @@ import com.markLove.Xplan.bean.BaseBean;
 import com.markLove.Xplan.bean.UserBean;
 import com.markLove.Xplan.bean.msg.Message;
 import com.markLove.Xplan.bean.msg.body.FileMessageBody;
+import com.markLove.Xplan.bean.msg.body.TxtMessageBody;
 import com.markLove.Xplan.config.Constants;
 import com.markLove.Xplan.module.image.IImageCompressor;
 import com.markLove.Xplan.mvp.contract.ChatView;
-import com.markLove.Xplan.mvp.contract.CpChatContract;
+import com.markLove.Xplan.mvp.contract.UserOperationContract;
 import com.markLove.Xplan.mvp.presenter.ChatPresenter;
-import com.markLove.Xplan.mvp.presenter.CpChatPresenter;
+import com.markLove.Xplan.mvp.presenter.UserOperationPresenter;
 import com.markLove.Xplan.mvp.presenter.impl.ChatPresenterImpl;
 import com.markLove.Xplan.ui.adapter.CpChatMessageAdapter;
 import com.markLove.Xplan.ui.dialog.CareOtherDialog;
@@ -73,7 +74,9 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -85,7 +88,7 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * 三分钟情侣聊天
  */
-public class CpChatActivity extends BaseActivity<CpChatPresenter> implements View.OnClickListener, ChatView,CpChatContract.View<BaseBean>,IMChatCallBack {
+public class CpChatActivity extends BaseActivity<UserOperationPresenter> implements View.OnClickListener, ChatView, UserOperationContract.View,IMChatCallBack {
     private ArrayList<Media> select;
 
     private TextView mTvTime,mTvCare,mTvTitle;
@@ -109,6 +112,10 @@ public class CpChatActivity extends BaseActivity<CpChatPresenter> implements Vie
     boolean isBlackUser = false;
     boolean keyboardIsShown = false;
     int usableHeightPrevious = 0;
+    /**
+     * 是否关注了
+     */
+    private boolean isCared;
 
     @Override
     protected int getContentViewId() {
@@ -116,8 +123,8 @@ public class CpChatActivity extends BaseActivity<CpChatPresenter> implements Vie
     }
 
     @Override
-    public CpChatPresenter onCreatePresenter() {
-        return new CpChatPresenter();
+    public UserOperationPresenter onCreatePresenter() {
+        return new UserOperationPresenter();
     }
 
     @Override
@@ -141,9 +148,13 @@ public class CpChatActivity extends BaseActivity<CpChatPresenter> implements Vie
         chatView.setOnSendMessageListener(new com.markLove.Xplan.ui.widget.ChatView.OnSendMessageListener() {
             @Override
             public void onSendMessage(Message message) {
-//                judeBlackList(message);
-                FileMessageBody fileMessageBody = (FileMessageBody) message.getBody();
-                sendVoice(fileMessageBody.getFilePath());
+                if (message.getChatType() == Message.ChatType.TXT){
+                    TxtMessageBody txtMessageBody = (TxtMessageBody) message.getBody();
+                    mImChatControl.sendMessage(IMMessage.CONTENT_TYPE_TXT,txtMessageBody.getMsg());
+                } else {
+                    FileMessageBody fileMessageBody = (FileMessageBody) message.getBody();
+                    sendVoice(fileMessageBody.getFilePath());
+                }
             }
         });
 
@@ -176,11 +187,26 @@ public class CpChatActivity extends BaseActivity<CpChatPresenter> implements Vie
     }
 
     @Override
-    public void refreshUI(BaseBean baseBean) {
-        mTvCare.setText(getString(R.string.cared));
-        mTvCare.setBackground(getDrawable(R.drawable.ic_cared));
+    public void onFocus(BaseBean baseBean) {
+        if (!isFinish){
+            isCared = true;
+            mTvCare.setText(getString(R.string.cared));
+            mTvCare.setBackground(getDrawable(R.drawable.bg_care_gray));
+            mTvCare.setClickable(false);
+        } else {
+            finish();
+        }
     }
 
+    @Override
+    public void isBlackSuccess(BaseBean baseBean) {
+
+    }
+
+    @Override
+    public void isBlackError(String baseBean) {
+
+    }
 
     class MyHandler extends Handler{
         @Override
@@ -199,7 +225,11 @@ public class CpChatActivity extends BaseActivity<CpChatPresenter> implements Vie
                         mTvTime.setText(time + "s");
                     } else {
                         myHandler.removeMessages(1);
-                        showCareDialog();
+                        if(!isCared){
+                            showCareDialog();
+                        } else {
+                            finish();
+                        }
                     }
                     break;
             }
@@ -219,11 +249,17 @@ public class CpChatActivity extends BaseActivity<CpChatPresenter> implements Vie
                 showExitDialog();
                 break;
             case R.id.tv_care:
-
+                requestFocus();
                 break;
         }
     }
 
+    private void requestFocus() {
+        Map<String, String> map = new HashMap<>();
+        map.put("targetUserId", String.valueOf(to_user_id));
+        map.put("type", "1");
+        mPresenter.focus(map);
+    }
 
     protected void initData() {
         mTvTitle.setText("找不到话题");
@@ -778,6 +814,7 @@ public class CpChatActivity extends BaseActivity<CpChatPresenter> implements Vie
         startActivityForResult(intent, Constants.REQUEST_CODE_CAMERA);
     }
 
+    private boolean isFinish;
     /**
      * 显示关注弹窗
      */
@@ -788,7 +825,8 @@ public class CpChatActivity extends BaseActivity<CpChatPresenter> implements Vie
             public void onCallBack(int type) {
                 //1 关注 2 取消
                 if (type == 1){
-
+                    isFinish = true;
+                    requestFocus();
                 } else {
                     finish();
                 }
@@ -1162,12 +1200,15 @@ public class CpChatActivity extends BaseActivity<CpChatPresenter> implements Vie
 
     @Override
     public void onFileTransferSuccess(long localId) {
-        LogUtils.i("huang","onFileTransferSuccess=");
+        LogUtils.i("huang", "onFileTransferSuccess=");
+        chatMessageAdapter.refreshMessageStatus(localId,IMMessage.STATUS_SUCCESS,IMMessage.STATUS_SUCCESS);
     }
 
     @Override
     public void onFileTransferFailed(long localId) {
-        LogUtils.i("huang","onFileTransferFailed=");
+        LogUtils.i("huang", "onFileTransferFailed=");
+        chatMessageAdapter.refreshMessageStatus(localId,IMMessage.STATUS_FAIL,IMMessage.STATUS_FAIL);
+        ToastUtils.showLong(this,R.string.send_fail);
     }
 
     @Override
@@ -1182,13 +1223,17 @@ public class CpChatActivity extends BaseActivity<CpChatPresenter> implements Vie
 
     @Override
     public void onSendMessageSuccessCallBack(long localId) {
-        LogUtils.i("huang","onSendMessageSuccessCallBack=");
+        LogUtils.i("huang", "onSendMessageSuccessCallBack=");
+        chatMessageAdapter.refreshMessageStatus(localId,IMMessage.STATUS_SUCCESS,IMMessage.STATUS_SUCCESS);
     }
 
     @Override
     public void onSendMessageFaileCallBack(long localId) {
-        LogUtils.i("huang","onSendMessageFaileCallBack=");
+        LogUtils.i("huang", "onSendMessageFaileCallBack=");
+        chatMessageAdapter.refreshMessageStatus(localId,IMMessage.STATUS_FAIL,IMMessage.STATUS_DEFAULT);
+        ToastUtils.showLong(this,R.string.send_fail);
     }
+
 
     @Override
     public void onAddMessagerCallBack(List<IMMessage> msgs) {
@@ -1207,7 +1252,7 @@ public class CpChatActivity extends BaseActivity<CpChatPresenter> implements Vie
 
     @Override
     public void onDeleteMessageCallBack(IMMessage message) {
-
+        chatMessageAdapter.deleteMessage(message.getLocalId());
     }
 
     @Override

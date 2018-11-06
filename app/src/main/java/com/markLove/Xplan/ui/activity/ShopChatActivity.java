@@ -168,10 +168,13 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
         chatView.setOnSendMessageListener(new com.markLove.Xplan.ui.widget.ChatView.OnSendMessageListener() {
             @Override
             public void onSendMessage(Message message) {
-//                judeBlackList(message);
-                FileMessageBody fileMessageBody = (FileMessageBody) message.getBody();
-
-                sendVoice(fileMessageBody.getFilePath());
+                if (message.getChatType() == Message.ChatType.TXT){
+                    TxtMessageBody txtMessageBody = (TxtMessageBody) message.getBody();
+                    mImChatControl.sendMessage(IMMessage.CONTENT_TYPE_TXT,txtMessageBody.getMsg());
+                } else {
+                    FileMessageBody fileMessageBody = (FileMessageBody) message.getBody();
+                    sendVoice(fileMessageBody.getFilePath());
+                }
             }
         });
 
@@ -1173,12 +1176,15 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 
     @Override
     public void onFileTransferSuccess(long localId) {
-        LogUtils.i("huang","onFileTransferSuccess=");
+        LogUtils.i("huang", "onFileTransferSuccess=");
+        chatMessageAdapter.refreshMessageStatus(localId,IMMessage.STATUS_SUCCESS,IMMessage.STATUS_SUCCESS);
     }
 
     @Override
     public void onFileTransferFailed(long localId) {
-        LogUtils.i("huang","onFileTransferFailed=");
+        LogUtils.i("huang", "onFileTransferFailed=");
+        chatMessageAdapter.refreshMessageStatus(localId,IMMessage.STATUS_FAIL,IMMessage.STATUS_FAIL);
+        ToastUtils.showLong(this,R.string.send_fail);
     }
 
     @Override
@@ -1193,13 +1199,17 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 
     @Override
     public void onSendMessageSuccessCallBack(long localId) {
-        LogUtils.i("huang","onSendMessageSuccessCallBack=");
+        LogUtils.i("huang", "onSendMessageSuccessCallBack=");
+        chatMessageAdapter.refreshMessageStatus(localId,IMMessage.STATUS_SUCCESS,IMMessage.STATUS_SUCCESS);
     }
 
     @Override
     public void onSendMessageFaileCallBack(long localId) {
-        LogUtils.i("huang","onSendMessageFaileCallBack=");
+        LogUtils.i("huang", "onSendMessageFaileCallBack=");
+        chatMessageAdapter.refreshMessageStatus(localId,IMMessage.STATUS_FAIL,IMMessage.STATUS_DEFAULT);
+        ToastUtils.showLong(this,R.string.send_fail);
     }
+
 
     @Override
     public void onAddMessagerCallBack(List<IMMessage> msgs) {
@@ -1218,7 +1228,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 
     @Override
     public void onDeleteMessageCallBack(IMMessage message) {
-
+        chatMessageAdapter.deleteMessage(message.getLocalId());
     }
 
     @Override

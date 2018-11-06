@@ -376,9 +376,26 @@ public class IMChatLogic implements IIMChatLogic, IMObserver, Handler.Callback {
 
     }
 
+    /**
+     * 发送文本消息
+     * @param msgType
+     * @param content
+     */
     @Override
     public void sendMessage(String msgType, String content) {
 
+        IMMsgRequest localMsg = buildeTxtIMMsgRequest(msgType,content);
+        mIMChatCallBack.onAddMessagerCallBack(localMsg.getIMessage());
+        mImEngine.senIMTextMessage(localMsg, mIMChatCallBack);
+    }
+
+    /**
+     * 构建发送文本请求体，并将消息存入本地数据库
+     * @param msgType
+     * @param content
+     * @return
+     */
+    public IMMsgRequest buildeTxtIMMsgRequest(String msgType, String content){
         String gropName = "";
         if (mTargetMem.getType() == 1 || mTargetMem.getType() == 2) {
 //            gropName = mImGroup.getName();
@@ -390,11 +407,6 @@ public class IMChatLogic implements IIMChatLogic, IMObserver, Handler.Callback {
 
         IMMsgRequestEntity imMsgRequestEntity = new IMMsgRequestEntity();
 
-//        if (msgType.equals(CONTENT_TYPE_MAP)) {
-//            LocalInfo localInfo = new Gson().fromJson(content, LocalInfo.class);
-//            imMsgRequestEntity.getMsgContent().setLocationInfo(localInfo);
-//            content = "[位置]";
-//        }
         imMsgRequestEntity.buildIMMsgRequestEntity(mTargetMem.getType(), msgType, getMyName(), myUserId, mTargetMem.getUserId(), gropName, content, mTargetMem.getUserName());
 
         ArrayList<AtInfo> atInfos = null;
@@ -411,9 +423,32 @@ public class IMChatLogic implements IIMChatLogic, IMObserver, Handler.Callback {
             }
         }
         IMMsgRequest localMsg = mImEngine.createLocalMsg(msgType, content, mTargetMem, atInfos, unreadCount);
+        return localMsg;
+    }
+
+    /**
+     * 发送文件消息
+     * @param dirPath
+     * @param msgType
+     */
+    @Override
+    public void singUploadLocalFiles(String dirPath, String msgType) {
+
+        IMMsgRequest localMsg = buildeFileIMMsgRequest(dirPath,msgType);
+
         mIMChatCallBack.onAddMessagerCallBack(localMsg.getIMessage());
-        mImEngine.senIMTextMessage(localMsg, mIMChatCallBack);
-        //  sendMsgAndCallUi(message, imMsgRequestEntity);
+
+        mImEngine.sendIMFileMessage(localMsg, mIMChatCallBack, this, null);
+
+    }
+
+    public IMMsgRequest buildeFileIMMsgRequest(String dirPath, String msgType){
+        IMMsgRequest localMsg = mImEngine.createLocalMsg(msgType, dirPath, mTargetMem);
+        return localMsg;
+    }
+
+    public IMEngine getmImEngine() {
+        return mImEngine;
     }
 
     /**
@@ -454,6 +489,46 @@ public class IMChatLogic implements IIMChatLogic, IMObserver, Handler.Callback {
 //        }
 
         return filterInfos.size();
+    }
+
+    /**
+     * 发送发送失败的消息
+     */
+    @Override
+    public void onSendFailMessage(IMMessage message) {
+        if (message == null)
+            return;
+
+        IMMsgRequestEntity imMsgRequestEntity = new IMMsgRequestEntity();
+
+        imMsgRequestEntity.buildIMMsgRequestEntity(message.getType(), message.getContentType(), getMyName(), myUserId, mTargetMem.getUserId(), message.getGroupName(), message.getContent(), mTargetMem.getUserName());
+
+        if (CONTENT_TYPE_MAP.equals(message.getContentType())) {
+            IMLocationInfo imLocationInfo = message.getIMLocationInfo();
+            imMsgRequestEntity.buildLocalInfo(imLocationInfo.getName(), imLocationInfo.getAddress(), imLocationInfo.getLatitude(), imLocationInfo.getLongitude());
+
+        } else if (CONTENT_TYPE_FILE.equals(message.getContentType()) ||
+                CONTENT_TYPE_IMG.equals(message.getContentType()) ||
+                CONTENT_TYPE_VIDEO.equals(message.getContentType()) ||
+                CONTENT_TYPE_SHORT_VOICE.equals(message.getContentType())) {
+            IMFileInfo fileInfo = message.getIMFileInfo();
+            imMsgRequestEntity.buildFileInfo(fileInfo.getSha(), fileInfo.getPath(), fileInfo.getName(), String.valueOf(fileInfo.getSize()), fileInfo.getTime());
+        } else if (IMMessage.CONTENT_TYPE_REPLY.equals(message.getContentType())) {
+            IMReplyInfo imReplyInfo = message.getIMReplyInfo();
+            imMsgRequestEntity.buildReplyInfo(imReplyInfo);
+        } else if (IMMessage.CONTENT_TYPE_RECORD.equals(message.getContentType())) {
+            IMChatRecordInfo imChatRecordInfo = message.getIMChatRecordInfo();
+            imMsgRequestEntity.buildChatRecordInfo(imChatRecordInfo);
+        }
+
+        IMMessage messages = mProtocolStack.proceessMessage(imMsgRequestEntity);
+        //修改未读人数
+        messages.setUnReadCount(message.getUnReadCount());
+        messages.update();
+        //删除消息
+        onDeleteMessage(message);
+        sendMsgAndCallUi(messages, imMsgRequestEntity);
+
     }
 
     /**
@@ -700,18 +775,6 @@ public class IMChatLogic implements IIMChatLogic, IMObserver, Handler.Callback {
     public boolean fileIsDownLoadOrUpload(String type) {
         return mImFileManager.isContainTask(type);
     }
-
-    @Override
-    public void singUploadLocalFiles(String dirPath, String msgType) {
-
-        IMMsgRequest localMsg = mImEngine.createLocalMsg(msgType, dirPath, mTargetMem);
-
-        mIMChatCallBack.onAddMessagerCallBack(localMsg.getIMessage());
-
-        mImEngine.sendIMFileMessage(localMsg, mIMChatCallBack, this, null);
-
-    }
-
 
     private PreViewController mPreviewConroller;
 
@@ -1060,6 +1123,10 @@ public class IMChatLogic implements IIMChatLogic, IMObserver, Handler.Callback {
 
     }
 
+    /**
+     * 删除数据，并通知ui
+     * @param imMessage
+     */
     @Override
     public void onDeleteMessage(final IMMessage imMessage) {
         if (imMessage == null)
@@ -1086,7 +1153,36 @@ public class IMChatLogic implements IIMChatLogic, IMObserver, Handler.Callback {
             mImEngine.getDbManager().deleteMessage(imMessage);
             mIMChatCallBack.onDeleteMessageCallBack(imMessage);
         }
+    }
 
+    /**
+     * 只删数据不通知ui
+     * @param imMessage
+     */
+    @Override
+    public void onDeleteMessageNoCallBack(final IMMessage imMessage) {
+        if (imMessage == null)
+            return;
+        boolean isDelayed = false;
+        if (imMessage.getStatus() == IMMessage.STATUS_SENDING) {
+            IMFileInfo fileInfo = imMessage.getFileInfo();
+            if (fileInfo != null) {
+                mImFileManager.cancel(String.valueOf(imMessage.getLocalId()));
+                isDelayed = true;
+            }
+
+        }
+        //删除
+        if (isDelayed) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mImEngine.getDbManager().deleteMessage(imMessage);
+                }
+            }, 500);
+        } else {
+            mImEngine.getDbManager().deleteMessage(imMessage);
+        }
     }
 
     @Override
@@ -1215,48 +1311,6 @@ public class IMChatLogic implements IIMChatLogic, IMObserver, Handler.Callback {
 //            }
 //        });
 
-
-    }
-
-
-    /**
-     * 发送发送失败的消息
-     */
-    @Override
-    public void onSendFailMessage(IMMessage message) {
-        if (message == null)
-            return;
-
-        IMMsgRequestEntity imMsgRequestEntity = new IMMsgRequestEntity();
-
-        imMsgRequestEntity.buildIMMsgRequestEntity(message.getType(), message.getContentType(), getMyName(), myUserId, mTargetMem.getUserId(), message.getGroupName(), message.getContent(), mTargetMem.getUserName());
-
-        if (CONTENT_TYPE_MAP.equals(message.getContentType())) {
-            IMLocationInfo imLocationInfo = message.getIMLocationInfo();
-            imMsgRequestEntity.buildLocalInfo(imLocationInfo.getName(), imLocationInfo.getAddress(), imLocationInfo.getLatitude(), imLocationInfo.getLongitude());
-
-        } else if (CONTENT_TYPE_FILE.equals(message.getContentType()) ||
-                CONTENT_TYPE_IMG.equals(message.getContentType()) ||
-                CONTENT_TYPE_VIDEO.equals(message.getContentType()) ||
-                CONTENT_TYPE_SHORT_VOICE.equals(message.getContentType())) {
-            IMFileInfo fileInfo = message.getIMFileInfo();
-            imMsgRequestEntity.buildFileInfo(fileInfo.getSha(), fileInfo.getPath(), fileInfo.getName(), String.valueOf(fileInfo.getSize()), fileInfo.getTime());
-        } else if (IMMessage.CONTENT_TYPE_REPLY.equals(message.getContentType())) {
-            IMReplyInfo imReplyInfo = message.getIMReplyInfo();
-            imMsgRequestEntity.buildReplyInfo(imReplyInfo);
-        } else if (IMMessage.CONTENT_TYPE_RECORD.equals(message.getContentType())) {
-            IMChatRecordInfo imChatRecordInfo = message.getIMChatRecordInfo();
-            imMsgRequestEntity.buildChatRecordInfo(imChatRecordInfo);
-        }
-
-        IMMessage messages = mProtocolStack.proceessMessage(imMsgRequestEntity);
-        //修改未读人数
-        messages.setUnReadCount(message.getUnReadCount());
-        messages.update();
-        //删除消息
-        onDeleteMessage(message);
-
-        sendMsgAndCallUi(messages, imMsgRequestEntity);
 
     }
 

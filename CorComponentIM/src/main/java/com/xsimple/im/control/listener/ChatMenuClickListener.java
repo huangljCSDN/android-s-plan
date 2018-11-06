@@ -33,6 +33,8 @@ public interface ChatMenuClickListener {
      */
     void onDeleteMessage(IMMessage imMessage);
 
+    void onDeleteMessageNoCallBack(IMMessage imMessage);
+
     /**
      * 删除附件
      *

@@ -1,5 +1,7 @@
 package com.markLove.Xplan.mvp.presenter;
 
+import android.util.Log;
+
 import com.markLove.Xplan.api.util.RequestCallBack;
 import com.markLove.Xplan.bean.BaseBean;
 import com.markLove.Xplan.mvp.contract.UserOperationContract;
@@ -44,18 +46,19 @@ public class UserOperationPresenter extends UserOperationContract.Presenter {
         if (!isAttach()) return;
         getView().showLoading();
 
-        mModel.isBlackList(map, new RequestCallBack<BaseBean>() {
+        mModel.isBlackList(map, new RequestCallBack<BaseBean<Object>>() {
             @Override
             public void onSuccess(BaseBean o) {
+                Log.i("ShopChatPresenter",o.toString());
                 getView().hideLoading();
-                getView().isBlackSuccess(o);
+//                getView().isBlackSuccess(o);
             }
 
             @Override
             public void onFail(String result) {
 //                Log.i("ShopChatPresenter",result);
                 getView().hideLoading();
-                getView().isBlackError(result);
+//                getView().isBlackError(result);
             }
         });
     }

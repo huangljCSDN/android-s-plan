@@ -4,8 +4,6 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,10 +22,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cjt2325.cameralibrary.JCameraView;
-import com.cjt2325.cameralibrary.util.FileUtil;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
 import com.markLove.Xplan.R;
+import com.markLove.Xplan.api.util.RequestCallBack;
 import com.markLove.Xplan.base.App;
 import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.BaseBean;
@@ -41,6 +39,7 @@ import com.markLove.Xplan.db.DBDao;
 import com.markLove.Xplan.module.image.IImageCompressor;
 import com.markLove.Xplan.mvp.contract.ChatView;
 import com.markLove.Xplan.mvp.contract.UserOperationContract;
+import com.markLove.Xplan.mvp.model.UserOperationModel;
 import com.markLove.Xplan.mvp.presenter.ChatPresenter;
 import com.markLove.Xplan.mvp.presenter.UserOperationPresenter;
 import com.markLove.Xplan.mvp.presenter.impl.ChatPresenterImpl;
@@ -61,10 +60,11 @@ import com.networkengine.controller.callback.RouterCallback;
 import com.networkengine.database.table.Member;
 import com.networkengine.engine.LogicEngine;
 import com.networkengine.entity.MemEntity;
+import com.xsimple.im.bean.IMMsgRequest;
 import com.xsimple.im.control.IMChatLogic;
 import com.xsimple.im.control.MessagerLoader;
-import com.xsimple.im.control.iable.IIMChatLogic;
 import com.xsimple.im.control.listener.IMChatCallBack;
+import com.xsimple.im.db.DbManager;
 import com.xsimple.im.db.datatable.IMChat;
 import com.xsimple.im.db.datatable.IMGroupRemark;
 import com.xsimple.im.db.datatable.IMMessage;
@@ -156,10 +156,13 @@ public class SingleChatActivity extends BaseActivity<UserOperationPresenter> imp
         chatView.setOnSendMessageListener(new com.markLove.Xplan.ui.widget.ChatView.OnSendMessageListener() {
             @Override
             public void onSendMessage(Message message) {
-//                judeBlackList(message);
-                FileMessageBody fileMessageBody = (FileMessageBody) message.getBody();
-
-                sendVoice(fileMessageBody.getFilePath());
+                if (message.getChatType() == Message.ChatType.TXT){
+                    TxtMessageBody txtMessageBody = (TxtMessageBody) message.getBody();
+                    sendMessageAndCheckBlack("",IMMessage.CONTENT_TYPE_TXT,txtMessageBody.getMsg());
+                } else {
+                    FileMessageBody fileMessageBody = (FileMessageBody) message.getBody();
+                    sendMessageAndCheckBlack(fileMessageBody.getFilePath(),IMMessage.CONTENT_TYPE_SHORT_VOICE,"");
+                }
             }
         });
 
@@ -209,10 +212,8 @@ public class SingleChatActivity extends BaseActivity<UserOperationPresenter> imp
 
     private void requestFocus() {
         Map<String, String> map = new HashMap<>();
-        map.put("userId", "");
-        map.put("page", "");
-        map.put("rows", "");
-        map.put("Token", "");
+        map.put("targetUserId", String.valueOf(to_user_id));
+        map.put("type", "1");
         mPresenter.focus(map);
     }
 
@@ -222,7 +223,7 @@ public class SingleChatActivity extends BaseActivity<UserOperationPresenter> imp
     private void isBlack() {
         Map<String, String> map = new HashMap<>();
         map.put("tarUserId", String.valueOf(to_user_id));
-        mPresenter.focus(map);
+        mPresenter.isBlackList(map);
     }
 
     protected void initData() {
@@ -248,14 +249,13 @@ public class SingleChatActivity extends BaseActivity<UserOperationPresenter> imp
 //        }
         to_user_id = getIntent().getIntExtra("chatId", 0);
         me_user_id = PreferencesUtils.getInt(this, Constants.ME_USER_ID);
+        nickName = getIntent().getStringExtra("nick_name");
+        headImgUrl = getIntent().getStringExtra("headImgUrl");
         LogUtils.d("me_user_id=" + me_user_id);
-//        tvChatUser.setText(nickName);
+        mTvTitle.setText(nickName);
         LinearLayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         chatMessageAdapter = new GroupChatMessageAdapter(this, new ArrayList<Message>());
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.icon);
-        String url = FileUtil.saveBitmap("haha", bitmap);
-//        chatMessageAdapter.setToHeadImgUrl(headImgUrl);
-        chatMessageAdapter.setToHeadImgUrl(url);
+        chatMessageAdapter.setToHeadImgUrl(headImgUrl);
         chatMessageAdapter.setFromHeadImgUrl(PreferencesUtils.getString(this, Constants.ME_HEAD_IMG_URL));
         chatMessageAdapter.setFailMessageResend(failMessageResend);
         manager.setStackFromEnd(false);
@@ -370,18 +370,18 @@ public class SingleChatActivity extends BaseActivity<UserOperationPresenter> imp
 
     @Override
     public void updataMessage(final String msgID, final int errorCode) {
-        if (Message.ChatStatus.values()[errorCode] == Message.ChatStatus.SUCCESS) {
-            if (null != chatMessageAdapter) {
-                Message message = chatMessageAdapter.getMessageByID(msgID);
-                if (message != null) {
-                    if (message.getFromID() == PreferencesUtils.getInt(this, Constants.ME_USER_ID) && (message.getChatType() == Message.ChatType.IMAGE || message.getChatType() == Message.ChatType.VOICE) && message.getStatus() == Message.ChatStatus.SUCCESS) {
-                        Message.ChatType chatType = message.getChatType() == Message.ChatType.IMAGE ? Message.ChatType.IMAGE_DESC : Message.ChatType.VOICE_DESC;
-                        FileMessageBody fileMessageBody = (FileMessageBody) message.getBody();
-                        sendMessage(Message.createDescriptionMessage(message.getFromID(), message.getToID(), Message.Type.CHAT, chatType, fileMessageBody.getFileName()));
-                    }
-                }
-            }
-        }
+//        if (Message.ChatStatus.values()[errorCode] == Message.ChatStatus.SUCCESS) {
+//            if (null != chatMessageAdapter) {
+//                Message message = chatMessageAdapter.getMessageByID(msgID);
+//                if (message != null) {
+//                    if (message.getFromID() == PreferencesUtils.getInt(this, Constants.ME_USER_ID) && (message.getChatType() == Message.ChatType.IMAGE || message.getChatType() == Message.ChatType.VOICE) && message.getStatus() == Message.ChatStatus.SUCCESS) {
+//                        Message.ChatType chatType = message.getChatType() == Message.ChatType.IMAGE ? Message.ChatType.IMAGE_DESC : Message.ChatType.VOICE_DESC;
+//                        FileMessageBody fileMessageBody = (FileMessageBody) message.getBody();
+//                        sendMessage(Message.createDescriptionMessage(message.getFromID(), message.getToID(), Message.Type.CHAT, chatType, fileMessageBody.getFileName()));
+//                    }
+//                }
+//            }
+//        }
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -390,8 +390,6 @@ public class SingleChatActivity extends BaseActivity<UserOperationPresenter> imp
                         int position = chatMessageAdapter.getItemPositionByMsgID(msgID);
                         if (position >= 0) {
                             Message.ChatStatus status = Message.ChatStatus.values()[errorCode];
-                            List<Message.ChatStatus> payloads = new ArrayList<Message.ChatStatus>();
-                            payloads.add(status);
                             chatMessageAdapter.notifyItemRangeChanged(position, 1, status);
                         }
                     } catch (Exception e) {
@@ -403,22 +401,17 @@ public class SingleChatActivity extends BaseActivity<UserOperationPresenter> imp
     }
 
     /**
-     * 判断是否被拉黑
-     *
+     * 判断是否被拉黑,已废弃，作参考
      * @param msg
      */
     private void judeBlackList(final Message msg) {
-        if (null != msg) {
-            int sendCount = PreferencesUtils.getInt(this, Constants.SEND_MESSAGE_COUNT + to_user_id, 0);
-            //原计数+1
-            PreferencesUtils.putInt(this, Constants.SEND_MESSAGE_COUNT + to_user_id, ++sendCount);
-            addOneMessage(msg);
-        }
-        sendMsg = msg;
-        //暂时不判断拉黑逻辑，直接发送
-//        sendMessage(msg);
-        //判断是否被拉黑
-        isBlack();
+//        if (null != msg) {
+//            int sendCount = PreferencesUtils.getInt(this, Constants.SEND_MESSAGE_COUNT + to_user_id, 0);
+//            //原计数+1
+//            PreferencesUtils.putInt(this, Constants.SEND_MESSAGE_COUNT + to_user_id, ++sendCount);
+//            addOneMessage(msg);
+//        }
+//        sendMsg = msg;
 
 //        StringBuilder sb = new StringBuilder(Constants.POST_JUDGE_BLACK_LIST);
 //        sb.append("?ToUserId=" + to_user_id);
@@ -514,8 +507,7 @@ public class SingleChatActivity extends BaseActivity<UserOperationPresenter> imp
         imgMsg.setStatus(Message.ChatStatus.SENDING);
         isOrigin = true;
         if (isOrigin) {
-            sendImage(filePath);
-//            judeBlackList(imgMsg);
+            sendMessageAndCheckBlack(filePath,IMMessage.CONTENT_TYPE_IMG,"");
         } else {
             Observable.create(new ObservableOnSubscribe<Message>() {
                 @Override
@@ -847,6 +839,7 @@ public class SingleChatActivity extends BaseActivity<UserOperationPresenter> imp
     /**
      * 显示删除按钮
      */
+    @Override
     public void showRemove() {
         closeSoftKeyBoard();
         chatView.setVisibility(View.GONE);
@@ -904,46 +897,17 @@ public class SingleChatActivity extends BaseActivity<UserOperationPresenter> imp
     @Override
     public void onFocus(BaseBean baseBean) {
         mTvCare.setText(getString(R.string.cared));
-        mTvCare.setBackground(getDrawable(R.drawable.ic_cared));
+        mTvCare.setBackground(getDrawable(R.drawable.bg_care_gray));
         mTvCare.setTextColor(getResources().getColor(R.color.color_333333));
+        mTvCare.setClickable(false);
     }
 
     @Override
     public void isBlackSuccess(BaseBean baseBean) {
-        if (baseBean.Status == 200) {
-//                        double data = (Double) infoResultData.getData();
-            double data = 1;
-            if (data == 1) {
-                //已经被拉黑
-                chatMessageAdapter.setBlack(true);
-                isBlackUser = true;
-                if (null != sendMsg && (sendMsg.getChatType() != Message.ChatType.GIFT || sendMsg.getChatType() != Message.ChatType.SUPERLIKE)) {
-                    sendMsg.setStatus(Message.ChatStatus.REJECTED);
-                    updataMessage(sendMsg.getMsgID(), Message.ChatStatus.REJECTED.ordinal());
-                    int me_user_id = PreferencesUtils.getInt(App.getInstance(), Constants.ME_USER_ID);
-                    DBDao.getDbDao(App.getInstance()).insertMessage(me_user_id, sendMsg);
-                }
-            } else {
-                chatMessageAdapter.setBlack(false);
-                isBlackUser = false;
-                if (null != sendMsg) {
-                    sendMessage(sendMsg);
-                }
-            }
-//                        initBecomeCouple();
-        }
     }
 
     @Override
     public void isBlackError(String baseBean) {
-        if (null != sendMsg) {
-            int sendCount = PreferencesUtils.getInt(SingleChatActivity.this, Constants.SEND_MESSAGE_COUNT + to_user_id, 0);
-            //原计数-1
-            PreferencesUtils.putInt(SingleChatActivity.this, Constants.SEND_MESSAGE_COUNT + to_user_id, --sendCount);
-            updataMessage(sendMsg.getMsgID(), Message.ChatStatus.FAIL.ordinal());
-            int me_user_id = PreferencesUtils.getInt(App.getInstance(), Constants.ME_USER_ID);
-            DBDao.getDbDao(App.getInstance()).insertMessage(me_user_id, sendMsg);
-        }
     }
 
 
@@ -951,7 +915,7 @@ public class SingleChatActivity extends BaseActivity<UserOperationPresenter> imp
     /**
      * 聊天控制器
      */
-    private IIMChatLogic mImChatControl;
+    private IMChatLogic mImChatControl;
 
     /**
      * Im　消息引擎
@@ -1097,33 +1061,110 @@ public class SingleChatActivity extends BaseActivity<UserOperationPresenter> imp
         }
     }
 
+    /**
+     * 发送消息，先检查是否被拉黑
+     * @param path
+     * @param msgType
+     * @param content
+     */
+    private void sendMessageAndCheckBlack(String path,String msgType,String content){
+        IMMsgRequest localMsg = bulidMessage(path,msgType,content);
+        checkIsBlackList(localMsg);
+    }
+
+    /**
+     * 检查被拉黑
+     * @param localMsg
+     */
+    private void checkIsBlackList(final IMMsgRequest localMsg){
+
+        UserOperationModel mModel = new UserOperationModel();
+        Map<String, String> map = new HashMap<>();
+        map.put("tarUserId", String.valueOf(to_user_id));
+        mModel.isBlackList(map, new RequestCallBack<BaseBean<Object>>() {
+            @Override
+            public void onSuccess(BaseBean baseBean) {
+                Log.i("UserOperationModel",baseBean.toString());
+                if (baseBean.Status == 200) {
+                    double data = 1;
+                    if (baseBean.Data instanceof Double){
+                        data = (Double) baseBean.Data;
+                    }
+                    if (data == 0) {  // 0 被拉黑，1 没有
+                        //已经被拉黑
+                        chatMessageAdapter.setBlack(true);
+                        isBlackUser = true;
+                        if (null != localMsg) {
+                            long localId = localMsg.getIMessage().getLocalId();
+                            chatMessageAdapter.refreshMessageStatus(localId,IMMessage.STATUS_FAIL,IMMessage.STATUS_FAIL);
+                            IMMessage message = DbManager.getInstance(SingleChatActivity.this).loadIMMessageByLocalId(localId);
+                            if (message == null)
+                                return ;
+                            message.setStatus(IMMessage.STATUS_FAIL);
+                            message.update();
+                            ToastUtils.show(SingleChatActivity.this,"你已经被拉黑",Toast.LENGTH_SHORT);
+                        }
+                    } else {
+                        chatMessageAdapter.setBlack(false);
+                        isBlackUser = false;
+                        if (null != localMsg) {
+                            mImChatControl.getmImEngine().senIMTextMessage(localMsg,SingleChatActivity.this);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFail(String result) {
+                long localId = localMsg.getIMessage().getLocalId();
+                chatMessageAdapter.refreshMessageStatus(localId,IMMessage.STATUS_FAIL,IMMessage.STATUS_FAIL);
+                IMMessage message = DbManager.getInstance(SingleChatActivity.this).loadIMMessageByLocalId(localId);
+                if (message == null)
+                    return ;
+                message.setStatus(IMMessage.STATUS_FAIL);
+                message.update();
+            }
+        });
+    }
+
+    /**
+     * 先显示消息，再检查黑名单
+     * @param path
+     * @param msgType
+     * @param content
+     */
+    private IMMsgRequest bulidMessage(String path,String msgType,String content){
+        IMMsgRequest localMsg = null;
+        if (IMMessage.CONTENT_TYPE_TXT.equals(msgType)){
+            localMsg = mImChatControl.buildeTxtIMMsgRequest(IMMessage.CONTENT_TYPE_TXT,content);
+        } else {
+            if (TextUtils.isEmpty(path) || !new File(path).exists()) {
+                return null;
+            }
+            localMsg = mImChatControl.buildeFileIMMsgRequest(path,msgType);
+        }
+
+        IMMessage imMessage = localMsg.getIMessage();
+        onAddMessagerCallBack(imMessage);
+        return localMsg;
+    }
+
     private void sendVoice(String path){
         if (TextUtils.isEmpty(path) || !new File(path).exists()) {
             return;
         }
-        List<String> list = new ArrayList<>();
-        list.add(path);
-        mImChatControl.uploadLocalFiles(list, IMMessage.CONTENT_TYPE_SHORT_VOICE);
+        mImChatControl.singUploadLocalFiles(path, IMMessage.CONTENT_TYPE_SHORT_VOICE);
     }
 
     /**
      * 发送照片
      */
     private void sendImage(String path) {
-        if (TextUtils.isEmpty(path))
+        if (TextUtils.isEmpty(path) || !new File(path).exists()) {
             return;
-        File file = new File(path);
-        if (!file.exists())
-            return;
+        }
         mImChatControl.singUploadLocalFiles(path, IMMessage.CONTENT_TYPE_IMG);
 
-//        if (IMMessage.CONTENT_TYPE_IMG.equals(type)) {
-//
-//        } else {
-//            //压缩
-////            compressVide(path, type);
-//            // mChatControl.singUploadLocalFiles(path, type);
-//        }
     }
 
     /**
@@ -1186,12 +1227,15 @@ public class SingleChatActivity extends BaseActivity<UserOperationPresenter> imp
 
     @Override
     public void onFileTransferSuccess(long localId) {
-        LogUtils.i("huang","onFileTransferSuccess=");
+        LogUtils.i("huang", "onFileTransferSuccess=");
+        chatMessageAdapter.refreshMessageStatus(localId,IMMessage.STATUS_SUCCESS,IMMessage.STATUS_SUCCESS);
     }
 
     @Override
     public void onFileTransferFailed(long localId) {
-        LogUtils.i("huang","onFileTransferFailed=");
+        LogUtils.i("huang", "onFileTransferFailed=");
+        chatMessageAdapter.refreshMessageStatus(localId,IMMessage.STATUS_FAIL,IMMessage.STATUS_FAIL);
+        ToastUtils.showLong(this,R.string.send_fail);
     }
 
     @Override
@@ -1206,13 +1250,17 @@ public class SingleChatActivity extends BaseActivity<UserOperationPresenter> imp
 
     @Override
     public void onSendMessageSuccessCallBack(long localId) {
-        LogUtils.i("huang","onSendMessageSuccessCallBack=");
+        LogUtils.i("huang", "onSendMessageSuccessCallBack=");
+        chatMessageAdapter.refreshMessageStatus(localId,IMMessage.STATUS_SUCCESS,IMMessage.STATUS_SUCCESS);
     }
 
     @Override
     public void onSendMessageFaileCallBack(long localId) {
-        LogUtils.i("huang","onSendMessageFaileCallBack=");
+        LogUtils.i("huang", "onSendMessageFaileCallBack=");
+        chatMessageAdapter.refreshMessageStatus(localId,IMMessage.STATUS_FAIL,IMMessage.STATUS_DEFAULT);
+        ToastUtils.showLong(this,R.string.send_fail);
     }
+
 
     @Override
     public void onAddMessagerCallBack(List<IMMessage> msgs) {
@@ -1231,7 +1279,7 @@ public class SingleChatActivity extends BaseActivity<UserOperationPresenter> imp
 
     @Override
     public void onDeleteMessageCallBack(IMMessage message) {
-
+        chatMessageAdapter.deleteMessage(message.getLocalId());
     }
 
     @Override

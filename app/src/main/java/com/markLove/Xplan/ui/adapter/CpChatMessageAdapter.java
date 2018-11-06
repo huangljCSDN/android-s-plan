@@ -26,6 +26,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.markLove.Xplan.R;
+import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.msg.Message;
 import com.markLove.Xplan.bean.msg.body.FileMessageBody;
 import com.markLove.Xplan.bean.msg.body.GiftMessageBody;
@@ -33,7 +34,6 @@ import com.markLove.Xplan.bean.msg.body.MessageBody;
 import com.markLove.Xplan.bean.msg.body.TxtMessageBody;
 import com.markLove.Xplan.config.Constants;
 import com.markLove.Xplan.module.emoji.EmojiUtils;
-import com.markLove.Xplan.ui.activity.ShopChatActivity;
 import com.markLove.Xplan.ui.activity.ZoomImageActivity;
 import com.markLove.Xplan.ui.dialog.BecomeLovesDialog;
 import com.markLove.Xplan.ui.dialog.CoupleGiftPopupWindow;
@@ -68,6 +68,7 @@ public class CpChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHolde
     Context context;
     List<Message> mDatas;
     MyGestureDetector mGestureDetector;
+    List<IMMessage> iMMsgList = new ArrayList<>();
     int select = 0;//0默认显示,1显示选中删除,2删除选中
     List<String> selectPositionList;
     boolean black = false;
@@ -255,9 +256,10 @@ public class CpChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHolde
             @Override
             public void onClick(View v) {
                 if (msg.getStatus() == Message.ChatStatus.FAIL || msg.getStatus() == Message.ChatStatus.REJECTED) {
-                    if (null != failMessageResend) {
-                        failMessageResend.failResend(msg);
-                    }
+//                    if (null != failMessageResend) {
+//                        failMessageResend.failResend(msg);
+//                    }
+                    onSendFailMessage(msg.getImMessage());
                 }
             }
         });
@@ -1008,11 +1010,13 @@ public class CpChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHolde
                 .setOnClickListener(R.id.custom_dialog_define, new BecomeLovesDialog.DialogViewOnClick() {
                     @Override
                     public void onClick() {
-                        Message msg = mDatas.get(position);
-                        int me_user_id = PreferencesUtils.getInt(context, Constants.ME_USER_ID);
-//                        DBDao.getDbDao(context).delectMessage(me_user_id, msg.getMsgID());
+                        IMMessage imMessage = iMMsgList.get(position);
+                        mImChatControl.onDeleteMessageNoCallBack(imMessage);
                         mDatas.remove(position);
+                        iMMsgList.remove(position);
                         notifyItemRemoved(position);
+                        //必须调用这行代码
+                        notifyItemRangeChanged(position, mDatas.size());
                     }
                 });
         builder.create().show();
@@ -1023,30 +1027,40 @@ public class CpChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHolde
         if (this.select == 0) {
             selectPositionList.clear();
         } else if (this.select == 1) {
-            ((ShopChatActivity) context).showRemove();
+            ((BaseActivity) context).showRemove();
         } else if (this.select == 2) {
             removeSelecPosition();
         }
         selectPositionList.clear();
         notifyDataSetChanged();
-        ((ShopChatActivity) context).selectPosition(mGestureDetector.getPosition());
+        ((BaseActivity) context).selectPosition(mGestureDetector.getPosition());
     }
 
     public void removeSelecPosition() {
         if (!selectPositionList.isEmpty()) {
-            int me_user_id = PreferencesUtils.getInt(context, Constants.ME_USER_ID);
+//            int me_user_id = PreferencesUtils.getInt(context, Constants.ME_USER_ID);
             for (String msgID : selectPositionList) {
                 Iterator<Message> iterator = mDatas.iterator();
                 while (iterator.hasNext()) {
                     Message msg = iterator.next();
+                    LogUtils.i("iddd===", msg.getMsgID());
                     if (msg.getMsgID().equals(msgID)) {
                         iterator.remove();
-//                        DBDao.getDbDao(context).delectMessage(me_user_id, msg.getMsgID());
+                        break;
+                    }
+                }
+                Iterator<IMMessage> iteratorMMsgList = iMMsgList.iterator();
+                while (iteratorMMsgList.hasNext()) {
+                    IMMessage imMessage = iteratorMMsgList.next();
+                    if (String.valueOf(imMessage.getLocalId()).equals(msgID)) {
+                        mImChatControl.onDeleteMessageNoCallBack(imMessage);
+                        iteratorMMsgList.remove();
                         break;
                     }
                 }
             }
         }
+        notifyDataSetChanged();
     }
 
     public boolean hasSelectRemovePostion() {
@@ -1345,36 +1359,39 @@ public class CpChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHolde
         mListener = listener;
     }
 
-    //---------------------------新IM方法---------------------------//
+    //---------------------------新IM方法,IMMessage转成Message，整合两套框架的结果，蛋疼的代码，被逼无奈，时间太紧，根本没时间重写，整套框架脑壳疼------------------------------//
     /**
      * 聊天控制器
      */
     private IIMChatLogic mImChatControl;
 
-    public void setImChatControl(IIMChatLogic mImChatControl){
+    public void setImChatControl(IIMChatLogic mImChatControl) {
         this.mImChatControl = mImChatControl;
     }
 
-    public void setImData(List<IMMessage> imMessageList){
+    public void setImData(List<IMMessage> imMessageList) {
         mDatas = changeListIMMessageToListMessage(imMessageList);
+        iMMsgList.addAll(imMessageList);
         notifyDataSetChanged();
     }
 
-    public void addListImData(List<IMMessage> imMessageList){
+    public void addListImData(List<IMMessage> imMessageList) {
         mDatas.addAll(changeListIMMessageToListMessage(imMessageList));
+        iMMsgList.addAll(imMessageList);
         notifyDataSetChanged();
     }
 
-    public void addOneImData(IMMessage imMessage){
+    public void addOneImData(IMMessage imMessage) {
         mDatas.add(changeIMMessageToMessage(imMessage));
+        iMMsgList.add(imMessage);
         notifyDataSetChanged();
     }
 
-    public List<Message> changeListIMMessageToListMessage(List<IMMessage> imMessageList){
+    public List<Message> changeListIMMessageToListMessage(List<IMMessage> imMessageList) {
         List<Message> list = new ArrayList<>();
-        if (imMessageList != null || !imMessageList.isEmpty()){
-            for (IMMessage imMessage : imMessageList){
-                LogUtils.i("huang","iiimessage="+imMessage.toString());
+        if (imMessageList != null || !imMessageList.isEmpty()) {
+            for (IMMessage imMessage : imMessageList) {
+                LogUtils.i("huang", "imessage=" + imMessage.toString());
                 Message message = changeIMMessageToMessage(imMessage);
                 list.add(message);
             }
@@ -1382,34 +1399,44 @@ public class CpChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHolde
         return list;
     }
 
-    public Message changeIMMessageToMessage(IMMessage imMessage){
+    /**
+     * 将immessage转成message用于显示
+     * @param imMessage
+     * @return
+     */
+    public Message changeIMMessageToMessage(IMMessage imMessage) {
         Message message = null;
         if (IMMessage.CONTENT_TYPE_SHORT_VOICE.equals(imMessage.getContentType()) ||
-                IMMessage.CONTENT_TYPE_VOICE_CHAT.equals(imMessage.getContentType())){
-            String path="";
+                IMMessage.CONTENT_TYPE_VOICE_CHAT.equals(imMessage.getContentType())) {
+            String path = "";
             String fileName = "";
-            if (imMessage.getIMFileInfo() != null){
+            if (imMessage.getIMFileInfo() != null) {
                 path = imMessage.getIMFileInfo().getPath();
                 fileName = imMessage.getIMFileInfo().getName();
             }
-            message = Message.createVoiceMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()),imMessage.getMsgID(), fileName, path);
+            message = Message.createVoiceMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()), imMessage.getLocalId() + "", fileName, path);
             message.setImMessage(imMessage);
-        } else if (IMMessage.CONTENT_TYPE_IMG.equals(imMessage.getContentType())){
-            String path="";
+            message.setStatus(changeStatus(imMessage.getStatus()));
+        } else if (IMMessage.CONTENT_TYPE_IMG.equals(imMessage.getContentType())) {
+            String path = "";
             String fileName = "";
             String sha = "";
-            if (imMessage.getIMFileInfo() != null){
+            if (imMessage.getIMFileInfo() != null) {
                 path = imMessage.getIMFileInfo().getPath();
                 fileName = imMessage.getIMFileInfo().getName();
                 sha = imMessage.getIMFileInfo().getSha();
             }
-            message = Message.createImageMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()),imMessage.getMsgID(), fileName, path);
+            message = Message.createImageMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()), imMessage.getLocalId() + "", fileName, path);
             FileMessageBody fileMessageBody = (FileMessageBody) message.getBody();
             fileMessageBody.setSha(sha);
+            message.setImMessage(imMessage);
+            message.setStatus(changeStatus(imMessage.getStatus()));
         } else {
-            message = Message.createTxtMessage(Message.Type.CHAT,Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()),imMessage.getMsgID(),imMessage.getContent());
+            message = Message.createTxtMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()), imMessage.getLocalId() + "", imMessage.getContent());
+            message.setImMessage(imMessage);
+            message.setStatus(changeStatus(imMessage.getStatus()));
         }
-//        onAutoDownload(imMessage);
+        onAutoDownload(imMessage);
         return message;
     }
 
@@ -1441,6 +1468,107 @@ public class CpChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHolde
             boolean isDownlod = TextUtils.isEmpty(path) || (!new File(path).exists());
             if (isDownlod) {
                 mImChatControl.downloadFiles(imMessage);
+            }
+        }
+    }
+
+    private Message.ChatStatus changeStatus(int status) {
+        if (status == -3) {
+            return Message.ChatStatus.DEFAULT;
+        }
+        if (status == 0) {
+            return Message.ChatStatus.SENDING;
+        }
+        if (status == 1) {
+            return Message.ChatStatus.SUCCESS;
+        }
+        if (status == -1) {
+            return Message.ChatStatus.FAIL;
+        }
+        return Message.ChatStatus.DEFAULT;
+    }
+
+    /**
+     * 刷新消息状态
+     * @param localId
+     * @param status
+     */
+    public void refreshMessageStatus(long localId, int status,int fileStatus) {
+        for (int i = 0; i < mDatas.size(); i++) {
+            Message message = mDatas.get(i);
+            if (message.getMsgID().equals(String.valueOf(localId))) {
+                message.setStatus(changeStatus(status));
+                notifyItemChanged(i);
+                break;
+            }
+        }
+        for (IMMessage imMessage : iMMsgList) {
+            if (imMessage.getLocalId() == localId) {
+                imMessage.setStatus(status);
+                if (fileStatus == IMMessage.STATUS_FAIL && imMessage.getIMFileInfo() != null){
+                    imMessage.getIMFileInfo().setStatus(IMMessage.STATUS_FAIL);
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * 根据消息id删除消息
+     * @param localId
+     */
+    public void deleteMessage(long localId){
+        for (int i = 0; i < mDatas.size(); i++) {
+            Message message = mDatas.get(i);
+            if (message.getMsgID().equals(String.valueOf(localId))) {
+                mDatas.remove(i);
+                notifyItemRemoved(i);
+                break;
+            }
+        }
+        for (int i = 0; i < iMMsgList.size(); i++) {
+            IMMessage imMessage = iMMsgList.get(i);
+            if (imMessage.getLocalId() == localId) {
+                iMMsgList.remove(i);
+                break;
+            }
+        }
+    }
+
+    /**
+     * 点击，发送发送失败的消息
+     */
+    private void onSendFailMessage(IMMessage imMessage) {
+        String contentType = imMessage.getContentType();
+        //文本类和地图类
+        if (IMMessage.CONTENT_TYPE_TXT.equals(contentType)
+                || IMMessage.CONTENT_TYPE_MAP.equals(contentType)
+                || IMMessage.CONTENT_TYPE_FUN.equals(contentType)
+                || IMMessage.CONTENT_TYPE_REPLY.equals(contentType)
+                || IMMessage.CONTENT_TYPE_RECORD.equals(contentType)) {
+
+            mImChatControl.onSendFailMessage(imMessage);
+
+            //文件属性的
+        } else if (IMMessage.CONTENT_TYPE_FILE.equals(contentType) ||
+                IMMessage.CONTENT_TYPE_IMG.equals(contentType) ||
+                IMMessage.CONTENT_TYPE_VIDEO.equals(contentType) ||
+                IMMessage.CONTENT_TYPE_SHORT_VOICE.equals(contentType)) {
+            imMessage.refresh();
+            IMFileInfo imFileInfo = imMessage.getIMFileInfo();
+            if (imFileInfo.getStatus() == IMMessage.STATUS_FAIL) {  //文件上传服务器失败
+                List<String> list = new ArrayList<>();
+                list.add(imFileInfo.getPath());
+                String contentType1 = imMessage.getContentType();
+                //删除源视图
+                mImChatControl.onDeleteMessage(imMessage);
+                //上传文件并添加视图
+                mImChatControl.uploadLocalFiles(list, contentType1);
+
+            } else if (imFileInfo.getStatus() == IMMessage.STATUS_SUCCESS) {  //文件上传服务器成功
+                mImChatControl.onSendFailMessage(imMessage);
+            } else if (imFileInfo.getStatus() == IMMessage.STATUS_NO_RECEIVE) {//本地文件不存在
+                mImChatControl.onSendFailMessage(imMessage);
             }
         }
     }

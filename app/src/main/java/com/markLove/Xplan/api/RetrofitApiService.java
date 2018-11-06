@@ -181,4 +181,12 @@ public interface RetrofitApiService {
      */
     @POST("user/operation/isBlackList")
     Observable<BaseBean> isBlackList(@QueryMap Map<String, String> map);
+
+    /**
+     * 获取，关注，黑名单列表
+     * @param map
+     * @return
+     */
+    @POST("user/operation/getFocusList")
+    Observable<BaseBean> getFocusList(@QueryMap Map<String, String> map);
 }

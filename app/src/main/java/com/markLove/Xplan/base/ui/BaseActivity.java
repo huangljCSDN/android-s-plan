@@ -58,6 +58,13 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
     protected abstract void init(Bundle savedInstanceState);
 
     /**
+     * 显示删除，非必须实现的方法
+     */
+    public void showRemove(){};
+
+    public void selectPosition(final int position){};
+
+    /**
      * 初始化Activity标题与返回按键
      *
      * @param title 标题内容

@@ -14,6 +14,24 @@ public class ChatBean {
     private int chatType;
     private int chatId;
     private int dataId;
+    private String dataName;
+    private String headImageUrl;
+
+    public String getDataName() {
+        return dataName;
+    }
+
+    public void setDataName(String dataName) {
+        this.dataName = dataName;
+    }
+
+    public String getHeadImgUrl() {
+        return headImageUrl;
+    }
+
+    public void setHeadImgUrl(String headImgUrl) {
+        this.headImageUrl = headImgUrl;
+    }
 
     public int getDataId() {
         return dataId;

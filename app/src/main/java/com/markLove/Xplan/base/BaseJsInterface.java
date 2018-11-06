@@ -1,13 +1,10 @@
 package com.markLove.Xplan.base;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.webkit.JavascriptInterface;
 
 import com.cjt2325.cameralibrary.util.LogUtil;
-import com.dmcbig.mediapicker.PickerConfig;
-import com.dmcbig.mediapicker.SinglePickerActivity;
 import com.markLove.Xplan.bean.ChatBean;
 import com.markLove.Xplan.bean.GoNativeBean;
 import com.markLove.Xplan.bean.GoViewBeaan;
@@ -16,18 +13,14 @@ import com.markLove.Xplan.config.Constants;
 import com.markLove.Xplan.ui.activity.CpChatActivity;
 import com.markLove.Xplan.ui.activity.GroupChatActivity;
 import com.markLove.Xplan.ui.activity.LauncherActivity;
-import com.markLove.Xplan.ui.activity.LoginActivity;
 import com.markLove.Xplan.ui.activity.MainActivity;
 import com.markLove.Xplan.ui.activity.ShopChatActivity;
 import com.markLove.Xplan.ui.activity.SingleChatActivity;
 import com.markLove.Xplan.ui.activity.WebViewActivity;
-import com.markLove.Xplan.ui.fragment.GroupFragment;
 import com.markLove.Xplan.utils.AppManager;
 import com.markLove.Xplan.utils.GsonUtils;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
-import com.markLove.Xplan.utils.ToastUtils;
-import com.networkengine.entity.MyFileFavorite;
 
 public class BaseJsInterface {
 
@@ -123,7 +116,7 @@ public class BaseJsInterface {
                 startCpChatActivity(chatBean.getDataId());
                 break;
             case 4:
-                startSingleChatActivity(chatBean.getDataId());
+                startSingleChatActivity(chatBean);
                 break;
         }
     }
@@ -215,9 +208,11 @@ public class BaseJsInterface {
         mActivity.startActivityForResult(intent,Constants.REQUEST_CODE_MERCHANT_CHAT);
     }
 
-    private void startSingleChatActivity(int id) {
+    private void startSingleChatActivity(ChatBean chatBean) {
         Intent intent = new Intent(mActivity, SingleChatActivity.class);
-        intent.putExtra("chatId", id);
+        intent.putExtra("chatId", chatBean.getDataId());
+        intent.putExtra("nick_name", chatBean.getDataName());
+        intent.putExtra("headImgUrl", chatBean.getHeadImgUrl());
         mActivity.startActivity(intent);
     }
 

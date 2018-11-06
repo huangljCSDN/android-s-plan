@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.markLove.Xplan.R;
+import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.GiftItem;
 import com.markLove.Xplan.bean.msg.Message;
 import com.markLove.Xplan.bean.msg.body.FileMessageBody;
@@ -36,7 +37,6 @@ import com.markLove.Xplan.bean.msg.body.TxtMessageBody;
 import com.markLove.Xplan.config.Constants;
 import com.markLove.Xplan.db.DBDao;
 import com.markLove.Xplan.module.emoji.EmojiUtils;
-import com.markLove.Xplan.ui.activity.GroupChatActivity;
 import com.markLove.Xplan.ui.activity.ZoomImageActivity;
 import com.markLove.Xplan.ui.dialog.BecomeLovesDialog;
 import com.markLove.Xplan.ui.dialog.CoupleGiftPopupWindow;
@@ -86,6 +86,7 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
     private String toHeadImgUrl;
 
     public void setToHeadImgUrl(String url) {
+        if (TextUtils.isEmpty(url)) return;
         if (!url.startsWith("http")) {
             url = Constants.BASE_IMG_URL + url;
         }
@@ -203,7 +204,7 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
             });
         }
 
-        if (viewHolder.btnAgree != null && msg.getChatType() == Message.ChatType.REQUEST_JOIN){
+        if (viewHolder.btnAgree != null && msg.getChatType() == Message.ChatType.REQUEST_JOIN) {
             viewHolder.btnAgree.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -246,9 +247,10 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
             @Override
             public void onClick(View v) {
                 if (msg.getStatus() == Message.ChatStatus.FAIL || msg.getStatus() == Message.ChatStatus.REJECTED) {
-                    if (null != failMessageResend) {
-                        failMessageResend.failResend(msg);
-                    }
+//                    if (null != failMessageResend) {
+//                        failMessageResend.failResend(msg);
+//                    }
+                    onSendFailMessage(msg.getImMessage());
                 }
             }
         });
@@ -297,6 +299,7 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
         holder.setStatus(msg.getStatus());
         if (null != holder.status && msg.getFromID() == PreferencesUtils.getInt(context, Constants.ME_USER_ID)) {
             failOnClick(holder.status, msg);
+
             if (null != holder.status) {
                 if (msg.getStatus() == Message.ChatStatus.FAIL || msg.getStatus() == Message.ChatStatus.REJECTED) {
                     holder.status.setClickable(true);
@@ -481,7 +484,7 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
         }
     }
 
-    private void resetButton(Button button){
+    private void resetButton(Button button) {
         button.setText("已同意");
         button.setTextColor(Color.parseColor("#333333"));
         button.setBackground(context.getDrawable(R.drawable.bg_joined));
@@ -621,8 +624,8 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
                             url = "";
                         }
                     }
-                    LogUtils.i("huang","boody11111111111 ="+ body);
-                    ImageDisplayUtil.setImgByUrl(imgMsg,url,null,ImageDisplayUtil.IMAGE_SIZE.L,damageImg,null);
+                    LogUtils.i("huang", "boody11111111111 =" + body);
+                    ImageDisplayUtil.setImgByUrl(imgMsg, url, null, ImageDisplayUtil.IMAGE_SIZE.L, damageImg, null);
                 }
             }
         }
@@ -885,7 +888,7 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
             if (body instanceof FileMessageBody) {
                 final FileMessageBody voiceMessageBody = (FileMessageBody) msg.getBody();
                 final Context context = rootView.getContext();
-                String voicePath= "";
+                String voicePath = "";
                 final String voicePath1 = Constants.LOCAL_VOICE_PATH + voiceMessageBody.getFileName();
                 final String voicePath2 = context.getExternalFilesDir("voice").getAbsolutePath() + File.separator + voiceMessageBody.getFileName();
                 final String voicePath3 = voiceMessageBody.getFilePath();
@@ -896,17 +899,17 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
                 } else if (new File(voicePath3).exists()) {
                     voicePath = voicePath3;
                 }
-                setVoiceResource(msg,voicePath);
+                setVoiceResource(msg, voicePath);
             }
         }
 
         private void setVoiceResource(Message msg, String voicePath) {
             final Context context = rootView.getContext();
             int duration = 0;
-            if (!TextUtils.isEmpty(msg.getImMessage().getIMFileInfo().getTime())){
-                LogUtils.i("huang","time="+msg.getImMessage().getIMFileInfo().getTime());
+            if (!TextUtils.isEmpty(msg.getImMessage().getIMFileInfo().getTime())) {
+                LogUtils.i("huang", "time=" + msg.getImMessage().getIMFileInfo().getTime());
                 duration = Integer.valueOf(msg.getImMessage().getIMFileInfo().getTime());
-            } else if (!TextUtils.isEmpty(voicePath)){
+            } else if (!TextUtils.isEmpty(voicePath)) {
                 duration = FileUtils.getAmrDuration(voicePath);
             }
             voiceTime.setText((duration > 60 ? 60 : duration) + "\"");
@@ -1113,7 +1116,7 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
                     @Override
                     public void onClick() {
                         IMMessage imMessage = iMMsgList.get(position);
-                        mImChatControl.onDeleteMessage(imMessage);
+                        mImChatControl.onDeleteMessageNoCallBack(imMessage);
                         mDatas.remove(position);
                         iMMsgList.remove(position);
                         notifyItemRemoved(position);
@@ -1129,13 +1132,13 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
         if (this.select == 0) {
             selectPositionList.clear();
         } else if (this.select == 1) {
-            ((GroupChatActivity) context).showRemove();
+            ((BaseActivity) context).showRemove();
         } else if (this.select == 2) {
             removeSelecPosition();
         }
         selectPositionList.clear();
         notifyDataSetChanged();
-        ((GroupChatActivity) context).selectPosition(mGestureDetector.getPosition());
+        ((BaseActivity) context).selectPosition(mGestureDetector.getPosition());
     }
 
     public void removeSelecPosition() {
@@ -1145,23 +1148,24 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
                 Iterator<Message> iterator = mDatas.iterator();
                 while (iterator.hasNext()) {
                     Message msg = iterator.next();
-//                    LogUtils.i("iddd===",msg.getMsgID());
-//                    if (msg.getMsgID().equals(msgID)) {
-//                        iterator.remove();
-//                        break;
-//                    }
+                    LogUtils.i("iddd===", msg.getMsgID());
+                    if (msg.getMsgID().equals(msgID)) {
+                        iterator.remove();
+                        break;
+                    }
                 }
                 Iterator<IMMessage> iteratorMMsgList = iMMsgList.iterator();
                 while (iteratorMMsgList.hasNext()) {
                     IMMessage imMessage = iteratorMMsgList.next();
-                    if (imMessage.getMsgID().equals(msgID)) {
-                        mImChatControl.onDeleteMessage(imMessage);
+                    if (String.valueOf(imMessage.getLocalId()).equals(msgID)) {
+                        mImChatControl.onDeleteMessageNoCallBack(imMessage);
                         iteratorMMsgList.remove();
                         break;
                     }
                 }
             }
         }
+        notifyDataSetChanged();
     }
 
     public boolean hasSelectRemovePostion() {
@@ -1200,13 +1204,13 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
                     String voicePath3 = voiceMessageBody.getFilePath();
                     if (new File(voicePath1).exists()) {
                         voicePath = voicePath1;
-                        playVoice(msg,voicePath);
+                        playVoice(msg, voicePath);
                     } else if (new File(voicePath2).exists()) {
                         voicePath = voicePath2;
-                        playVoice(msg,voicePath);
+                        playVoice(msg, voicePath);
                     } else if (new File(voicePath3).exists()) {
                         voicePath = voicePath3;
-                        playVoice(msg,voicePath);
+                        playVoice(msg, voicePath);
                     } else {
                         mImChatControl.downloadFilesAndOpen2(msg.getImMessage(), new SingNetFileTransferListener() {
                             @Override
@@ -1217,7 +1221,7 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
                             @Override
                             public void onFileTransferSuccess(FileSubPackage packages) {
                                 String path = packages.getLocalPath();
-                                playVoice(msg,path);
+                                playVoice(msg, path);
                             }
 
                             @Override
@@ -1323,7 +1327,7 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
             }
         }
 
-        private void playVoice(Message msg,String voicePath){
+        private void playVoice(Message msg, String voicePath) {
             final ImageView voicePlayer = (ImageView) mGestureDetector.getTouchView().findViewById(R.id.chat_voice_player);
             if (msg.getFromID() == PreferencesUtils.getInt(context, Constants.ME_USER_ID)) {
                 voicePlayer.setImageResource(R.drawable.send_voice_05);
@@ -1460,39 +1464,39 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
         mListener = listener;
     }
 
-    //---------------------------新IM方法 ,蛋疼的兼容 IMMessage 转成Message，脑壳疼------------------------------//
+    //---------------------------新IM方法,IMMessage转成Message，整合两套框架的结果，蛋疼的代码，被逼无奈，时间太紧，根本没时间重写，整套框架脑壳疼------------------------------//
     /**
      * 聊天控制器
      */
     private IIMChatLogic mImChatControl;
 
-    public void setImChatControl(IIMChatLogic mImChatControl){
+    public void setImChatControl(IIMChatLogic mImChatControl) {
         this.mImChatControl = mImChatControl;
     }
 
-    public void setImData(List<IMMessage> imMessageList){
+    public void setImData(List<IMMessage> imMessageList) {
         mDatas = changeListIMMessageToListMessage(imMessageList);
         iMMsgList.addAll(imMessageList);
         notifyDataSetChanged();
     }
 
-    public void addListImData(List<IMMessage> imMessageList){
+    public void addListImData(List<IMMessage> imMessageList) {
         mDatas.addAll(changeListIMMessageToListMessage(imMessageList));
         iMMsgList.addAll(imMessageList);
         notifyDataSetChanged();
     }
 
-    public void addOneImData(IMMessage imMessage){
+    public void addOneImData(IMMessage imMessage) {
         mDatas.add(changeIMMessageToMessage(imMessage));
         iMMsgList.add(imMessage);
         notifyDataSetChanged();
     }
 
-    public List<Message> changeListIMMessageToListMessage(List<IMMessage> imMessageList){
+    public List<Message> changeListIMMessageToListMessage(List<IMMessage> imMessageList) {
         List<Message> list = new ArrayList<>();
-        if (imMessageList != null || !imMessageList.isEmpty()){
-            for (IMMessage imMessage : imMessageList){
-                LogUtils.i("huang","imessage="+imMessage.toString());
+        if (imMessageList != null || !imMessageList.isEmpty()) {
+            for (IMMessage imMessage : imMessageList) {
+                LogUtils.i("huang", "imessage=" + imMessage.toString());
                 Message message = changeIMMessageToMessage(imMessage);
                 list.add(message);
             }
@@ -1500,32 +1504,42 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
         return list;
     }
 
-    public Message changeIMMessageToMessage(IMMessage imMessage){
+    /**
+     * 将immessage转成message用于显示
+     * @param imMessage
+     * @return
+     */
+    public Message changeIMMessageToMessage(IMMessage imMessage) {
         Message message = null;
         if (IMMessage.CONTENT_TYPE_SHORT_VOICE.equals(imMessage.getContentType()) ||
-                IMMessage.CONTENT_TYPE_VOICE_CHAT.equals(imMessage.getContentType())){
-            String path="";
+                IMMessage.CONTENT_TYPE_VOICE_CHAT.equals(imMessage.getContentType())) {
+            String path = "";
             String fileName = "";
-            if (imMessage.getIMFileInfo() != null){
+            if (imMessage.getIMFileInfo() != null) {
                 path = imMessage.getIMFileInfo().getPath();
                 fileName = imMessage.getIMFileInfo().getName();
             }
-            message = Message.createVoiceMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()),imMessage.getMsgID(), fileName, path);
+            message = Message.createVoiceMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()), imMessage.getLocalId() + "", fileName, path);
             message.setImMessage(imMessage);
-        } else if (IMMessage.CONTENT_TYPE_IMG.equals(imMessage.getContentType())){
-            String path="";
+            message.setStatus(changeStatus(imMessage.getStatus()));
+        } else if (IMMessage.CONTENT_TYPE_IMG.equals(imMessage.getContentType())) {
+            String path = "";
             String fileName = "";
             String sha = "";
-            if (imMessage.getIMFileInfo() != null){
+            if (imMessage.getIMFileInfo() != null) {
                 path = imMessage.getIMFileInfo().getPath();
                 fileName = imMessage.getIMFileInfo().getName();
                 sha = imMessage.getIMFileInfo().getSha();
             }
-            message = Message.createImageMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()),imMessage.getMsgID(), fileName, path);
+            message = Message.createImageMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()), imMessage.getLocalId() + "", fileName, path);
             FileMessageBody fileMessageBody = (FileMessageBody) message.getBody();
             fileMessageBody.setSha(sha);
+            message.setImMessage(imMessage);
+            message.setStatus(changeStatus(imMessage.getStatus()));
         } else {
-            message = Message.createTxtMessage(Message.Type.CHAT,Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()),imMessage.getMsgID(),imMessage.getContent());
+            message = Message.createTxtMessage(Message.Type.CHAT, Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()), imMessage.getLocalId() + "", imMessage.getContent());
+            message.setImMessage(imMessage);
+            message.setStatus(changeStatus(imMessage.getStatus()));
         }
         onAutoDownload(imMessage);
         return message;
@@ -1559,6 +1573,107 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
             boolean isDownlod = TextUtils.isEmpty(path) || (!new File(path).exists());
             if (isDownlod) {
                 mImChatControl.downloadFiles(imMessage);
+            }
+        }
+    }
+
+    private Message.ChatStatus changeStatus(int status) {
+        if (status == -3) {
+            return Message.ChatStatus.DEFAULT;
+        }
+        if (status == 0) {
+            return Message.ChatStatus.SENDING;
+        }
+        if (status == 1) {
+            return Message.ChatStatus.SUCCESS;
+        }
+        if (status == -1) {
+            return Message.ChatStatus.FAIL;
+        }
+        return Message.ChatStatus.DEFAULT;
+    }
+
+    /**
+     * 刷新消息状态
+     * @param localId
+     * @param status
+     */
+    public void refreshMessageStatus(long localId, int status,int fileStatus) {
+        for (int i = 0; i < mDatas.size(); i++) {
+            Message message = mDatas.get(i);
+            if (message.getMsgID().equals(String.valueOf(localId))) {
+                message.setStatus(changeStatus(status));
+                notifyItemChanged(i);
+                break;
+            }
+        }
+        for (IMMessage imMessage : iMMsgList) {
+            if (imMessage.getLocalId() == localId) {
+                imMessage.setStatus(status);
+                if (fileStatus == IMMessage.STATUS_FAIL && imMessage.getIMFileInfo() != null){
+                    imMessage.getIMFileInfo().setStatus(IMMessage.STATUS_FAIL);
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * 根据消息id删除消息
+     * @param localId
+     */
+    public void deleteMessage(long localId){
+        for (int i = 0; i < mDatas.size(); i++) {
+            Message message = mDatas.get(i);
+            if (message.getMsgID().equals(String.valueOf(localId))) {
+               mDatas.remove(i);
+               notifyItemRemoved(i);
+               break;
+            }
+        }
+        for (int i = 0; i < iMMsgList.size(); i++) {
+            IMMessage imMessage = iMMsgList.get(i);
+            if (imMessage.getLocalId() == localId) {
+                iMMsgList.remove(i);
+                break;
+            }
+        }
+    }
+
+    /**
+     * 点击，发送发送失败的消息
+     */
+    private void onSendFailMessage(IMMessage imMessage) {
+        String contentType = imMessage.getContentType();
+        //文本类和地图类
+        if (IMMessage.CONTENT_TYPE_TXT.equals(contentType)
+                || IMMessage.CONTENT_TYPE_MAP.equals(contentType)
+                || IMMessage.CONTENT_TYPE_FUN.equals(contentType)
+                || IMMessage.CONTENT_TYPE_REPLY.equals(contentType)
+                || IMMessage.CONTENT_TYPE_RECORD.equals(contentType)) {
+
+            mImChatControl.onSendFailMessage(imMessage);
+
+            //文件属性的
+        } else if (IMMessage.CONTENT_TYPE_FILE.equals(contentType) ||
+                IMMessage.CONTENT_TYPE_IMG.equals(contentType) ||
+                IMMessage.CONTENT_TYPE_VIDEO.equals(contentType) ||
+                IMMessage.CONTENT_TYPE_SHORT_VOICE.equals(contentType)) {
+            imMessage.refresh();
+            IMFileInfo imFileInfo = imMessage.getIMFileInfo();
+            if (imFileInfo.getStatus() == IMMessage.STATUS_FAIL) {  //文件上传服务器失败
+                List<String> list = new ArrayList<>();
+                list.add(imFileInfo.getPath());
+                String contentType1 = imMessage.getContentType();
+                //删除源视图
+                mImChatControl.onDeleteMessage(imMessage);
+                //上传文件并添加视图
+                mImChatControl.uploadLocalFiles(list, contentType1);
+
+            } else if (imFileInfo.getStatus() == IMMessage.STATUS_SUCCESS) {  //文件上传服务器成功
+                mImChatControl.onSendFailMessage(imMessage);
+            } else if (imFileInfo.getStatus() == IMMessage.STATUS_NO_RECEIVE) {//本地文件不存在
+                mImChatControl.onSendFailMessage(imMessage);
             }
         }
     }

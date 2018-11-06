@@ -1,6 +1,5 @@
 package com.xsimple.im.db.datatable;
 
-import com.networkengine.entity.FileInfo;
 import com.networkengine.entity.GetMsgsEntity;
 import com.xsimple.im.db.greendao.DaoSession;
 import com.xsimple.im.db.greendao.IMCallInfoDao;
@@ -59,6 +58,8 @@ public class IMMessage {
      * 未接收或者未发送
      */
     public static final int STATUS_NO_RECEIVE = -3;
+
+    public static final int STATUS_DEFAULT = -999;
 
     /**
      * 消息类型

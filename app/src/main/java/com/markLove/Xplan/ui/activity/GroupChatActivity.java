@@ -185,9 +185,13 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         chatView.setOnSendMessageListener(new com.markLove.Xplan.ui.widget.ChatView.OnSendMessageListener() {
             @Override
             public void onSendMessage(Message message) {
-//                judeBlackList(message);
-                FileMessageBody fileMessageBody = (FileMessageBody) message.getBody();
-                sendVoice(fileMessageBody.getFilePath());
+                if (message.getChatType() == Message.ChatType.TXT){
+                    TxtMessageBody txtMessageBody = (TxtMessageBody) message.getBody();
+                    mImChatControl.sendMessage(IMMessage.CONTENT_TYPE_TXT,txtMessageBody.getMsg());
+                } else {
+                    FileMessageBody fileMessageBody = (FileMessageBody) message.getBody();
+                    sendVoice(fileMessageBody.getFilePath());
+                }
             }
         });
 
@@ -393,7 +397,8 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         @Override
         public void failResend(Message msg) {
             closeSoftKeyBoard();
-            resendMessage(msg);
+//            resendMessage(msg);
+
         }
     };
 
@@ -408,7 +413,6 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
             @Override
             public void onMenuClick() {
                 updataMessage(resendMessage.getMsgID(), Message.ChatStatus.SENDING.ordinal());
-                judeBlackList(resendMessage);
             }
         });
         resendMsgDialog.show();
@@ -497,22 +501,6 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     }
 
     /**
-     * 判断是否被拉黑
-     *
-     * @param msg
-     */
-    private void judeBlackList(final Message msg) {
-        if (null != msg) {
-            int sendCount = PreferencesUtils.getInt(this, Constants.SEND_MESSAGE_COUNT + to_user_id, 0);
-            //原计数+1
-            PreferencesUtils.putInt(this, Constants.SEND_MESSAGE_COUNT + to_user_id, ++sendCount);
-            addOneMessage(msg);
-        }
-        //暂时不判断拉黑逻辑，直接发送
-        sendMessage(msg);
-    }
-
-    /**
      * 发送消息
      *
      * @param message
@@ -592,7 +580,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 
                         @Override
                         public void onNext(Message message) {
-                            judeBlackList(message);
+
                         }
 
                         @Override
@@ -899,6 +887,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     /**
      * 显示删除按钮
      */
+    @Override
     public void showRemove() {
         closeSoftKeyBoard();
         chatView.setVisibility(View.GONE);
@@ -944,6 +933,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         mRlTitleBar.setVisibility(View.VISIBLE);
     }
 
+    @Override
     public void selectPosition(final int position) {
         rlChatMsgList.post(new Runnable() {
             @Override
@@ -1376,11 +1366,14 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     @Override
     public void onFileTransferSuccess(long localId) {
         LogUtils.i("huang", "onFileTransferSuccess=");
+        chatMessageAdapter.refreshMessageStatus(localId,IMMessage.STATUS_SUCCESS,IMMessage.STATUS_SUCCESS);
     }
 
     @Override
     public void onFileTransferFailed(long localId) {
         LogUtils.i("huang", "onFileTransferFailed=");
+        chatMessageAdapter.refreshMessageStatus(localId,IMMessage.STATUS_FAIL,IMMessage.STATUS_FAIL);
+        ToastUtils.showLong(this,R.string.send_fail);
     }
 
     @Override
@@ -1396,11 +1389,14 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     @Override
     public void onSendMessageSuccessCallBack(long localId) {
         LogUtils.i("huang", "onSendMessageSuccessCallBack=");
+        chatMessageAdapter.refreshMessageStatus(localId,IMMessage.STATUS_SUCCESS,IMMessage.STATUS_SUCCESS);
     }
 
     @Override
     public void onSendMessageFaileCallBack(long localId) {
         LogUtils.i("huang", "onSendMessageFaileCallBack=");
+        chatMessageAdapter.refreshMessageStatus(localId,IMMessage.STATUS_FAIL,IMMessage.STATUS_DEFAULT);
+        ToastUtils.showLong(this,R.string.send_fail);
     }
 
     @Override
@@ -1420,7 +1416,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 
     @Override
     public void onDeleteMessageCallBack(IMMessage message) {
-
+        chatMessageAdapter.deleteMessage(message.getLocalId());
     }
 
     @Override
