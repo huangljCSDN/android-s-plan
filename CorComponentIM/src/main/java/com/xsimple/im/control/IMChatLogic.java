@@ -918,10 +918,10 @@ public class IMChatLogic implements IIMChatLogic, IMObserver, Handler.Callback {
                 iterator.remove();
                 continue;
             }
-            if (!mCanProcessorList.contains(next.getType())) {
-                iterator.remove();
-                continue;
-            }
+//            if (!mCanProcessorList.contains(next.getType())) {
+//                iterator.remove();
+//                continue;
+//            }
             List<IMMessage> imMessage = next.getImMessage();
             if (imMessage == null || imMessage.isEmpty()) {
                 iterator.remove();
@@ -934,16 +934,16 @@ public class IMChatLogic implements IIMChatLogic, IMObserver, Handler.Callback {
                     iterator1.remove();
                     continue;
                 }
-                if (mChat == null) {
-                    mChat = getOrCreateChat();
-                    if (mChat == null) {
-                        iterator1.remove();
-                        continue;
-                    }
-                }
-                if (!Objects.equals(next1.getCId(), mChat.getId())) {
-                    iterator1.remove();
-                }
+//                if (mChat == null) {
+//                    mChat = getOrCreateChat();
+//                    if (mChat == null) {
+//                        iterator1.remove();
+//                        continue;
+//                    }
+//                }
+//                if (!Objects.equals(next1.getCId(), mChat.getId())) {
+//                    iterator1.remove();
+//                }
             }
             handlerOrder(next);
         }

@@ -84,7 +84,6 @@ import com.xsimple.im.db.datatable.IMChat;
 import com.xsimple.im.db.datatable.IMGroupRemark;
 import com.xsimple.im.db.datatable.IMMessage;
 import com.xsimple.im.engine.IMEngine;
-import com.xsimple.im.engine.protocol.IMCommand;
 import com.xsimple.im.event.ExitGroupEvent;
 
 import org.greenrobot.eventbus.EventBus;
@@ -313,6 +312,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 //        getGiftList();
         getChatOpen();
         getGroupDetailData(dataId);
+        joinGroup(dataId);
     }
 
     /**

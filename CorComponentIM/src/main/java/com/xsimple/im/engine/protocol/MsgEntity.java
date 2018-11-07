@@ -1,6 +1,7 @@
 package com.xsimple.im.engine.protocol;
 
 import com.networkengine.entity.GetMsgsEntity;
+import com.networkengine.util.LogUtil;
 
 /**
  * Created by pengpeng on 17/5/5.
@@ -32,6 +33,7 @@ public class MsgEntity extends GetMsgsEntity implements IProcessorParameter<Stri
 
     @Override
     public String getKey() {
+        LogUtil.i("getKey="+getMsgContent().getType());
         return getMsgContent().getType();
     }
 

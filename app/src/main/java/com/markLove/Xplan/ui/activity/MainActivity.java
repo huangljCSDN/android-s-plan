@@ -30,7 +30,6 @@ import com.markLove.Xplan.ui.fragment.MineFragment;
 import com.markLove.Xplan.ui.fragment.MsgFragment;
 import com.markLove.Xplan.ui.fragment.SearchFragment;
 import com.markLove.Xplan.utils.AMapClient;
-import com.markLove.Xplan.utils.AppManager;
 import com.markLove.Xplan.utils.GsonUtils;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
@@ -42,6 +41,7 @@ import com.networkengine.engine.LogicEngine;
 import com.networkengine.util.CoracleSdk;
 import com.xsimple.im.db.datatable.IMBoxMessage;
 import com.xsimple.im.db.datatable.IMChat;
+import com.xsimple.im.db.datatable.IMMessage;
 import com.xsimple.im.db.datatable.IMOfficialMessage;
 import com.xsimple.im.engine.IMEngine;
 import com.xsimple.im.engine.LoginLogic;
@@ -95,7 +95,25 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
         LogUtils.i("huang",GsonUtils.obj2Json(imOfficialMessage));
         IMEngine mImEngine = IMEngine.getInstance(getApplication());
         List<IMChat> chats = mImEngine.getChats(App.getInstance().getUserId());
-
+        for (IMChat chat : chats){
+            if (chat.getType() == IMChat.SESSION_GROUP_CLUSTER || chat.getType() == IMChat.SESSION_PERSON){
+                List<IMMessage> list = IMEngine.getInstance(this).getDbManager().loadLastMessage(chat.getId());
+                chat.setIMMessages(list);
+            } else if (chat.getType() == IMChat.SESSION_BOX_MSG){
+                List<IMBoxMessage> list = IMEngine.getInstance(this).getDbManager().loadLastBoxMessage(chat.getId());
+                chat.setIMBoxMessage(list);
+            } else if (chat.getType() == IMChat.SESSION_OFFICIAL_MSG){
+                List<IMOfficialMessage> list = IMEngine.getInstance(this).getDbManager().loadLastOfficialMessage(chat.getId());
+                chat.setIMOfficialMessage(list);
+            }
+        }
+        List<IMOfficialMessage> officialMessages = new ArrayList<>();
+        officialMessages.add(imOfficialMessage);
+        List<IMBoxMessage> imBoxMessages = new ArrayList<>();
+        imBoxMessages.add(imBoxMessage);
+        chats.get(1).setIMOfficialMessage(officialMessages);
+        chats.get(0).setIMBoxMessage(imBoxMessages);
+        LogUtils.i("huang","chats="+GsonUtils.obj2Json(chats));
     }
 
     private void initMapClient(){
@@ -266,6 +284,7 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
                 member.setUserName(userBean.getUserInfo().getNickName());
                 member.setUserToken(result.getUserToken());
                 LogicEngine.getInstance().setUser(member);
+                test();
             }
 
             @Override

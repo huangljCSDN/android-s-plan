@@ -198,7 +198,7 @@ public class ProtocolStack {
         if (TextUtils.isEmpty(parameter.getKey())) {
             return null;
         }
-
+        LogUtil.i("IMCommand==="+mCmdProcessorFactory.create(parameter.getKey()).process(parameter).toString());
         return mCmdProcessorFactory.create(parameter.getKey()).process(parameter);
     }
 

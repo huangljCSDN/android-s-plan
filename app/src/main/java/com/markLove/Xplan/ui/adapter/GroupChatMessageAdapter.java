@@ -18,7 +18,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -1552,7 +1551,7 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
             message.setStatus(changeStatus(imMessage.getStatus()));
         } else if (IMMessage.GROUP_OFFICE_AGREE.equals(imMessage.getContentType())) {
             TxtMessageBody txtMessageBody = new TxtMessageBody(Message.Type.CHAT, Message.ChatType.TXT, imMessage.getContent());
-            message = new Message(Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()),String.valueOf(imMessage.getLocalId()),Message.Type.CHAT, Message.ChatType.REQUEST_JOIN,txtMessageBody);
+            message = new Message(IMMessage.SYSTEM_ID, Integer.parseInt(imMessage.getApplyId()),String.valueOf(imMessage.getLocalId()),Message.Type.CHAT, Message.ChatType.NOTIFICATION,txtMessageBody);
             message.setImMessage(imMessage);
             message.setStatus(changeStatus(imMessage.getStatus()));
             if (Integer.valueOf(imMessage.getTagertId()) == me_user_id){
@@ -1560,7 +1559,7 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
             }
         } else if (IMMessage.GROUP_OFFICE_APPLY.equals(imMessage.getContentType())) {
             TxtMessageBody txtMessageBody = new TxtMessageBody(Message.Type.CHAT, Message.ChatType.TXT, imMessage.getContent());
-            message = new Message(Integer.parseInt(imMessage.getSenderId()), Integer.parseInt(imMessage.getTagertId()),String.valueOf(imMessage.getLocalId()),Message.Type.CHAT, Message.ChatType.NOTIFICATION,txtMessageBody);
+            message = new Message(IMMessage.SYSTEM_ID, Integer.parseInt(imMessage.getApplyId()),String.valueOf(imMessage.getLocalId()),Message.Type.CHAT, Message.ChatType.REQUEST_JOIN,txtMessageBody);
             message.setImMessage(imMessage);
             message.setAgree(imMessage.getIsAgree());
             message.setStatus(changeStatus(imMessage.getStatus()));

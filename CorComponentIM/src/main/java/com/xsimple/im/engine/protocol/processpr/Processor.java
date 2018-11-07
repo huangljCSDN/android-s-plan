@@ -34,11 +34,12 @@ public abstract class Processor<Parameter, Result> {
 
     public int fixGroupOrGroup(String type) {
 
-        if (type.startsWith("FIX")) {
-            return IMMessage.TYPE_GROUP;
-        }
-
-        return IMMessage.TYPE_DISCUSS;
+//        if (type.startsWith("FIX")) {
+//            return IMMessage.TYPE_GROUP;
+//        }
+//
+//        return IMMessage.TYPE_DISCUSS;
+        return IMMessage.TYPE_GROUP;
     }
 
 }

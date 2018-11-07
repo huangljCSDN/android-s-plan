@@ -3,8 +3,10 @@ package com.xsimple.im.db.datatable;
 import android.support.annotation.IntDef;
 
 import com.xsimple.im.db.greendao.DaoSession;
+import com.xsimple.im.db.greendao.IMBoxMessageDao;
 import com.xsimple.im.db.greendao.IMChatDao;
 import com.xsimple.im.db.greendao.IMMessageDao;
+import com.xsimple.im.db.greendao.IMOfficialMessageDao;
 import com.xsimple.im.db.greendao.IMSysMessageDao;
 
 import org.greenrobot.greendao.DaoException;
@@ -20,8 +22,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.List;
-import com.xsimple.im.db.greendao.IMOfficialMessageDao;
-import com.xsimple.im.db.greendao.IMBoxMessageDao;
 
 
 /**
@@ -36,7 +36,6 @@ public class IMChat {
     public static final int SESSION_GROUP_DISCUSSION = 2;// 讨论组
     public static final int SESSION_SYSTEM_MSG = 3;// 系统消息
     public static final int SESSION_LIGHT_MSG = 4;// 轻应用消息
-
 
     public static final int SESSION_BOX_MSG = 5;// 消息盒子
     public static final int SESSION_OFFICIAL_MSG = 6;// 官方消息
@@ -195,8 +194,33 @@ public class IMChat {
     }
 
 
+    public void setuId(String uId) {
+        this.uId = uId;
+    }
 
+    public void setStick(boolean stick) {
+        isStick = stick;
+    }
 
+    public void setNotDisturb(boolean notDisturb) {
+        isNotDisturb = notDisturb;
+    }
+
+    public void setIMMessages(List<IMMessage> IMMessages) {
+        this.IMMessages = IMMessages;
+    }
+
+    public void setIMSysMessage(List<com.xsimple.im.db.datatable.IMSysMessage> IMSysMessage) {
+        this.IMSysMessage = IMSysMessage;
+    }
+
+    public void setIMBoxMessage(List<com.xsimple.im.db.datatable.IMBoxMessage> IMBoxMessage) {
+        this.IMBoxMessage = IMBoxMessage;
+    }
+
+    public void setIMOfficialMessage(List<com.xsimple.im.db.datatable.IMOfficialMessage> IMOfficialMessage) {
+        this.IMOfficialMessage = IMOfficialMessage;
+    }
 
     public Long getId() {
         return this.id;

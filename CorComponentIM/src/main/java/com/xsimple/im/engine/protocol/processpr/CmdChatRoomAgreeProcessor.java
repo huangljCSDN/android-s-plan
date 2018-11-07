@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.networkengine.entity.GroupMember;
 import com.networkengine.entity.MessageContent;
-import com.xsimple.im.R;
 import com.xsimple.im.db.DbManager;
 import com.xsimple.im.engine.protocol.IMCommand;
 import com.xsimple.im.engine.protocol.MsgEntity;
@@ -30,7 +29,7 @@ public class CmdChatRoomAgreeProcessor extends CmdGroupProcessor {
 
     @Override
     protected boolean processChatAndGroup(MsgEntity msgEntity) throws Exception {
-        return saveGroup(msgEntity);
+        return saveFixGroup(msgEntity);
     }
 
     @Override

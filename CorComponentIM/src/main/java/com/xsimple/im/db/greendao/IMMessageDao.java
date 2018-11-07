@@ -46,27 +46,28 @@ public class IMMessageDao extends AbstractDao<IMMessage, Long> {
         public final static Property SendOrReceive = new Property(6, int.class, "sendOrReceive", false, "sendOrReceive");
         public final static Property GroupName = new Property(7, String.class, "groupName", false, "group_name");
         public final static Property SenderId = new Property(8, String.class, "senderId", false, "sender_id");
-        public final static Property SenderName = new Property(9, String.class, "senderName", false, "sender_name");
-        public final static Property Time = new Property(10, long.class, "time", false, "time");
-        public final static Property Type = new Property(11, int.class, "type", false, "type");
-        public final static Property ContentType = new Property(12, String.class, "contentType", false, "content_type");
-        public final static Property Content = new Property(13, String.class, "content", false, "content");
-        public final static Property Status = new Property(14, int.class, "status", false, "status");
-        public final static Property IsRead = new Property(15, boolean.class, "isRead", false, "read");
-        public final static Property IsAgree = new Property(16, boolean.class, "isAgree", false, "agree");
-        public final static Property ReadCount = new Property(17, int.class, "readCount", false, "read_count");
-        public final static Property UnReadCount = new Property(18, int.class, "unReadCount", false, "un_read_count");
-        public final static Property Mk = new Property(19, String.class, "mk", false, "mk");
-        public final static Property IsDisturb = new Property(20, String.class, "isDisturb", false, "IS_DISTURB");
-        public final static Property IsAiteMe = new Property(21, boolean.class, "isAiteMe", false, "IS_AITE_ME");
-        public final static Property FId = new Property(22, Long.class, "fId", false, "F_ID");
-        public final static Property CallId = new Property(23, Long.class, "callId", false, "CALL_ID");
-        public final static Property LId = new Property(24, Long.class, "lId", false, "L_ID");
-        public final static Property SId = new Property(25, Long.class, "sId", false, "S_ID");
-        public final static Property RId = new Property(26, Long.class, "rId", false, "R_ID");
-        public final static Property ReplyId = new Property(27, Long.class, "replyId", false, "REPLY_ID");
-        public final static Property RecordId = new Property(28, Long.class, "recordId", false, "RECORD_ID");
-        public final static Property AtInfo = new Property(29, String.class, "AtInfo", false, "AT_INFO");
+        public final static Property ApplyId = new Property(9, String.class, "applyId", false, "apply_id");
+        public final static Property SenderName = new Property(10, String.class, "senderName", false, "sender_name");
+        public final static Property Time = new Property(11, long.class, "time", false, "time");
+        public final static Property Type = new Property(12, int.class, "type", false, "type");
+        public final static Property ContentType = new Property(13, String.class, "contentType", false, "content_type");
+        public final static Property Content = new Property(14, String.class, "content", false, "content");
+        public final static Property Status = new Property(15, int.class, "status", false, "status");
+        public final static Property IsRead = new Property(16, boolean.class, "isRead", false, "read");
+        public final static Property IsAgree = new Property(17, boolean.class, "isAgree", false, "agree");
+        public final static Property ReadCount = new Property(18, int.class, "readCount", false, "read_count");
+        public final static Property UnReadCount = new Property(19, int.class, "unReadCount", false, "un_read_count");
+        public final static Property Mk = new Property(20, String.class, "mk", false, "mk");
+        public final static Property IsDisturb = new Property(21, String.class, "isDisturb", false, "IS_DISTURB");
+        public final static Property IsAiteMe = new Property(22, boolean.class, "isAiteMe", false, "IS_AITE_ME");
+        public final static Property FId = new Property(23, Long.class, "fId", false, "F_ID");
+        public final static Property CallId = new Property(24, Long.class, "callId", false, "CALL_ID");
+        public final static Property LId = new Property(25, Long.class, "lId", false, "L_ID");
+        public final static Property SId = new Property(26, Long.class, "sId", false, "S_ID");
+        public final static Property RId = new Property(27, Long.class, "rId", false, "R_ID");
+        public final static Property ReplyId = new Property(28, Long.class, "replyId", false, "REPLY_ID");
+        public final static Property RecordId = new Property(29, Long.class, "recordId", false, "RECORD_ID");
+        public final static Property AtInfo = new Property(30, String.class, "AtInfo", false, "AT_INFO");
     }
 
     private DaoSession daoSession;
@@ -95,27 +96,28 @@ public class IMMessageDao extends AbstractDao<IMMessage, Long> {
                 "\"sendOrReceive\" INTEGER NOT NULL ," + // 6: sendOrReceive
                 "\"group_name\" TEXT," + // 7: groupName
                 "\"sender_id\" TEXT," + // 8: senderId
-                "\"sender_name\" TEXT," + // 9: senderName
-                "\"time\" INTEGER NOT NULL ," + // 10: time
-                "\"type\" INTEGER NOT NULL ," + // 11: type
-                "\"content_type\" TEXT," + // 12: contentType
-                "\"content\" TEXT," + // 13: content
-                "\"status\" INTEGER NOT NULL ," + // 14: status
-                "\"read\" INTEGER NOT NULL ," + // 15: isRead
-                "\"agree\" INTEGER NOT NULL ," + // 16: isAgree
-                "\"read_count\" INTEGER NOT NULL ," + // 17: readCount
-                "\"un_read_count\" INTEGER NOT NULL ," + // 18: unReadCount
-                "\"mk\" TEXT," + // 19: mk
-                "\"IS_DISTURB\" TEXT," + // 20: isDisturb
-                "\"IS_AITE_ME\" INTEGER NOT NULL ," + // 21: isAiteMe
-                "\"F_ID\" INTEGER," + // 22: fId
-                "\"CALL_ID\" INTEGER," + // 23: callId
-                "\"L_ID\" INTEGER," + // 24: lId
-                "\"S_ID\" INTEGER," + // 25: sId
-                "\"R_ID\" INTEGER," + // 26: rId
-                "\"REPLY_ID\" INTEGER," + // 27: replyId
-                "\"RECORD_ID\" INTEGER," + // 28: recordId
-                "\"AT_INFO\" TEXT);"); // 29: AtInfo
+                "\"apply_id\" TEXT," + // 9: applyId
+                "\"sender_name\" TEXT," + // 10: senderName
+                "\"time\" INTEGER NOT NULL ," + // 11: time
+                "\"type\" INTEGER NOT NULL ," + // 12: type
+                "\"content_type\" TEXT," + // 13: contentType
+                "\"content\" TEXT," + // 14: content
+                "\"status\" INTEGER NOT NULL ," + // 15: status
+                "\"read\" INTEGER NOT NULL ," + // 16: isRead
+                "\"agree\" INTEGER NOT NULL ," + // 17: isAgree
+                "\"read_count\" INTEGER NOT NULL ," + // 18: readCount
+                "\"un_read_count\" INTEGER NOT NULL ," + // 19: unReadCount
+                "\"mk\" TEXT," + // 20: mk
+                "\"IS_DISTURB\" TEXT," + // 21: isDisturb
+                "\"IS_AITE_ME\" INTEGER NOT NULL ," + // 22: isAiteMe
+                "\"F_ID\" INTEGER," + // 23: fId
+                "\"CALL_ID\" INTEGER," + // 24: callId
+                "\"L_ID\" INTEGER," + // 25: lId
+                "\"S_ID\" INTEGER," + // 26: sId
+                "\"R_ID\" INTEGER," + // 27: rId
+                "\"REPLY_ID\" INTEGER," + // 28: replyId
+                "\"RECORD_ID\" INTEGER," + // 29: recordId
+                "\"AT_INFO\" TEXT);"); // 30: AtInfo
     }
 
     /** Drops the underlying database table. */
@@ -169,77 +171,82 @@ public class IMMessageDao extends AbstractDao<IMMessage, Long> {
             stmt.bindString(9, senderId);
         }
  
+        String applyId = entity.getApplyId();
+        if (applyId != null) {
+            stmt.bindString(10, applyId);
+        }
+ 
         String senderName = entity.getSenderName();
         if (senderName != null) {
-            stmt.bindString(10, senderName);
+            stmt.bindString(11, senderName);
         }
-        stmt.bindLong(11, entity.getTime());
-        stmt.bindLong(12, entity.getType());
+        stmt.bindLong(12, entity.getTime());
+        stmt.bindLong(13, entity.getType());
  
         String contentType = entity.getContentType();
         if (contentType != null) {
-            stmt.bindString(13, contentType);
+            stmt.bindString(14, contentType);
         }
  
         String content = entity.getContent();
         if (content != null) {
-            stmt.bindString(14, content);
+            stmt.bindString(15, content);
         }
-        stmt.bindLong(15, entity.getStatus());
-        stmt.bindLong(16, entity.getIsRead() ? 1L: 0L);
-        stmt.bindLong(17, entity.getIsAgree() ? 1L: 0L);
-        stmt.bindLong(18, entity.getReadCount());
-        stmt.bindLong(19, entity.getUnReadCount());
+        stmt.bindLong(16, entity.getStatus());
+        stmt.bindLong(17, entity.getIsRead() ? 1L: 0L);
+        stmt.bindLong(18, entity.getIsAgree() ? 1L: 0L);
+        stmt.bindLong(19, entity.getReadCount());
+        stmt.bindLong(20, entity.getUnReadCount());
  
         String mk = entity.getMk();
         if (mk != null) {
-            stmt.bindString(20, mk);
+            stmt.bindString(21, mk);
         }
  
         String isDisturb = entity.getIsDisturb();
         if (isDisturb != null) {
-            stmt.bindString(21, isDisturb);
+            stmt.bindString(22, isDisturb);
         }
-        stmt.bindLong(22, entity.getIsAiteMe() ? 1L: 0L);
+        stmt.bindLong(23, entity.getIsAiteMe() ? 1L: 0L);
  
         Long fId = entity.getFId();
         if (fId != null) {
-            stmt.bindLong(23, fId);
+            stmt.bindLong(24, fId);
         }
  
         Long callId = entity.getCallId();
         if (callId != null) {
-            stmt.bindLong(24, callId);
+            stmt.bindLong(25, callId);
         }
  
         Long lId = entity.getLId();
         if (lId != null) {
-            stmt.bindLong(25, lId);
+            stmt.bindLong(26, lId);
         }
  
         Long sId = entity.getSId();
         if (sId != null) {
-            stmt.bindLong(26, sId);
+            stmt.bindLong(27, sId);
         }
  
         Long rId = entity.getRId();
         if (rId != null) {
-            stmt.bindLong(27, rId);
+            stmt.bindLong(28, rId);
         }
  
         Long replyId = entity.getReplyId();
         if (replyId != null) {
-            stmt.bindLong(28, replyId);
+            stmt.bindLong(29, replyId);
         }
  
         Long recordId = entity.getRecordId();
         if (recordId != null) {
-            stmt.bindLong(29, recordId);
+            stmt.bindLong(30, recordId);
         }
  
         String AtInfo = entity.getAtInfo();
         if (AtInfo != null) {
-            stmt.bindString(30, AtInfo);
+            stmt.bindString(31, AtInfo);
         }
     }
 
@@ -288,77 +295,82 @@ public class IMMessageDao extends AbstractDao<IMMessage, Long> {
             stmt.bindString(9, senderId);
         }
  
+        String applyId = entity.getApplyId();
+        if (applyId != null) {
+            stmt.bindString(10, applyId);
+        }
+ 
         String senderName = entity.getSenderName();
         if (senderName != null) {
-            stmt.bindString(10, senderName);
+            stmt.bindString(11, senderName);
         }
-        stmt.bindLong(11, entity.getTime());
-        stmt.bindLong(12, entity.getType());
+        stmt.bindLong(12, entity.getTime());
+        stmt.bindLong(13, entity.getType());
  
         String contentType = entity.getContentType();
         if (contentType != null) {
-            stmt.bindString(13, contentType);
+            stmt.bindString(14, contentType);
         }
  
         String content = entity.getContent();
         if (content != null) {
-            stmt.bindString(14, content);
+            stmt.bindString(15, content);
         }
-        stmt.bindLong(15, entity.getStatus());
-        stmt.bindLong(16, entity.getIsRead() ? 1L: 0L);
-        stmt.bindLong(17, entity.getIsAgree() ? 1L: 0L);
-        stmt.bindLong(18, entity.getReadCount());
-        stmt.bindLong(19, entity.getUnReadCount());
+        stmt.bindLong(16, entity.getStatus());
+        stmt.bindLong(17, entity.getIsRead() ? 1L: 0L);
+        stmt.bindLong(18, entity.getIsAgree() ? 1L: 0L);
+        stmt.bindLong(19, entity.getReadCount());
+        stmt.bindLong(20, entity.getUnReadCount());
  
         String mk = entity.getMk();
         if (mk != null) {
-            stmt.bindString(20, mk);
+            stmt.bindString(21, mk);
         }
  
         String isDisturb = entity.getIsDisturb();
         if (isDisturb != null) {
-            stmt.bindString(21, isDisturb);
+            stmt.bindString(22, isDisturb);
         }
-        stmt.bindLong(22, entity.getIsAiteMe() ? 1L: 0L);
+        stmt.bindLong(23, entity.getIsAiteMe() ? 1L: 0L);
  
         Long fId = entity.getFId();
         if (fId != null) {
-            stmt.bindLong(23, fId);
+            stmt.bindLong(24, fId);
         }
  
         Long callId = entity.getCallId();
         if (callId != null) {
-            stmt.bindLong(24, callId);
+            stmt.bindLong(25, callId);
         }
  
         Long lId = entity.getLId();
         if (lId != null) {
-            stmt.bindLong(25, lId);
+            stmt.bindLong(26, lId);
         }
  
         Long sId = entity.getSId();
         if (sId != null) {
-            stmt.bindLong(26, sId);
+            stmt.bindLong(27, sId);
         }
  
         Long rId = entity.getRId();
         if (rId != null) {
-            stmt.bindLong(27, rId);
+            stmt.bindLong(28, rId);
         }
  
         Long replyId = entity.getReplyId();
         if (replyId != null) {
-            stmt.bindLong(28, replyId);
+            stmt.bindLong(29, replyId);
         }
  
         Long recordId = entity.getRecordId();
         if (recordId != null) {
-            stmt.bindLong(29, recordId);
+            stmt.bindLong(30, recordId);
         }
  
         String AtInfo = entity.getAtInfo();
         if (AtInfo != null) {
-            stmt.bindString(30, AtInfo);
+            stmt.bindString(31, AtInfo);
         }
     }
 
@@ -385,27 +397,28 @@ public class IMMessageDao extends AbstractDao<IMMessage, Long> {
             cursor.getInt(offset + 6), // sendOrReceive
             cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // groupName
             cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // senderId
-            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // senderName
-            cursor.getLong(offset + 10), // time
-            cursor.getInt(offset + 11), // type
-            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // contentType
-            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // content
-            cursor.getInt(offset + 14), // status
-            cursor.getShort(offset + 15) != 0, // isRead
-            cursor.getShort(offset + 16) != 0, // isAgree
-            cursor.getInt(offset + 17), // readCount
-            cursor.getInt(offset + 18), // unReadCount
-            cursor.isNull(offset + 19) ? null : cursor.getString(offset + 19), // mk
-            cursor.isNull(offset + 20) ? null : cursor.getString(offset + 20), // isDisturb
-            cursor.getShort(offset + 21) != 0, // isAiteMe
-            cursor.isNull(offset + 22) ? null : cursor.getLong(offset + 22), // fId
-            cursor.isNull(offset + 23) ? null : cursor.getLong(offset + 23), // callId
-            cursor.isNull(offset + 24) ? null : cursor.getLong(offset + 24), // lId
-            cursor.isNull(offset + 25) ? null : cursor.getLong(offset + 25), // sId
-            cursor.isNull(offset + 26) ? null : cursor.getLong(offset + 26), // rId
-            cursor.isNull(offset + 27) ? null : cursor.getLong(offset + 27), // replyId
-            cursor.isNull(offset + 28) ? null : cursor.getLong(offset + 28), // recordId
-            cursor.isNull(offset + 29) ? null : cursor.getString(offset + 29) // AtInfo
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // applyId
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // senderName
+            cursor.getLong(offset + 11), // time
+            cursor.getInt(offset + 12), // type
+            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // contentType
+            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // content
+            cursor.getInt(offset + 15), // status
+            cursor.getShort(offset + 16) != 0, // isRead
+            cursor.getShort(offset + 17) != 0, // isAgree
+            cursor.getInt(offset + 18), // readCount
+            cursor.getInt(offset + 19), // unReadCount
+            cursor.isNull(offset + 20) ? null : cursor.getString(offset + 20), // mk
+            cursor.isNull(offset + 21) ? null : cursor.getString(offset + 21), // isDisturb
+            cursor.getShort(offset + 22) != 0, // isAiteMe
+            cursor.isNull(offset + 23) ? null : cursor.getLong(offset + 23), // fId
+            cursor.isNull(offset + 24) ? null : cursor.getLong(offset + 24), // callId
+            cursor.isNull(offset + 25) ? null : cursor.getLong(offset + 25), // lId
+            cursor.isNull(offset + 26) ? null : cursor.getLong(offset + 26), // sId
+            cursor.isNull(offset + 27) ? null : cursor.getLong(offset + 27), // rId
+            cursor.isNull(offset + 28) ? null : cursor.getLong(offset + 28), // replyId
+            cursor.isNull(offset + 29) ? null : cursor.getLong(offset + 29), // recordId
+            cursor.isNull(offset + 30) ? null : cursor.getString(offset + 30) // AtInfo
         );
         return entity;
     }
@@ -421,27 +434,28 @@ public class IMMessageDao extends AbstractDao<IMMessage, Long> {
         entity.setSendOrReceive(cursor.getInt(offset + 6));
         entity.setGroupName(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
         entity.setSenderId(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
-        entity.setSenderName(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
-        entity.setTime(cursor.getLong(offset + 10));
-        entity.setType(cursor.getInt(offset + 11));
-        entity.setContentType(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
-        entity.setContent(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
-        entity.setStatus(cursor.getInt(offset + 14));
-        entity.setIsRead(cursor.getShort(offset + 15) != 0);
-        entity.setIsAgree(cursor.getShort(offset + 16) != 0);
-        entity.setReadCount(cursor.getInt(offset + 17));
-        entity.setUnReadCount(cursor.getInt(offset + 18));
-        entity.setMk(cursor.isNull(offset + 19) ? null : cursor.getString(offset + 19));
-        entity.setIsDisturb(cursor.isNull(offset + 20) ? null : cursor.getString(offset + 20));
-        entity.setIsAiteMe(cursor.getShort(offset + 21) != 0);
-        entity.setFId(cursor.isNull(offset + 22) ? null : cursor.getLong(offset + 22));
-        entity.setCallId(cursor.isNull(offset + 23) ? null : cursor.getLong(offset + 23));
-        entity.setLId(cursor.isNull(offset + 24) ? null : cursor.getLong(offset + 24));
-        entity.setSId(cursor.isNull(offset + 25) ? null : cursor.getLong(offset + 25));
-        entity.setRId(cursor.isNull(offset + 26) ? null : cursor.getLong(offset + 26));
-        entity.setReplyId(cursor.isNull(offset + 27) ? null : cursor.getLong(offset + 27));
-        entity.setRecordId(cursor.isNull(offset + 28) ? null : cursor.getLong(offset + 28));
-        entity.setAtInfo(cursor.isNull(offset + 29) ? null : cursor.getString(offset + 29));
+        entity.setApplyId(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
+        entity.setSenderName(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
+        entity.setTime(cursor.getLong(offset + 11));
+        entity.setType(cursor.getInt(offset + 12));
+        entity.setContentType(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
+        entity.setContent(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
+        entity.setStatus(cursor.getInt(offset + 15));
+        entity.setIsRead(cursor.getShort(offset + 16) != 0);
+        entity.setIsAgree(cursor.getShort(offset + 17) != 0);
+        entity.setReadCount(cursor.getInt(offset + 18));
+        entity.setUnReadCount(cursor.getInt(offset + 19));
+        entity.setMk(cursor.isNull(offset + 20) ? null : cursor.getString(offset + 20));
+        entity.setIsDisturb(cursor.isNull(offset + 21) ? null : cursor.getString(offset + 21));
+        entity.setIsAiteMe(cursor.getShort(offset + 22) != 0);
+        entity.setFId(cursor.isNull(offset + 23) ? null : cursor.getLong(offset + 23));
+        entity.setCallId(cursor.isNull(offset + 24) ? null : cursor.getLong(offset + 24));
+        entity.setLId(cursor.isNull(offset + 25) ? null : cursor.getLong(offset + 25));
+        entity.setSId(cursor.isNull(offset + 26) ? null : cursor.getLong(offset + 26));
+        entity.setRId(cursor.isNull(offset + 27) ? null : cursor.getLong(offset + 27));
+        entity.setReplyId(cursor.isNull(offset + 28) ? null : cursor.getLong(offset + 28));
+        entity.setRecordId(cursor.isNull(offset + 29) ? null : cursor.getLong(offset + 29));
+        entity.setAtInfo(cursor.isNull(offset + 30) ? null : cursor.getString(offset + 30));
      }
     
     @Override

@@ -275,6 +275,8 @@ public class IMMessage {
 
     public static final String FIXGROUP_AGREE = "FIXGROUP_AGREE";
 
+    public static final int SYSTEM_ID = -999999;
+
     public static boolean isCommand(GetMsgsEntity entity) {
         return entity.getParam().getType().startsWith("FIXGROUP")
                 || entity.getParam().getType().startsWith("GROUP")
@@ -332,6 +334,12 @@ public class IMMessage {
      */
     @Property(nameInDb = "sender_id")
     private String senderId;
+
+    /**
+     * 申请者加入组局者id
+     */
+    @Property(nameInDb = "apply_id")
+    private String applyId;
 
     /**
      * 发送者名字
@@ -460,13 +468,13 @@ public class IMMessage {
     @Generated(hash = 450159840)
     private transient IMMessageDao myDao;
 
-    @Generated(hash = 1050909129)
+    @Generated(hash = 592671950)
     public IMMessage(Long localId, String msgID, String receiverName, String vId, Long cId,
-            String tagertId, int sendOrReceive, String groupName, String senderId, String senderName,
-            long time, int type, String contentType, String content, int status, boolean isRead,
-            boolean isAgree, int readCount, int unReadCount, String mk, String isDisturb,
-            boolean isAiteMe, Long fId, Long callId, Long lId, Long sId, Long rId, Long replyId,
-            Long recordId, String AtInfo) {
+            String tagertId, int sendOrReceive, String groupName, String senderId, String applyId,
+            String senderName, long time, int type, String contentType, String content, int status,
+            boolean isRead, boolean isAgree, int readCount, int unReadCount, String mk,
+            String isDisturb, boolean isAiteMe, Long fId, Long callId, Long lId, Long sId, Long rId,
+            Long replyId, Long recordId, String AtInfo) {
         this.localId = localId;
         this.msgID = msgID;
         this.receiverName = receiverName;
@@ -476,6 +484,7 @@ public class IMMessage {
         this.sendOrReceive = sendOrReceive;
         this.groupName = groupName;
         this.senderId = senderId;
+        this.applyId = applyId;
         this.senderName = senderName;
         this.time = time;
         this.type = type;
@@ -1154,5 +1163,15 @@ public class IMMessage {
 
     public void setIsAgree(boolean isAgree) {
         this.isAgree = isAgree;
+    }
+
+
+    public String getApplyId() {
+        return this.applyId;
+    }
+
+
+    public void setApplyId(String applyId) {
+        this.applyId = applyId;
     }
 }

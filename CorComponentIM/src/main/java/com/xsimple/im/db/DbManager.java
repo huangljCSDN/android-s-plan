@@ -1193,6 +1193,40 @@ public class DbManager {
     }
 
     /**
+     * 加载最后一条盒子消息
+     * @param chat_id
+     * @return
+     */
+    public List<IMBoxMessage> loadLastBoxMessage(long chat_id) {
+
+        QueryBuilder<IMBoxMessage> builder;
+        builder = mImBoxMessageDao.queryBuilder();
+
+        builder.where(IMBoxMessageDao.Properties.CId.eq(chat_id))
+                .orderDesc(IMBoxMessageDao.Properties.SendTimer)
+                .limit(1);
+        return builder.build().list();
+
+    }
+
+    /**
+     * 加载最后一条官方消息
+     * @param chat_id
+     * @return
+     */
+    public List<IMOfficialMessage> loadLastOfficialMessage(long chat_id) {
+
+        QueryBuilder<IMOfficialMessage> builder;
+        builder = mImOfficialMessageDao.queryBuilder();
+
+        builder.where(IMOfficialMessageDao.Properties.CId.eq(chat_id))
+                .orderDesc(IMOfficialMessageDao.Properties.SendTimer)
+                .limit(1);
+        return builder.build().list();
+
+    }
+
+    /**
      * 获取最后修改的一条消息
      */
     public List<IMSysMessage> loadLastSysMessage(long chat_id) {

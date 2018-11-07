@@ -132,4 +132,13 @@ public class IMCommand {
         this.mActionId = mActionId;
     }
 
+    @Override
+    public String toString() {
+        return "IMCommand{" +
+                "Type='" + Type + '\'' +
+                ", imSysMessage=" + imSysMessage +
+                ", imMessage=" + imMessage +
+                ", mActionId='" + mActionId + '\'' +
+                '}';
+    }
 }

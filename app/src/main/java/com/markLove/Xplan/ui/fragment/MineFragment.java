@@ -29,7 +29,6 @@ import com.markLove.Xplan.mvp.contract.FileContract;
 import com.markLove.Xplan.mvp.presenter.FilePresenter;
 import com.markLove.Xplan.ui.activity.CameraActivity;
 import com.markLove.Xplan.ui.activity.PublishActivity;
-import com.markLove.Xplan.ui.activity.WebViewActivity;
 import com.markLove.Xplan.ui.widget.MyWebView;
 import com.markLove.Xplan.utils.GsonUtils;
 import com.markLove.Xplan.utils.LogUtils;
@@ -79,9 +78,9 @@ public class MineFragment extends BaseFragment<FilePresenter> implements FileCon
 
         // 被JS调用的方法必须加入@JavascriptInterface注解
         @JavascriptInterface
-        public void toPublishPage() {
+        public void toPublishPage(String json) {
             //{"chatType":1,"chatId":1}
-            LogUtils.i("huang", "toPublishPage=");
+            LogUtils.i("huang", "toPublishPage="+json);
             startPublishActivity();
         }
 

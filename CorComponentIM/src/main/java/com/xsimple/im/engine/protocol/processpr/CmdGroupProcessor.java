@@ -5,6 +5,7 @@ import android.text.TextUtils;
 
 import com.networkengine.entity.GroupMember;
 import com.networkengine.entity.MessageContent;
+import com.networkengine.util.LogUtil;
 import com.xsimple.im.db.DbManager;
 import com.xsimple.im.db.datatable.IMChat;
 import com.xsimple.im.db.datatable.IMGroup;
@@ -41,9 +42,11 @@ public abstract class CmdGroupProcessor extends Processor<MsgEntity, IMCommand> 
 
         IMMessage imMessage = new IMMessage();
 
-        setContentType(imMessage, msgEntity);
-//        imMessage.setTagertId(messageContent.getG_id());
-        imMessage.setTagertId(messageContent.getUserId());
+//        setContentType(imMessage, msgEntity);
+        imMessage.setContentType(msgEntity.getMsgContent().getType());
+        imMessage.setTagertId(getGid(msgEntity));
+//        imMessage.setTagertId(messageContent.getUserId());
+        imMessage.setApplyId(messageContent.getUserId());
         imMessage.setSenderId(msgEntity.getParam().getSenderId());
         imMessage.setSenderName(messageContent.getSenderName());
         imMessage.setStatus(IMMessage.STATUS_SUCCESS);
@@ -213,10 +216,11 @@ public abstract class CmdGroupProcessor extends Processor<MsgEntity, IMCommand> 
         if (addUpdateOrDelete(msgEntity)) {
             mDbManager.addOrUpdateMsgToChat(mUid, msgs);
             mInstruction.setImMessage(msgs);
+            LogUtil.i("000000000000");
             return mInstruction;
         }
         processSystemMessage(msgEntity);
-
+        LogUtil.i("1111111111111111111111");
         return null;
     }
 
