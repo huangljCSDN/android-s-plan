@@ -3,6 +3,8 @@ package com.xsimple.im.db;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.networkengine.entity.GetMsgsEntity;
+import com.networkengine.entity.GroupMember;
 import com.networkengine.util.LogUtil;
 import com.xsimple.im.db.datatable.IMBHelper;
 import com.xsimple.im.db.datatable.IMBoxMessage;
@@ -38,7 +40,10 @@ import com.xsimple.im.db.greendao.IMReplyInfoDao;
 import com.xsimple.im.db.greendao.IMSysMessageDao;
 import com.xsimple.im.db.greendao.IMUserDao;
 import com.xsimple.im.engine.IMEngine;
+import com.xsimple.im.engine.protocol.MsgEntity;
+import com.xsimple.im.event.NewSysMsgEvent;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.greendao.identityscope.IdentityScopeType;
 import org.greenrobot.greendao.query.Query;
 import org.greenrobot.greendao.query.QueryBuilder;
@@ -350,6 +355,38 @@ public class DbManager {
                 .orderAsc(IMMessageDao.Properties.Time);
 
 
+        return builder.build().list();
+    }
+
+    /**
+     * 所有的盒子消息
+     * @param chat_id
+     * @return
+     */
+    public List<IMBoxMessage> loadBoxIMMessage(long chat_id) {
+
+        QueryBuilder<IMBoxMessage> builder;
+
+        builder = mImBoxMessageDao.queryBuilder();
+
+        builder.where(IMBoxMessageDao.Properties.CId.eq(chat_id))
+                .orderAsc(IMMessageDao.Properties.Time);
+        return builder.build().list();
+    }
+
+    /**
+     * 获取所有的官方消息
+     * @param chat_id
+     * @return
+     */
+    public List<IMOfficialMessage> loadOfficialIMMessage(long chat_id) {
+
+        QueryBuilder<IMOfficialMessage> builder;
+
+        builder = mImOfficialMessageDao.queryBuilder();
+
+        builder.where(IMOfficialMessageDao.Properties.CId.eq(chat_id))
+                .orderAsc(IMMessageDao.Properties.Time);
         return builder.build().list();
     }
 
@@ -1061,6 +1098,22 @@ public class DbManager {
         mChatDao.deleteByKey(id);
     }
 
+    public void deleteAll(long id) {
+        mChatDao.deleteByKey(id);
+    }
+
+    /**
+     * 删除盒子小助手消息
+     * @param id
+     */
+    public void deleteBoxMessage(long id) {
+        mImBoxMessageDao.deleteByKey(id);
+    }
+
+    public void deleteOfficialMessage(long id) {
+        mImOfficialMessageDao.deleteByKey(id);
+    }
+
     /**
      * 根据发送者和接受者删除会话
      */
@@ -1223,7 +1276,6 @@ public class DbManager {
                 .orderDesc(IMOfficialMessageDao.Properties.SendTimer)
                 .limit(1);
         return builder.build().list();
-
     }
 
     /**
@@ -1293,5 +1345,43 @@ public class DbManager {
         return false;
     }
 
+    /**
+     * 处理并保存官方消息
+     * @param msgEntity
+     * @return
+     */
+    public boolean processOfficialMessage(GetMsgsEntity msgEntity) {
+        IMOfficialMessage imOfficialMessage = new IMOfficialMessage();
+        imOfficialMessage.setUserId(msgEntity.getMsgContent().getUserId());
+        imOfficialMessage.setSendTimer(Long.parseLong(msgEntity.getParam().getSendTime()));
+        imOfficialMessage.setType(msgEntity.getMsgContent().getType());
+        imOfficialMessage.setTitle(msgEntity.getMsgContent().getGroupName());
+        imOfficialMessage.setContent(msgEntity.getMsgContent().getContent());
+        imOfficialMessage.setImgUrl(msgEntity.getMsgContent().getImgUrl());
+        imOfficialMessage.setNetUrl(msgEntity.getMsgContent().getNetUrl());
+        if (mDbManager.addOrUpdateOfficialMsgToChat(imOfficialMessage)){
+            EventBus.getDefault().post(new NewSysMsgEvent());
+        }
+        return true;
+    }
+
+    /**
+     * 处理并保存盒子助手消息
+     * @param msgEntity
+     * @return
+     */
+    public boolean processBoxMessage(GetMsgsEntity msgEntity) {
+        IMBoxMessage imBoxMessage = new IMBoxMessage();
+        imBoxMessage.setUserId(msgEntity.getMsgContent().getUserId());
+        imBoxMessage.setSendTimer(Long.parseLong(msgEntity.getParam().getSendTime()));
+        imBoxMessage.setType(msgEntity.getMsgContent().getType());
+        imBoxMessage.setTitle(msgEntity.getMsgContent().getGroupName());
+        imBoxMessage.setContent(msgEntity.getMsgContent().getContent());
+
+        if (mDbManager.addOrUpdateBoxMsgToChat(imBoxMessage)){
+            EventBus.getDefault().post(new NewSysMsgEvent());
+        }
+        return true;
+    }
 
 }

@@ -91,7 +91,7 @@ public interface MchlApiService {
      * @return
      */
     @POST(PubConstant.API_GET_MSGS)
-    Call<GetMsgsResult> getNewMsgs(@Body RequestGetMsgsParam requestGetMsgsParam);
+    Call<Object> getNewMsgs(@Body RequestGetMsgsParam requestGetMsgsParam);
 
     /**
      * 发送消息 mchl/sendMsg

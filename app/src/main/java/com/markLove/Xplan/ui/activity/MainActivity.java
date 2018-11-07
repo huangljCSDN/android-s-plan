@@ -21,6 +21,7 @@ import com.markLove.Xplan.base.ui.BaseActivity;
 import com.markLove.Xplan.bean.BaseBean;
 import com.markLove.Xplan.bean.UserBean;
 import com.markLove.Xplan.config.Constants;
+import com.markLove.Xplan.manager.PushManager;
 import com.markLove.Xplan.mvp.contract.MainContract;
 import com.markLove.Xplan.mvp.presenter.MainPresenter;
 import com.markLove.Xplan.ui.adapter.FragmentTabAdapter;
@@ -34,10 +35,12 @@ import com.markLove.Xplan.utils.GsonUtils;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
 import com.markLove.Xplan.utils.StatusBarUtil;
+import com.networkengine.ConfigUtil;
 import com.networkengine.controller.callback.ErrorResult;
 import com.networkengine.controller.callback.XCallback;
 import com.networkengine.database.table.Member;
 import com.networkengine.engine.LogicEngine;
+import com.networkengine.mqtt.MqttService;
 import com.networkengine.util.CoracleSdk;
 import com.xsimple.im.db.datatable.IMBoxMessage;
 import com.xsimple.im.db.datatable.IMChat;
@@ -85,35 +88,6 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
         myHandler = new MyHandler(this);
         myHandler.sendEmptyMessageDelayed(1,1000*40);
         login();
-//        test();
-    }
-
-    private void test(){
-        IMBoxMessage imBoxMessage = new IMBoxMessage(Long.parseLong("0"),Long.parseLong("0"),"366930", (long)213123,false,false,"box","","你被提出组局了");
-        LogUtils.i("huang",GsonUtils.obj2Json(imBoxMessage));
-        IMOfficialMessage imOfficialMessage = new IMOfficialMessage((long)0,(long)0,"356665","das15564789.png","http://www.baidu.com",(long)1515588845,false,false,"official","这是标题","给你送了大礼包了");
-        LogUtils.i("huang",GsonUtils.obj2Json(imOfficialMessage));
-        IMEngine mImEngine = IMEngine.getInstance(getApplication());
-        List<IMChat> chats = mImEngine.getChats(App.getInstance().getUserId());
-        for (IMChat chat : chats){
-            if (chat.getType() == IMChat.SESSION_GROUP_CLUSTER || chat.getType() == IMChat.SESSION_PERSON){
-                List<IMMessage> list = IMEngine.getInstance(this).getDbManager().loadLastMessage(chat.getId());
-                chat.setIMMessages(list);
-            } else if (chat.getType() == IMChat.SESSION_BOX_MSG){
-                List<IMBoxMessage> list = IMEngine.getInstance(this).getDbManager().loadLastBoxMessage(chat.getId());
-                chat.setIMBoxMessage(list);
-            } else if (chat.getType() == IMChat.SESSION_OFFICIAL_MSG){
-                List<IMOfficialMessage> list = IMEngine.getInstance(this).getDbManager().loadLastOfficialMessage(chat.getId());
-                chat.setIMOfficialMessage(list);
-            }
-        }
-        List<IMOfficialMessage> officialMessages = new ArrayList<>();
-        officialMessages.add(imOfficialMessage);
-        List<IMBoxMessage> imBoxMessages = new ArrayList<>();
-        imBoxMessages.add(imBoxMessage);
-        chats.get(1).setIMOfficialMessage(officialMessages);
-        chats.get(0).setIMBoxMessage(imBoxMessages);
-        LogUtils.i("huang","chats="+GsonUtils.obj2Json(chats));
     }
 
     private void initMapClient(){
@@ -284,7 +258,7 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
                 member.setUserName(userBean.getUserInfo().getNickName());
                 member.setUserToken(result.getUserToken());
                 LogicEngine.getInstance().setUser(member);
-                test();
+                initPushManager();
             }
 
             @Override
@@ -293,6 +267,15 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
                 Toast.makeText(MainActivity.this, result.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    protected void initPushManager() {
+        //获取mqtt服务
+        MqttService mqttService = LogicEngine.getInstance().getMqttService();
+        //获取登陆用户id
+        String userId = LogicEngine.getInstance().getUser().getId();
+        //初始化消息管理器
+        PushManager mPushManager = new PushManager(mqttService, ConfigUtil.getAppKey(), userId,MainActivity.this);
     }
 
     @Override

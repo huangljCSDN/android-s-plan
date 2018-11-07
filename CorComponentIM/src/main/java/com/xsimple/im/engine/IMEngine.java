@@ -784,7 +784,6 @@ public class IMEngine implements Handler.Callback {
                         isPsuh = false;
                         callback.sendFail(Loadresult.RESULT_CODE_LOAD_FAIL);
                         break;
-
                 }
 
             }

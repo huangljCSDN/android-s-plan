@@ -1,21 +1,13 @@
 package com.markLove.Xplan.manager;
 
-import android.app.Activity;
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
-import android.util.Log;
-import android.view.Gravity;
 
-import com.google.gson.Gson;
-import com.markLove.Xplan.utils.AppManager;
+import com.markLove.Xplan.utils.GsonUtils;
+import com.markLove.Xplan.utils.LogUtils;
 import com.networkengine.engine.LogicEngine;
 import com.networkengine.entity.GetMsgsEntity;
 import com.networkengine.entity.GetMsgsResult;
@@ -24,19 +16,11 @@ import com.networkengine.entity.RequestGetMsgsParam;
 import com.networkengine.httpApi.MchlApiService;
 import com.networkengine.mqtt.MqttChannel;
 import com.networkengine.mqtt.MqttService;
-import com.xsimple.im.engine.Initializer;
-
-import java.io.File;
+import com.xsimple.im.db.DbManager;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import retrofit2.Response;
-
-import static com.networkengine.engine.LogicEngine.getMxmUrl;
 
 public class PushManager {
 
@@ -46,12 +30,15 @@ public class PushManager {
     private MqttService mqttService;
     private String appkey;
     private String userId;
+    private DbManager dbManager;
+    private Context mContext;
 
-    public PushManager(MqttService mqttService, String appkey, String userId) {
+    public PushManager(MqttService mqttService, String appkey, String userId,Context context) {
         this.mqttService = mqttService;
         this.appkey = appkey;
         this.userId = userId;
-
+        mContext = context;
+        dbManager = DbManager.getInstance(context);
         stepUp();
     }
 
@@ -71,7 +58,7 @@ public class PushManager {
                 return false;
             }
         });
-        mqttService.subscribeToTopic(String.format("sys/%s", userId));
+//        mqttService.subscribeToTopic(String.format("sys/%s", userId));
 
         doPullMessage(0, DEF_TRY_COUNT);
     }
@@ -81,44 +68,14 @@ public class PushManager {
         task.execute(msgId, tryCount);
     }
 
-    private void showSystemMessage(final Context context, final GetMsgsEntity messageEntity) {
+    private void showSystemMessage(final GetMsgsEntity messageEntity) {
         final MessageContent msgContent = messageEntity.getMsgContent();
         String type = msgContent.getType();
-        if (MessageContent.MSG_TYPE_LOCK_DEVICE.equals(type)
-                || MessageContent.MSG_TYPE_LOCK_USER.equals(type)
-                || MessageContent.MSG_TYPE_UPDATE.equals(type)) {
-//            showDialog(context, msgContent, false);
-        } else if (MessageContent.MSG_TYPE_SYSTEM.equals(type)) {
-        }
-    }
-
-    //比较时间，拼接提醒字符串
-    private String getNotifyString(MessageContent messageContent) {
-        try {
-            Date signDate = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(messageContent.getMessage());
-            Calendar signCalendar = Calendar.getInstance();
-            signCalendar.setTime(signDate);
-            Calendar nowCalendar = Calendar.getInstance();
-            if (signCalendar.get(Calendar.YEAR) != nowCalendar.get(Calendar.YEAR)
-                    || signCalendar.get(Calendar.MONTH) != nowCalendar.get(Calendar.MONTH)
-                    || signCalendar.get(Calendar.DAY_OF_MONTH) != nowCalendar.get(Calendar.DAY_OF_MONTH)
-                    || signCalendar.get(Calendar.HOUR_OF_DAY) - nowCalendar.get(Calendar.HOUR_OF_DAY) < 0) {
-                return "";
-            } else {
-                String notifyString = "距离上班时间还有";
-                int hour = signCalendar.get(Calendar.HOUR_OF_DAY) - nowCalendar.get(Calendar.HOUR_OF_DAY);
-                int minite = signCalendar.get(Calendar.MINUTE) - nowCalendar.get(Calendar.MINUTE);
-                if (messageContent.getSignType().equals("SIGNOFF")) {
-                    notifyString = hour > 0 || minite > 0 ? "下班时间已到，记得签退哦" : "";
-                } else {
-                    notifyString = hour > 0 ? notifyString + hour + "小时" : notifyString;
-                    notifyString = minite > 0 ? notifyString + minite + "分钟" : notifyString;
-                }
-                return notifyString;
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return "";
+        //盒子小助手消息
+        if (MessageContent.MSG_TYPE_BOX.equals(type)) {
+            dbManager.processBoxMessage(messageEntity);
+        } else if (MessageContent.MSG_TYPE_OFFICIAL.equals(type)) { //官方消息
+            dbManager.processOfficialMessage(messageEntity);
         }
     }
 
@@ -151,30 +108,31 @@ public class PushManager {
             try {
                 MchlApiService mchlApiService = LogicEngine.getInstance().getMchlClient();
                 RequestGetMsgsParam requestGetMsgsParam = new RequestGetMsgsParam(10, params[0]);
-                Response<GetMsgsResult> execute = mchlApiService.getNewMsgs(requestGetMsgsParam).execute();
+                Response<Object> execute = mchlApiService.getNewMsgs(requestGetMsgsParam).execute();
                 if (execute == null) {
                     return null;
                 }
-                if (execute.isSuccessful()) {
-
-                    GetMsgsResult body = execute.body();
-
-                    List<GetMsgsEntity> data = null;
-                    if (body != null && body.getData() != null) {
-                        data = body.getData().getData();
-                    }
-                    if (data != null && !data.isEmpty()) {
-                        long clientMaxMsgId = 0;
-                        try {
-                            clientMaxMsgId = Long.parseLong(body.getData().getClientMaxMsgId());
-                        } catch (Exception e) {
-
-                        }
-                        doPullMessage(clientMaxMsgId, DEF_TRY_COUNT);
-                        return data;
-                    }
-
-                }
+                LogUtils.i("Response11111111="+GsonUtils.obj2Json(execute.body()));
+//                if (execute.isSuccessful()) {
+//
+//                    GetMsgsResult body = execute.body();
+//
+//                    List<GetMsgsEntity> data = null;
+//                    if (body != null && body.getData() != null) {
+//                        data = body.getData().getData();
+//                    }
+//                    if (data != null && !data.isEmpty()) {
+//                        long clientMaxMsgId = 0;
+//                        try {
+//                            clientMaxMsgId = Long.parseLong(body.getData().getClientMaxMsgId());
+//                        } catch (Exception e) {
+//
+//                        }
+//                        doPullMessage(clientMaxMsgId, DEF_TRY_COUNT);
+//                        return data;
+//                    }
+//
+//                }
             } catch (IOException e) {
                 doPullMessage(params[0], --tryCount);
             }
@@ -187,9 +145,7 @@ public class PushManager {
             super.onPostExecute(messageEntity);
             if (messageEntity != null) {
                 for (GetMsgsEntity msg : messageEntity) {
-//                    Activity currActivity = CoracleSdk.getCoracleSdk().getCurrActivity();
-                    Activity currActivity =  AppManager.getAppManager().currentActivity();
-                    showSystemMessage(currActivity, msg);
+                    showSystemMessage(msg);
                 }
             }
         }

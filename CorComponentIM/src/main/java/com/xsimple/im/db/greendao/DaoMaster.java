@@ -21,40 +21,40 @@ public class DaoMaster extends AbstractDaoMaster {
 
     /** Creates underlying database table using DAOs. */
     public static void createAllTables(Database db, boolean ifNotExists) {
-        IMMessageDao.createTable(db, ifNotExists);
-        IMChatDao.createTable(db, ifNotExists);
-        IMGroupUserDao.createTable(db, ifNotExists);
-        IMChatRecordInfoDao.createTable(db, ifNotExists);
-        IMGroupRemarkDao.createTable(db, ifNotExists);
-        IMFileInfoPiceDao.createTable(db, ifNotExists);
-        IMFileInfoDao.createTable(db, ifNotExists);
-        IMSysMessageDao.createTable(db, ifNotExists);
-        IMReplyInfoDao.createTable(db, ifNotExists);
-        IMUserDao.createTable(db, ifNotExists);
-        IMShareInfoDao.createTable(db, ifNotExists);
-        IMGroupDao.createTable(db, ifNotExists);
         IMCallInfoDao.createTable(db, ifNotExists);
+        IMChatDao.createTable(db, ifNotExists);
+        IMChatRecordInfoDao.createTable(db, ifNotExists);
+        IMFileInfoDao.createTable(db, ifNotExists);
+        IMFileInfoPiceDao.createTable(db, ifNotExists);
+        IMGroupDao.createTable(db, ifNotExists);
+        IMGroupRemarkDao.createTable(db, ifNotExists);
+        IMGroupUserDao.createTable(db, ifNotExists);
         IMLocationInfoDao.createTable(db, ifNotExists);
+        IMMessageDao.createTable(db, ifNotExists);
+        IMReplyInfoDao.createTable(db, ifNotExists);
+        IMShareInfoDao.createTable(db, ifNotExists);
+        IMSysMessageDao.createTable(db, ifNotExists);
+        IMUserDao.createTable(db, ifNotExists);
         IMBoxMessageDao.createTable(db, ifNotExists);
         IMOfficialMessageDao.createTable(db, ifNotExists);
     }
 
     /** Drops underlying database table using DAOs. */
     public static void dropAllTables(Database db, boolean ifExists) {
-        IMMessageDao.dropTable(db, ifExists);
-        IMChatDao.dropTable(db, ifExists);
-        IMGroupUserDao.dropTable(db, ifExists);
-        IMChatRecordInfoDao.dropTable(db, ifExists);
-        IMGroupRemarkDao.dropTable(db, ifExists);
-        IMFileInfoPiceDao.dropTable(db, ifExists);
-        IMFileInfoDao.dropTable(db, ifExists);
-        IMSysMessageDao.dropTable(db, ifExists);
-        IMReplyInfoDao.dropTable(db, ifExists);
-        IMUserDao.dropTable(db, ifExists);
-        IMShareInfoDao.dropTable(db, ifExists);
-        IMGroupDao.dropTable(db, ifExists);
         IMCallInfoDao.dropTable(db, ifExists);
+        IMChatDao.dropTable(db, ifExists);
+        IMChatRecordInfoDao.dropTable(db, ifExists);
+        IMFileInfoDao.dropTable(db, ifExists);
+        IMFileInfoPiceDao.dropTable(db, ifExists);
+        IMGroupDao.dropTable(db, ifExists);
+        IMGroupRemarkDao.dropTable(db, ifExists);
+        IMGroupUserDao.dropTable(db, ifExists);
         IMLocationInfoDao.dropTable(db, ifExists);
+        IMMessageDao.dropTable(db, ifExists);
+        IMReplyInfoDao.dropTable(db, ifExists);
+        IMShareInfoDao.dropTable(db, ifExists);
+        IMSysMessageDao.dropTable(db, ifExists);
+        IMUserDao.dropTable(db, ifExists);
         IMBoxMessageDao.dropTable(db, ifExists);
         IMOfficialMessageDao.dropTable(db, ifExists);
     }
@@ -75,20 +75,20 @@ public class DaoMaster extends AbstractDaoMaster {
 
     public DaoMaster(Database db) {
         super(db, SCHEMA_VERSION);
-        registerDaoClass(IMMessageDao.class);
-        registerDaoClass(IMChatDao.class);
-        registerDaoClass(IMGroupUserDao.class);
-        registerDaoClass(IMChatRecordInfoDao.class);
-        registerDaoClass(IMGroupRemarkDao.class);
-        registerDaoClass(IMFileInfoPiceDao.class);
-        registerDaoClass(IMFileInfoDao.class);
-        registerDaoClass(IMSysMessageDao.class);
-        registerDaoClass(IMReplyInfoDao.class);
-        registerDaoClass(IMUserDao.class);
-        registerDaoClass(IMShareInfoDao.class);
-        registerDaoClass(IMGroupDao.class);
         registerDaoClass(IMCallInfoDao.class);
+        registerDaoClass(IMChatDao.class);
+        registerDaoClass(IMChatRecordInfoDao.class);
+        registerDaoClass(IMFileInfoDao.class);
+        registerDaoClass(IMFileInfoPiceDao.class);
+        registerDaoClass(IMGroupDao.class);
+        registerDaoClass(IMGroupRemarkDao.class);
+        registerDaoClass(IMGroupUserDao.class);
         registerDaoClass(IMLocationInfoDao.class);
+        registerDaoClass(IMMessageDao.class);
+        registerDaoClass(IMReplyInfoDao.class);
+        registerDaoClass(IMShareInfoDao.class);
+        registerDaoClass(IMSysMessageDao.class);
+        registerDaoClass(IMUserDao.class);
         registerDaoClass(IMBoxMessageDao.class);
         registerDaoClass(IMOfficialMessageDao.class);
     }
