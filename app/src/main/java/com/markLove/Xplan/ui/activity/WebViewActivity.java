@@ -110,16 +110,20 @@ public class WebViewActivity extends BaseActivity<FilePresenter>  implements Fil
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String content = editText.getText().toString().trim();
-                HashMap<String,String> map = new HashMap<>();
-                map.put("text",content);
-                String json = GsonUtils.obj2Json(map);
-                mWebView.loadUrl("javascript:openInPutTextFinish("+json+")");
-                editText.setText("");
-                llEdit.setVisibility(View.GONE);
+                KeyboardUtils.hideKeyboard(editText);
             }
         });
         initSoftKeyboard();
+    }
+
+    private void sendCommend(){
+        String content = editText.getText().toString().trim();
+        HashMap<String,String> map = new HashMap<>();
+        map.put("text",content);
+        String json = GsonUtils.obj2Json(map);
+        mWebView.loadUrl("javascript:openInPutTextFinish("+json+")");
+        editText.setText("");
+        llEdit.setVisibility(View.GONE);
     }
 
     //设置软键盘弹起和关闭的监听
@@ -137,8 +141,7 @@ public class WebViewActivity extends BaseActivity<FilePresenter>  implements Fil
                     } else {
                         // 键盘收起
 //                        keyboardIsShown = false;
-                        editText.setText("");
-                        llEdit.setVisibility(View.GONE);
+                        sendCommend();
                     }
                     getWindow().getDecorView().requestLayout();
                     usableHeightPrevious = usableHeightNow;
