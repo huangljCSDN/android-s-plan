@@ -1554,8 +1554,11 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
             message = new Message(IMMessage.SYSTEM_ID, Integer.parseInt(imMessage.getApplyId()),String.valueOf(imMessage.getLocalId()),Message.Type.CHAT, Message.ChatType.NOTIFICATION,txtMessageBody);
             message.setImMessage(imMessage);
             message.setStatus(changeStatus(imMessage.getStatus()));
-            if (Integer.valueOf(imMessage.getTagertId()) == me_user_id){
-                ((GroupChatActivity)context).showJoinSuccess();
+            LogUtils.i("huang","me_user_id="+me_user_id+"  applyId="+imMessage.getApplyId());
+            if (Integer.valueOf(imMessage.getApplyId()) == me_user_id){
+                if (context instanceof  GroupChatActivity){
+                    ((GroupChatActivity)context).showJoinSuccess();
+                }
             }
         } else if (IMMessage.GROUP_OFFICE_APPLY.equals(imMessage.getContentType())) {
             TxtMessageBody txtMessageBody = new TxtMessageBody(Message.Type.CHAT, Message.ChatType.TXT, imMessage.getContent());

@@ -1142,6 +1142,7 @@ public class IMMessage {
                 ", cId=" + cId +
                 ", fId=" + fId +
                 ", tagertId='" + tagertId + '\'' +
+                ", applyId='" + applyId + '\'' +
                 ", sendOrReceive=" + sendOrReceive +
                 ", groupName='" + groupName + '\'' +
                 ", senderId='" + senderId + '\'' +

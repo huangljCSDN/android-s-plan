@@ -78,7 +78,7 @@ dependencies {
     //修改状态栏的颜色
     implementation 'com.readystatesoftware.systembartint:systembartint:1.0.4'
     //压缩
-    implementation 'top.zibin:Luban:1.1.7'
+    implementation 'top.zibin:Luban:1.1.8'
     implementation 'com.amap.api:search:latest.integration'
     implementation 'com.amap.api:location:latest.integration'
 

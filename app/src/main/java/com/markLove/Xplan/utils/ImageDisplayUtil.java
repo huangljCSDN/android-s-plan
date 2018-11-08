@@ -25,6 +25,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
+import com.markLove.Xplan.config.Constants;
 import com.markLove.Xplan.ui.widget.GlideRoundImage;
 import com.networkengine.R;
 import com.networkengine.database.table.Member;
@@ -381,7 +382,8 @@ public class ImageDisplayUtil {
         if (null == uri || !uri.startsWith("http")) {
             return uri;
         } else {
-            return GlideCacheModule.DISK_PATH + "/" + uri.hashCode() + ".jpg";
+//            return GlideCacheModule.DISK_PATH + "/" + uri.hashCode() + ".jpg";
+            return Constants.LOCAL_IMG_PATH + uri.hashCode() + ".jpg";
         }
     }
 

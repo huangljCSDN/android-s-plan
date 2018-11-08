@@ -122,8 +122,7 @@ public class MsgFragment extends BaseFragment {
          */
         @JavascriptInterface
         private String getMessageInfo() {
-            List<IMOfficialMessage> imOfficialMessageList = dbManager.loadOfficialIMMessage(officialChatId);
-            return GsonUtils.obj2Json(imOfficialMessageList);
+            return initMsgData();
         }
 
         /**

@@ -86,6 +86,8 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import top.zibin.luban.CompressionPredicate;
+import top.zibin.luban.OnCompressListener;
 
 /**
  * 三分钟情侣聊天
@@ -104,14 +106,9 @@ public class CpChatActivity extends BaseActivity<UserOperationPresenter> impleme
 
     ChatPresenter chatPresenter;
     CpChatMessageAdapter chatMessageAdapter;
-    String nickName;
-    String headImgUrl;
     //    AutoCameraUtils autoCameraUtils;
     int me_user_id;
     int to_user_id;
-    boolean isEnd = false;
-    boolean isLikeAndUser = false;
-    boolean isBlackUser = false;
     boolean keyboardIsShown = false;
     int usableHeightPrevious = 0;
     /**
@@ -272,26 +269,6 @@ public class CpChatActivity extends BaseActivity<UserOperationPresenter> impleme
 
     protected void initData() {
         mTvTitle.setText("找不到话题");
-        boolean isLove = PreferencesUtils.getBoolean(this, Constants.USER_IS_LOVES_INFO_KEY);
-        if (isLove) {
-            int femaleID = PreferencesUtils.getInt(this, Constants.FEMALE_USER_ID, 0);
-            int maleID = PreferencesUtils.getInt(this, Constants.MALE_USER_ID, 0);
-            if (femaleID != 0 && maleID != 0) {
-                if ((femaleID == me_user_id && maleID == to_user_id) || (femaleID == to_user_id && maleID == me_user_id)) {
-                    isLikeAndUser = true;
-                }
-            }
-        }
-        Intent intent = getIntent();
-//        Bundle bundle = intent.getBundleExtra("data");
-//        if (null == bundle) {
-////            ToastUtils.showCenter(this, "无效的接受者", 0);
-//            finish();o
-//        } else {
-//            to_user_id = Integer.parseInt(bundle.getString("user_id"));
-//            nickName = bundle.getString("nick_name");
-//            headImgUrl = bundle.getString("head_img_url");
-//        }
         to_user_id = getIntent().getIntExtra("chatId", 0);
         me_user_id = PreferencesUtils.getInt(this, Constants.ME_USER_ID);
         LogUtils.d("me_user_id=" + me_user_id);
@@ -322,29 +299,6 @@ public class CpChatActivity extends BaseActivity<UserOperationPresenter> impleme
             chatMessageAdapter.setBetweenUserSex(2,1);
         }
         chatView.setId(me_user_id,to_user_id);
-//        tvChatSendPrice.setText(gold + "");
-//        chatPresenter.getHistory(me_user_id, to_user_id);
-//        getGiftList();
-        getChatOpen();
-    }
-
-    private void getChatOpen() {
-//        Map<String, String> params = new HashMap<>();
-//        params.put("Token", PreferencesUtils.getString(this, Constants.TOKEN_KEY));
-//        OkGoHttpUtils.get(Constants.GET_JUDE_CHAT_OPEN, params, new OkGoHttpCallBack() {
-//        @Override
-//        public void onSuccess(String s, Call call, Response response) {
-//            ChatOpen chatOpen = GsonUtils.json2Bean(s, ChatOpen.class);
-//            if (chatOpen.isHaveData()) {
-//                ChatOpen.DtBean dtBean = chatOpen.getDt().get(0);
-//                if ("1".equals(dtBean.getChatOpen())) {
-//                    PreferencesUtils.putBoolean(ShopChatActivity.this, Constants.CHAT_OPEN_KEY, true);
-//                } else {
-//                    PreferencesUtils.putBoolean(ShopChatActivity.this, Constants.CHAT_OPEN_KEY, false);
-//                }
-//            }
-//        }
-//    });
     }
 
     RecyclerView.AdapterDataObserver adapterDataObserver = new RecyclerView.AdapterDataObserver() {
@@ -366,25 +320,8 @@ public class CpChatActivity extends BaseActivity<UserOperationPresenter> impleme
         @Override
         public void failResend(Message msg) {
             closeSoftKeyBoard();
-            resendMessage(msg);
         }
     };
-
-    /**
-     * 重新发送消息
-     * @param resendMessage
-     */
-    private void resendMessage(final Message resendMessage) {
-        ResendMsgDialog resendMsgDialog = new ResendMsgDialog(this);
-        resendMsgDialog.setOnMenuClickListener(new ResendMsgDialog.OnMenuClickListener() {
-            @Override
-            public void onMenuClick() {
-                updataMessage(resendMessage.getMsgID(), Message.ChatStatus.SENDING.ordinal());
-                judeBlackList(resendMessage);
-            }
-        });
-        resendMsgDialog.show();
-    }
 
     /**
      * 显示历史消息
@@ -406,216 +343,12 @@ public class CpChatActivity extends BaseActivity<UserOperationPresenter> impleme
      */
     @Override
     public void addOneMessage(final Message msg) {
-        if ((msg.getToID() == me_user_id && msg.getFromID() == to_user_id)
-                || (msg.getToID() == to_user_id && msg.getFromID() == me_user_id)) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (null != chatMessageAdapter) {
-                        chatMessageAdapter.addOne(msg);
-                    }
-                }
-            });
-        }
     }
 
     @Override
     public void updataMessage(final String msgID, final int errorCode) {
-        if (Message.ChatStatus.values()[errorCode] == Message.ChatStatus.SUCCESS) {
-            if (null != chatMessageAdapter) {
-                Message message = chatMessageAdapter.getMessageByID(msgID);
-                if (message != null) {
-                    if (message.getFromID() == PreferencesUtils.getInt(this, Constants.ME_USER_ID) && (message.getChatType() == Message.ChatType.IMAGE || message.getChatType() == Message.ChatType.VOICE) && message.getStatus() == Message.ChatStatus.SUCCESS) {
-                        Message.ChatType chatType = message.getChatType() == Message.ChatType.IMAGE ? Message.ChatType.IMAGE_DESC : Message.ChatType.VOICE_DESC;
-                        FileMessageBody fileMessageBody = (FileMessageBody) message.getBody();
-                        sendMessage(Message.createDescriptionMessage(message.getFromID(), message.getToID(), Message.Type.CHAT, chatType, fileMessageBody.getFileName()));
-                    }
-                }
-            }
-        }
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (null != chatMessageAdapter) {
-                    try {
-                        int position = chatMessageAdapter.getItemPositionByMsgID(msgID);
-                        if (position >= 0) {
-                            Message.ChatStatus status = Message.ChatStatus.values()[errorCode];
-                            List<Message.ChatStatus> payloads = new ArrayList<Message.ChatStatus>();
-                            payloads.add(status);
-                            chatMessageAdapter.notifyItemRangeChanged(position, 1, status);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
     }
 
-    /**
-     * 判断是否被拉黑
-     *
-     * @param msg
-     */
-    private void judeBlackList(final Message msg) {
-        if (null != msg) {
-            int sendCount = PreferencesUtils.getInt(this, Constants.SEND_MESSAGE_COUNT + to_user_id, 0);
-            //原计数+1
-            PreferencesUtils.putInt(this, Constants.SEND_MESSAGE_COUNT + to_user_id, ++sendCount);
-            addOneMessage(msg);
-        }
-        //暂时不判断拉黑逻辑，直接发送
-        sendMessage(msg);
-
-//        StringBuilder sb = new StringBuilder(Constants.POST_JUDGE_BLACK_LIST);
-//        sb.append("?ToUserId=" + to_user_id);
-//        sb.append("&Token=" + PreferencesUtils.getString(this, Constants.TOKEN_KEY));
-//        OkGoHttpUtils.post(sb.toString(), new OkGoHttpCallBack() {
-//            @Override
-//            public void onSuccess(String s, Call call, Response response) {
-//                try {
-//                    InfoResultData infoResultData = GsonUtils.json2Bean(s, InfoResultData.class);
-//                    if (infoResultData.getStatus() == 200) {
-//                        double data = (Double) infoResultData.getData();
-//                        if (data == 1) {
-//                            //已经被拉黑
-//                            chatMessageAdapter.setBlack(true);
-//                            isBlackUser = true;
-//                            if (null != msg && (msg.getChatType() != Message.ChatType.GIFT || msg.getChatType() != Message.ChatType.SUPERLIKE)) {
-//                                msg.setStatus(Message.ChatStatus.REJECTED);
-//                                updataMessage(msg.getMsgID(), Message.ChatStatus.REJECTED.ordinal());
-//                                int me_user_id = PreferencesUtils.getInt(App.getInstance(), Constants.ME_USER_ID);
-//                                DBDao.getDbDao(App.getInstance()).insertMessage(me_user_id, msg);
-//                            }
-//                        } else {
-//                            chatMessageAdapter.setBlack(false);
-//                            isBlackUser = false;
-//                            if (null != msg) {
-////                                if (msg.getChatType() == Message.ChatType.SUPERLIKE) {
-////                                    sendSuperLikeDecuctionMoney(msg, 1);
-////                                } else {
-//                                sendMessage(msg);
-////                                }
-//                            }
-//                        }
-////                        initBecomeCouple();
-//                    }
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//            @Override
-//            public void onError(Call call, Response response, Exception e) {
-//                super.onError(call, response, e);
-//                if (null != msg) {
-//                    int sendCount = PreferencesUtils.getInt(ShopChatActivity.this, Constants.SEND_MESSAGE_COUNT + to_user_id, 0);
-//                    //原计数-1
-//                    PreferencesUtils.putInt(ShopChatActivity.this, Constants.SEND_MESSAGE_COUNT + to_user_id, --sendCount);
-//                    updataMessage(msg.getMsgID(), Message.ChatStatus.FAIL.ordinal());
-//                    int me_user_id = PreferencesUtils.getInt(App.getInstance(), Constants.ME_USER_ID);
-//                    DBDao.getDbDao(App.getInstance()).insertMessage(me_user_id, msg);
-//                }
-//            }
-//        });
-    }
-
-    /**
-     * 发送消息
-     *
-     * @param message
-     */
-    private void sendMessage(Message message) {
-//        DBDao.getDbDao(this).insertMessage(me_user_id, message);
-        boolean isOpen = PreferencesUtils.getBoolean(this, Constants.CHAT_OPEN_KEY, true);
-        String token = PreferencesUtils.getString(this, Constants.TOKEN_KEY);
-        LogUtils.d("------->token=" + token + ",isOpen=" + isOpen);
-        if (isOpen) {
-//            ChatClient.getInstance().sendMessage(token, message);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    rlChatMsgList.scrollToPosition(chatMessageAdapter.getItemCount());
-                }
-            });
-        } else {
-            if (message.getChatType() == Message.ChatType.LOVE) {
-                PreferencesUtils.putLong(this, Constants.BECOME_COUPLE_TIME_KEY + to_user_id, 0);
-            }
-            ToastUtils.showCenter(this, "该服务正在紧急维护当中，请稍后再试", 0);
-            updataMessage(message.getMsgID(), Message.ChatStatus.FAIL.ordinal());
-        }
-    }
-
-    /**
-     * 图片返回处理
-     *
-     * @param uri
-     * @param filePath
-     * @param isOrigin 是否原图发送
-     */
-    public void onImageReturn(Uri uri, String filePath, boolean isOrigin) {
-//        String filePath = autoCameraUtils.getPath(this, uri);
-        String fileName = filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length());
-        final Message imgMsg = Message.createImageMessage(Message.Type.CHAT, me_user_id, to_user_id,"", fileName, filePath);
-        imgMsg.setStatus(Message.ChatStatus.SENDING);
-        isOrigin = true;
-        if (isOrigin) {
-            sendImage(filePath);
-//            judeBlackList(imgMsg);
-        } else {
-            Observable.create(new ObservableOnSubscribe<Message>() {
-                @Override
-                public void subscribe(final ObservableEmitter<Message> emitter) throws Exception {
-                    final FileMessageBody imgMessageBody = (FileMessageBody) imgMsg.getBody();
-                    final String outPath = Constants.LOCAL_IMG_PATH + imgMessageBody.getFileName();
-                    ImageUtils.compressImageInPath(imgMessageBody.getFilePath(), Constants.LOCAL_IMG_PATH, new IImageCompressor.OnImageCompressListener() {
-                        @Override
-                        public void onCompressStart(String msg) {
-
-                        }
-
-                        @Override
-                        public void onCompressComplete(List<String> destFilePaths) {
-                            if (destFilePaths != null && destFilePaths.size() > 0) {
-                                imgMessageBody.setFilePath(outPath);
-                                emitter.onNext(imgMsg);
-                                emitter.onComplete();
-                            }
-                        }
-
-                        @Override
-                        public void onCompressError(String msg) {
-
-                        }
-                    });
-                }
-            }).subscribeOn(Schedulers.io())
-                    .observeOn(Schedulers.io())
-                    .subscribe(new Observer<Message>() {
-                        @Override
-                        public void onSubscribe(Disposable d) {
-
-                        }
-
-                        @Override
-                        public void onNext(Message message) {
-                            judeBlackList(message);
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-
-                        }
-
-                        @Override
-                        public void onComplete() {
-
-                        }
-                    });
-        }
-    }
 
     @Override
     public void onBackPressed() {
@@ -630,8 +363,6 @@ public class CpChatActivity extends BaseActivity<UserOperationPresenter> impleme
     @Override
     protected void onStart() {
         super.onStart();
-//        ChatClient.getInstance().isNotification = false;
-//        ChatClient.getInstance().currentlyID = to_user_id;
         Log.v("MAIN", "onStart");
     }
 
@@ -646,71 +377,12 @@ public class CpChatActivity extends BaseActivity<UserOperationPresenter> impleme
     @Override
     protected void onStop() {
         super.onStop();
-//        ChatClient.getInstance().isNotification = true;
         Log.v("MAIN", "onStop");
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-//        try {
-//            if (chatMessageAdapter.getItemCount() > 0) {
-//                Message msg = chatMessageAdapter.getItemMsg(chatMessageAdapter.getItemCount() - 1);
-//                msg = DBDao.getDbDao(this).queryLastMessage(me_user_id, to_user_id, msg.getMsgID());
-//                ChatUser chatUser = new ChatUser();
-//                chatUser.setNickName(nickName);
-//                chatUser.setUserID(to_user_id);
-//                chatUser.setHeadImgUrl(headImgUrl);
-//                chatUser.setChatTime(DataUtils.getDateTime(msg.getMsgTime() != 0 ? msg.getMsgTime() : System.currentTimeMillis()));
-//                chatUser.setLastMsgId(msg.getMsgID());
-//                chatUser.setUnreadCount(0);
-//                chatUser.setLastMsgChatType(msg.getChatType());
-//                switch (msg.getChatType()) {
-//                    case TXT:
-//                        TxtMessageBody txtMessageBody = (TxtMessageBody) msg.getBody();
-//                        chatUser.setLastMsgContent(txtMessageBody.getMsg());
-//                        break;
-//                    case IMAGE:
-//                        chatUser.setLastMsgContent("[图片]");
-//                        break;
-//                    case VOICE:
-//                        chatUser.setLastMsgContent("[语音]");
-//                        break;
-//                    case LOVE:
-//                        chatUser.setLastMsgContent("[情侣邀请]");
-//                        break;
-//                    case SUPERLIKE:
-//                        chatUser.setLastMsgContent("[超喜欢]");
-//                        break;
-//                    case GIFT:
-//                        chatUser.setLastMsgContent("[礼物]");
-//                        break;
-//                    case IMAGE_DESC:
-//                        chatUser.setLastMsgContent("[图片]");
-//                        break;
-//                    case VOICE_DESC:
-//                        chatUser.setLastMsgContent("[语音]");
-//                        break;
-//                    default:
-//                        chatUser.setLastMsgContent("");
-//                        break;
-//                }
-//                DBDao.getDbDao(this).insertChatUser(me_user_id, chatUser);
-////            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        if (null != chatPresenter) {
-//            chatPresenter.onPause();
-//        }
     }
 
     @Override
     protected void onDestroy() {
         chatMessageAdapter.unregisterAdapterDataObserver(adapterDataObserver);
-//        if (null != handler) {
-//            handler.removeCallbacksAndMessages(null);
-//        }
         if (null != chatPresenter) {
             chatPresenter.onDestory();
         }
@@ -721,6 +393,44 @@ public class CpChatActivity extends BaseActivity<UserOperationPresenter> impleme
         super.onDestroy();
     }
 
+    /**
+     * 压缩图片
+     * @param photos
+     */
+    private void compressImg(List<String> photos, boolean isOrigin){
+        if (photos.size() == 0) return;
+        if (isOrigin){
+            for (String path:photos){
+                sendImage(path);
+            }
+        } else {
+            top.zibin.luban.Luban.with(this)
+                    .load(photos)
+                    .ignoreBy(100)
+                    .setTargetDir(Constants.LOCAL_IMG_PATH) //缓存路径
+                    .filter(new CompressionPredicate() {
+                        @Override
+                        public boolean apply(String path) {
+                            return !(TextUtils.isEmpty(path) || path.toLowerCase().endsWith(".gif"));
+                        }
+                    })
+                    .setCompressListener(new OnCompressListener() {
+                        @Override
+                        public void onStart() {
+                        }
+
+                        @Override
+                        public void onSuccess(File file) {
+                            sendImage(file.getAbsolutePath());
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                        }
+                    }).launch();
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -729,25 +439,21 @@ public class CpChatActivity extends BaseActivity<UserOperationPresenter> impleme
             if (requestCode == Constants.REQUEST_CODE_CAMERA) {
                 final String path = data.getStringExtra("path");
                 Log.i("huang", "path=" + path);
-//                Uri mediaUri = Uri.parse("file://" + path);
-//                Glide.with(this)
-//                        .load(mediaUri)
-//                        .into(imageView);
-//                imageView.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        playVideo(path);
-//                    }
-//                });
-                onImageReturn(null, path, true);
+                ArrayList<String> photos = new ArrayList<>();
+                photos.add(path);
+                compressImg(photos,false);
             }
             if (requestCode == Constants.REQUEST_CODE_PICKER) {
                 select = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
                 Boolean isOrigin = data.getBooleanExtra(PickerConfig.IS_ORIGIN, false);
+                ArrayList<String> photos = new ArrayList<>();
                 for (final Media media : select) {
-                    Log.i("media", media.toString());
-                    onImageReturn(null, media.path, isOrigin);
+                    LogUtils.i("media", media.toString());
+                    if (new File(media.path).exists()){
+                        photos.add(media.path);
+                    }
                 }
+                compressImg(photos,isOrigin);
             }
             if (resultCode == 102) {
                 Log.i("CJT", "video");

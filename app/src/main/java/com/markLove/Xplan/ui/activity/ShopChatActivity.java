@@ -98,6 +98,8 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import top.zibin.luban.CompressionPredicate;
+import top.zibin.luban.OnCompressListener;
 
 /**
  * 店铺聊天室
@@ -228,26 +230,7 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
     }
 
     protected void initData() {
-        boolean isLove = PreferencesUtils.getBoolean(this, Constants.USER_IS_LOVES_INFO_KEY);
-        if (isLove) {
-            int femaleID = PreferencesUtils.getInt(this, Constants.FEMALE_USER_ID, 0);
-            int maleID = PreferencesUtils.getInt(this, Constants.MALE_USER_ID, 0);
-            if (femaleID != 0 && maleID != 0) {
-                if ((femaleID == me_user_id && maleID == to_user_id) || (femaleID == to_user_id && maleID == me_user_id)) {
-                    isLikeAndUser = true;
-                }
-            }
-        }
         Intent intent = getIntent();
-//        Bundle bundle = intent.getBundleExtra("data");
-//        if (null == bundle) {
-////            ToastUtils.showCenter(this, "无效的接受者", 0);
-//            finish();o
-//        } else {
-//            to_user_id = Integer.parseInt(bundle.getString("user_id"));
-//            nickName = bundle.getString("nick_name");
-//            headImgUrl = bundle.getString("head_img_url");
-//        }
         to_user_id = intent.getIntExtra("chatId", 0);
         dataId = intent.getIntExtra("dataId", 0);
         me_user_id = PreferencesUtils.getInt(this, Constants.ME_USER_ID);
@@ -271,9 +254,6 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
         chatPresenter = new ChatPresenterImpl();
         chatPresenter.setView(this);
         chatView.setId(me_user_id,dataId);
-//        tvChatSendPrice.setText(gold + "");
-//        chatPresenter.getHistory(me_user_id, to_user_id);
-//        getGiftList();
     }
 
     RecyclerView.AdapterDataObserver adapterDataObserver = new RecyclerView.AdapterDataObserver() {
@@ -295,40 +275,12 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
         @Override
         public void failResend(Message msg) {
             closeSoftKeyBoard();
-            resendMessage(msg);
         }
     };
 
-    /**
-     * 重新发送消息
-     *
-     * @param resendMessage
-     */
-    private void resendMessage(final Message resendMessage) {
-        ResendMsgDialog resendMsgDialog = new ResendMsgDialog(this);
-        resendMsgDialog.setOnMenuClickListener(new ResendMsgDialog.OnMenuClickListener() {
-            @Override
-            public void onMenuClick() {
-                updataMessage(resendMessage.getMsgID(), Message.ChatStatus.SENDING.ordinal());
 
-            }
-        });
-        resendMsgDialog.show();
-    }
-
-    /**
-     * 显示历史消息
-     *
-     * @param historyMessageList
-     */
     @Override
-    public void showHistoryMessage(final List<Message> historyMessageList) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                chatMessageAdapter.addAll(historyMessageList);
-            }
-        });
+    public void showHistoryMessage(List<Message> historyMessageList) {
     }
 
     /**
@@ -338,143 +290,47 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
      */
     @Override
     public void addOneMessage(final Message msg) {
-        if ((msg.getToID() == me_user_id && msg.getFromID() == to_user_id)
-                || (msg.getToID() == to_user_id && msg.getFromID() == me_user_id)) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (null != chatMessageAdapter) {
-                        chatMessageAdapter.addOne(msg);
-                    }
-                }
-            });
-        }
     }
 
     @Override
     public void updataMessage(final String msgID, final int errorCode) {
-        if (Message.ChatStatus.values()[errorCode] == Message.ChatStatus.SUCCESS) {
-            if (null != chatMessageAdapter) {
-                Message message = chatMessageAdapter.getMessageByID(msgID);
-                if (message != null) {
-                    if (message.getFromID() == PreferencesUtils.getInt(this, Constants.ME_USER_ID) && (message.getChatType() == Message.ChatType.IMAGE || message.getChatType() == Message.ChatType.VOICE) && message.getStatus() == Message.ChatStatus.SUCCESS) {
-                        Message.ChatType chatType = message.getChatType() == Message.ChatType.IMAGE ? Message.ChatType.IMAGE_DESC : Message.ChatType.VOICE_DESC;
-                        FileMessageBody fileMessageBody = (FileMessageBody) message.getBody();
-                        sendMessage(Message.createDescriptionMessage(message.getFromID(), message.getToID(), Message.Type.CHAT, chatType, fileMessageBody.getFileName()));
-                    }
-                }
-            }
-        }
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (null != chatMessageAdapter) {
-                    try {
-                        int position = chatMessageAdapter.getItemPositionByMsgID(msgID);
-                        if (position >= 0) {
-                            Message.ChatStatus status = Message.ChatStatus.values()[errorCode];
-                            List<Message.ChatStatus> payloads = new ArrayList<Message.ChatStatus>();
-                            payloads.add(status);
-                            chatMessageAdapter.notifyItemRangeChanged(position, 1, status);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
     }
 
     /**
-     * 发送消息
-     *
-     * @param message
+     * 压缩图片
+     * @param photos
      */
-    private void sendMessage(Message message) {
-        DBDao.getDbDao(this).insertMessage(me_user_id, message);
-        boolean isOpen = PreferencesUtils.getBoolean(this, Constants.CHAT_OPEN_KEY, true);
-        String token = PreferencesUtils.getString(this, Constants.TOKEN_KEY);
-        LogUtils.d("------->token=" + token + ",isOpen=" + isOpen);
-        if (isOpen) {
-//            ChatClient.getInstance().sendMessage(token, message);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    rlChatMsgList.scrollToPosition(chatMessageAdapter.getItemCount());
-                }
-            });
+    private void compressImg(List<String> photos, boolean isOrigin){
+        if (photos.size() == 0) return;
+        if (isOrigin){
+            for (String path:photos){
+                sendImage(path);
+            }
         } else {
-            ToastUtils.showCenter(this, "该服务正在紧急维护当中，请稍后再试", 0);
-            updataMessage(message.getMsgID(), Message.ChatStatus.FAIL.ordinal());
-        }
-    }
-
-    /**
-     * 图片返回处理
-     *
-     * @param uri
-     * @param filePath
-     * @param isOrigin 是否原图发送
-     */
-    public void onImageReturn(Uri uri, String filePath, boolean isOrigin) {
-//        String filePath = autoCameraUtils.getPath(this, uri);
-        String fileName = filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length());
-        final Message imgMsg = Message.createImageMessage(Message.Type.CHAT, me_user_id, to_user_id,"",fileName, filePath);
-        imgMsg.setStatus(Message.ChatStatus.SENDING);
-        isOrigin = true;
-        if (isOrigin) {
-            sendImage(filePath);
-//            judeBlackList(imgMsg);
-        } else {
-            Observable.create(new ObservableOnSubscribe<Message>() {
-                @Override
-                public void subscribe(final ObservableEmitter<Message> emitter) throws Exception {
-                    final FileMessageBody imgMessageBody = (FileMessageBody) imgMsg.getBody();
-                    final String outPath = Constants.LOCAL_IMG_PATH + imgMessageBody.getFileName();
-                    ImageUtils.compressImageInPath(imgMessageBody.getFilePath(), Constants.LOCAL_IMG_PATH, new IImageCompressor.OnImageCompressListener() {
+            top.zibin.luban.Luban.with(this)
+                    .load(photos)
+                    .ignoreBy(100)
+                    .setTargetDir(Constants.LOCAL_IMG_PATH) //缓存路径
+                    .filter(new CompressionPredicate() {
                         @Override
-                        public void onCompressStart(String msg) {
-
+                        public boolean apply(String path) {
+                            return !(TextUtils.isEmpty(path) || path.toLowerCase().endsWith(".gif"));
+                        }
+                    })
+                    .setCompressListener(new OnCompressListener() {
+                        @Override
+                        public void onStart() {
                         }
 
                         @Override
-                        public void onCompressComplete(List<String> destFilePaths) {
-                            if (destFilePaths != null && destFilePaths.size() > 0) {
-                                imgMessageBody.setFilePath(outPath);
-                                emitter.onNext(imgMsg);
-                                emitter.onComplete();
-                            }
-                        }
-
-                        @Override
-                        public void onCompressError(String msg) {
-
-                        }
-                    });
-                }
-            }).subscribeOn(Schedulers.io())
-                    .observeOn(Schedulers.io())
-                    .subscribe(new Observer<Message>() {
-                        @Override
-                        public void onSubscribe(Disposable d) {
-
-                        }
-
-                        @Override
-                        public void onNext(Message message) {
-
+                        public void onSuccess(File file) {
+                            sendImage(file.getAbsolutePath());
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
                         }
-
-                        @Override
-                        public void onComplete() {
-
-                        }
-                    });
+                    }).launch();
         }
     }
 
@@ -512,56 +368,6 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
     @Override
     protected void onPause() {
         super.onPause();
-        try {
-            if (chatMessageAdapter.getItemCount() > 0) {
-                Message msg = chatMessageAdapter.getItemMsg(chatMessageAdapter.getItemCount() - 1);
-                msg = DBDao.getDbDao(this).queryLastMessage(me_user_id, to_user_id, msg.getMsgID());
-                ChatUser chatUser = new ChatUser();
-                chatUser.setNickName(nickName);
-                chatUser.setUserID(to_user_id);
-                chatUser.setHeadImgUrl(headImgUrl);
-                chatUser.setChatTime(DataUtils.getDateTime(msg.getMsgTime() != 0 ? msg.getMsgTime() : System.currentTimeMillis()));
-                chatUser.setLastMsgId(msg.getMsgID());
-                chatUser.setUnreadCount(0);
-                chatUser.setLastMsgChatType(msg.getChatType());
-                switch (msg.getChatType()) {
-                    case TXT:
-                        TxtMessageBody txtMessageBody = (TxtMessageBody) msg.getBody();
-                        chatUser.setLastMsgContent(txtMessageBody.getMsg());
-                        break;
-                    case IMAGE:
-                        chatUser.setLastMsgContent("[图片]");
-                        break;
-                    case VOICE:
-                        chatUser.setLastMsgContent("[语音]");
-                        break;
-                    case LOVE:
-                        chatUser.setLastMsgContent("[情侣邀请]");
-                        break;
-                    case SUPERLIKE:
-                        chatUser.setLastMsgContent("[超喜欢]");
-                        break;
-                    case GIFT:
-                        chatUser.setLastMsgContent("[礼物]");
-                        break;
-                    case IMAGE_DESC:
-                        chatUser.setLastMsgContent("[图片]");
-                        break;
-                    case VOICE_DESC:
-                        chatUser.setLastMsgContent("[语音]");
-                        break;
-                    default:
-                        chatUser.setLastMsgContent("");
-                        break;
-                }
-                DBDao.getDbDao(this).insertChatUser(me_user_id, chatUser);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (null != chatPresenter) {
-            chatPresenter.onPause();
-        }
     }
 
     @Override
@@ -598,25 +404,21 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
             if (requestCode == Constants.REQUEST_CODE_CAMERA) {
                 final String path = data.getStringExtra("path");
                 Log.i("huang", "path=" + path);
-//                Uri mediaUri = Uri.parse("file://" + path);
-//                Glide.with(this)
-//                        .load(mediaUri)
-//                        .into(imageView);
-//                imageView.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        playVideo(path);
-//                    }
-//                });
-                onImageReturn(null, path, true);
+                ArrayList<String> photos = new ArrayList<>();
+                photos.add(path);
+                compressImg(photos,false);
             }
             if (requestCode == Constants.REQUEST_CODE_PICKER) {
                 select = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
                 Boolean isOrigin = data.getBooleanExtra(PickerConfig.IS_ORIGIN, false);
+                ArrayList<String> photos = new ArrayList<>();
                 for (final Media media : select) {
-                    Log.i("media", media.toString());
-                    onImageReturn(null, media.path, isOrigin);
+                    LogUtils.i("media", media.toString());
+                    if (new File(media.path).exists()){
+                        photos.add(media.path);
+                    }
                 }
+                compressImg(photos,isOrigin);
             }
             if (requestCode == Constants.REQUEST_CODE_CHAT_MEMBER) {
                 GoNativeBean goNativeBean = (GoNativeBean) data.getSerializableExtra("goNativeBean");
@@ -720,14 +522,15 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 
     private void showExitTipDialog(){
         ExitRoomDialog exitRoomDialog = new ExitRoomDialog(this);
-        exitRoomDialog.setTipContent(getString(R.string.exit_shop_chat_room));
         exitRoomDialog.setOnDialogCallBack(new ExitRoomDialog.OnDialogCallBack() {
             @Override
             public void onCallBack(String content) {
+                exitChatRoom();
                 finish();
             }
         });
         exitRoomDialog.show();
+        exitRoomDialog.setTipContent(getString(R.string.exit_shop_chat_room));
     }
 
     /**
@@ -1041,6 +844,12 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
 
             @Override
             public void onFail(ErrorResult error) {
+                //已经加入聊天室
+                if(error.getCode() == 4097) {
+                    mImEngine.subscribeToTopic(chatId);
+                } else {
+                    ToastUtils.showLong(ShopChatActivity.this,error.toString());
+                }
                 LogUtils.i("ShopChatTestActivity","加入聊天室失败="+error.toString());
             }
         });

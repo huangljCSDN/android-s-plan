@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.webkit.JavascriptInterface;
@@ -37,6 +38,9 @@ import com.markLove.Xplan.utils.PreferencesUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import top.zibin.luban.CompressionPredicate;
+import top.zibin.luban.OnCompressListener;
 
 public class MineFragment extends BaseFragment<FilePresenter> implements FileContract.View{
     private MyWebView mWebView;
@@ -194,6 +198,49 @@ public class MineFragment extends BaseFragment<FilePresenter> implements FileCon
         mPresenter.upload(files);
     }
 
+     /**
+      * 压缩图片
+     * @param photos
+     */
+    private void compressImg(List<String> photos, boolean isOrigin){
+        final List<File> files = new ArrayList<>();
+        final int size = photos.size();
+
+        if (photos.size() == 0) return;
+            top.zibin.luban.Luban.with(getContext())
+                    .load(photos)
+                    .ignoreBy(100)
+                    .setTargetDir(Constants.LOCAL_IMG_PATH) //缓存路径
+                    .filter(new CompressionPredicate() {
+                        @Override
+                        public boolean apply(String path) {
+                            return !(TextUtils.isEmpty(path) || path.toLowerCase().endsWith(".gif"));
+                        }
+                    })
+                    .setCompressListener(new OnCompressListener() {
+                        int count = 0;
+                        @Override
+                        public void onStart() {
+
+                        }
+
+                        @Override
+                        public void onSuccess(File file) {
+                            count ++;
+                            files.add(file);
+                            if (count == size){
+                                mPresenter.upload(files);
+                                count =0;
+                            }
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                        }
+
+                    }).launch();
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -201,22 +248,22 @@ public class MineFragment extends BaseFragment<FilePresenter> implements FileCon
             if (requestCode == Constants.REQUEST_CODE_CAMERA) {
                 final String path = data.getStringExtra("path");
                 Log.i("huang", "path=" + path);
-                Media media = new Media(path, "", 0, 1, 999, 9999, "");
-                mediaList.clear();
-                mediaList.add(media);
+                ArrayList<String> photos = new ArrayList<>();
+                photos.add(path);
+                compressImg(photos,false);
                 localFilePath = path;
-                uploadFile();
             }
             if (requestCode == Constants.REQUEST_CODE_PICKER) {
                 ArrayList<Media> select = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
+                ArrayList<String> photos = new ArrayList<>();
                 for (final Media media : select) {
-                    Log.i("media", media.toString());
-                    Media media1 = new Media(media.path, "", 0, 1, 999, 9999, "");
-                    mediaList.clear();
-                    mediaList.add(media1);
-                    localFilePath = media.path;
+                    LogUtils.i("media", media.toString());
+                    if (new File(media.path).exists()){
+                        photos.add(media.path);
+                        localFilePath = media.path;
+                    }
                 }
-                uploadFile();
+                compressImg(photos,false);
             }
 
             if (requestCode == Constants.REQUEST_CODE_PUBLISH){

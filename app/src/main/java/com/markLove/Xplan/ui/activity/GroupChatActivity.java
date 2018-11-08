@@ -85,6 +85,7 @@ import com.xsimple.im.db.datatable.IMGroupRemark;
 import com.xsimple.im.db.datatable.IMMessage;
 import com.xsimple.im.engine.IMEngine;
 import com.xsimple.im.event.ExitGroupEvent;
+import com.xsimple.im.utils.Luban;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -102,6 +103,8 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import top.zibin.luban.CompressionPredicate;
+import top.zibin.luban.OnCompressListener;
 
 /**
  * 组局聊天室
@@ -123,8 +126,6 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 
     ChatPresenter chatPresenter;
     GroupChatMessageAdapter chatMessageAdapter;
-    String nickName;
-    String headImgUrl;
     GroupDetailBean.GroupBean groupBean;
     //    AutoCameraUtils autoCameraUtils;
     int me_user_id;
@@ -132,10 +133,6 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     int dataId; //组局id
     String chatId; //聊天室id
     int agreeMsgId;  //同意报名的消息id
-
-    boolean isEnd = false;
-    boolean isLikeAndUser = false;
-    boolean isBlackUser = false;
     boolean keyboardIsShown = false;
     int usableHeightPrevious = 0;
 
@@ -151,7 +148,6 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 
     @Override
     protected void init(Bundle savedInstanceState) {
-//        StatusBarUtil.setStatusBarColor(this,R.color.colorPrimary);
         StatusBarUtil.setStatusBarColor(this, R.color.color_190827);
         rlChatMsgList = findViewById(R.id.chat_msg_list);
         mFlMore = findViewById(R.id.fl_more);
@@ -281,20 +277,10 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 
     protected void initData() {
         Intent intent = getIntent();
-//        Bundle bundle = intent.getBundleExtra("data");
-//        if (null == bundle) {
-////            ToastUtils.showCenter(this, "无效的接受者", 0);
-//            finish();
-//        } else {
-//
-////            nickName = bundle.getString("nick_name");
-//            headImgUrl = bundle.getString("head_img_url");
-//        }
         to_user_id = intent.getIntExtra("chatId", 0);
         dataId = intent.getIntExtra("dataId", 0);
         me_user_id = PreferencesUtils.getInt(this, Constants.ME_USER_ID);
         LogUtils.d("me_user_id=" + me_user_id);
-//        tvChatUser.setText(nickName);
         LinearLayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         chatMessageAdapter = new GroupChatMessageAdapter(this, new ArrayList<Message>());
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.icon);
@@ -314,8 +300,6 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         chatView.setId(me_user_id, dataId);
 //        tvChatSendPrice.setText(gold + "");
 //        chatPresenter.getHistory(me_user_id, to_user_id);
-//        getGiftList();
-        getChatOpen();
         getGroupDetailData(dataId);
         joinGroup(dataId);
     }
@@ -334,7 +318,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     /**
      * 退出组局
      *
-     * @param dataId
+     * @param
      */
     private void exitGroup() {
         Map<String, String> map = new HashMap<>();
@@ -379,29 +363,9 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
      */
 
     private void signUp() {
-
         SignUpTipDialog signUpTipDialog = new SignUpTipDialog(this);
         signUpTipDialog.setCanceledOnTouchOutside(true);
         signUpTipDialog.show();
-    }
-
-    private void getChatOpen() {
-//        Map<String, String> params = new HashMap<>();
-//        params.put("Token", PreferencesUtils.getString(this, Constants.TOKEN_KEY));
-//        OkGoHttpUtils.get(Constants.GET_JUDE_CHAT_OPEN, params, new OkGoHttpCallBack() {
-//        @Override
-//        public void onSuccess(String s, Call call, Response response) {
-//            ChatOpen chatOpen = GsonUtils.json2Bean(s, ChatOpen.class);
-//            if (chatOpen.isHaveData()) {
-//                ChatOpen.DtBean dtBean = chatOpen.getDt().get(0);
-//                if ("1".equals(dtBean.getChatOpen())) {
-//                    PreferencesUtils.putBoolean(ShopChatActivity.this, Constants.CHAT_OPEN_KEY, true);
-//                } else {
-//                    PreferencesUtils.putBoolean(ShopChatActivity.this, Constants.CHAT_OPEN_KEY, false);
-//                }
-//            }
-//        }
-//    });
     }
 
     RecyclerView.AdapterDataObserver adapterDataObserver = new RecyclerView.AdapterDataObserver() {
@@ -423,26 +387,8 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         @Override
         public void failResend(Message msg) {
             closeSoftKeyBoard();
-//            resendMessage(msg);
-
         }
     };
-
-    /**
-     * 重新发送消息
-     *
-     * @param resendMessage
-     */
-    private void resendMessage(final Message resendMessage) {
-        ResendMsgDialog resendMsgDialog = new ResendMsgDialog(this);
-        resendMsgDialog.setOnMenuClickListener(new ResendMsgDialog.OnMenuClickListener() {
-            @Override
-            public void onMenuClick() {
-                updataMessage(resendMessage.getMsgID(), Message.ChatStatus.SENDING.ordinal());
-            }
-        });
-        resendMsgDialog.show();
-    }
 
     /**
      * 显示历史消息
@@ -459,166 +405,50 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         });
     }
 
-    /**
-     * 添加一条消息
-     *
-     * @param msg
-     */
     @Override
-    public void addOneMessage(final Message msg) {
-        LogUtils.i("huang", "msg" + msg.toString());
-        if ((msg.getToID() == me_user_id && msg.getFromID() == to_user_id)
-                || (msg.getToID() == to_user_id && msg.getFromID() == me_user_id)) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (null != chatMessageAdapter) {
-                        chatMessageAdapter.addOne(msg);
-                    }
-                }
-            });
-        }
-    }
+    public void addOneMessage(Message msg) {
 
-    //{packetLength=0, fromID=0, toID=0, msgID='frlT9vdj', type=CHAT, chatType=TXT, status=SENDING, packetOrder=0, packetCount=0,
-    // body={"msg":"11","chatType":"TXT","dateTime":"2018/10/17 22:18:15","type":"CHAT","userName":""}, msgTime=0}
-
-    private Message getTestData() {
-        TxtMessageBody txtMessageBody = new TxtMessageBody(Message.Type.CHAT, Message.ChatType.REQUEST_JOIN, "hahahha");
-        Message txtMessage = new Message(0, 0, ChatUtils.generateShortUuid(), Message.Type.CHAT, Message.ChatType.REQUEST_JOIN, txtMessageBody);
-        txtMessage.setStatus(Message.ChatStatus.SENDING);
-
-        addOneMessage(txtMessage);
-        return txtMessage;
     }
 
     @Override
     public void updataMessage(final String msgID, final int errorCode) {
-        if (Message.ChatStatus.values()[errorCode] == Message.ChatStatus.SUCCESS) {
-            if (null != chatMessageAdapter) {
-                Message message = chatMessageAdapter.getMessageByID(msgID);
-                if (message != null) {
-                    if (message.getFromID() == PreferencesUtils.getInt(this, Constants.ME_USER_ID) && (message.getChatType() == Message.ChatType.IMAGE || message.getChatType() == Message.ChatType.VOICE) && message.getStatus() == Message.ChatStatus.SUCCESS) {
-                        Message.ChatType chatType = message.getChatType() == Message.ChatType.IMAGE ? Message.ChatType.IMAGE_DESC : Message.ChatType.VOICE_DESC;
-                        FileMessageBody fileMessageBody = (FileMessageBody) message.getBody();
-                        sendMessage(Message.createDescriptionMessage(message.getFromID(), message.getToID(), Message.Type.CHAT, chatType, fileMessageBody.getFileName()));
-                    }
-                }
-            }
-        }
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (null != chatMessageAdapter) {
-                    try {
-                        int position = chatMessageAdapter.getItemPositionByMsgID(msgID);
-                        if (position >= 0) {
-                            Message.ChatStatus status = Message.ChatStatus.values()[errorCode];
-                            List<Message.ChatStatus> payloads = new ArrayList<Message.ChatStatus>();
-                            payloads.add(status);
-                            chatMessageAdapter.notifyItemRangeChanged(position, 1, status);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
     }
 
     /**
-     * 发送消息
-     *
-     * @param message
+     * 压缩图片
+     * @param photos
      */
-    private void sendMessage(Message message) {
-        DBDao.getDbDao(this).insertMessage(me_user_id, message);
-        boolean isOpen = PreferencesUtils.getBoolean(this, Constants.CHAT_OPEN_KEY, true);
-        String token = PreferencesUtils.getString(this, Constants.TOKEN_KEY);
-        LogUtils.d("------->token=" + token + ",isOpen=" + isOpen);
-        if (isOpen) {
-//            ChatClient.getInstance().sendMessage(token, message);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    rlChatMsgList.scrollToPosition(chatMessageAdapter.getItemCount());
-                }
-            });
+    private void compressImg(List<String> photos, boolean isOrigin){
+        if (photos.size() == 0) return;
+        if (isOrigin){
+            for (String path:photos){
+                sendImage(path);
+            }
         } else {
-//            if (message.getChatType() == Message.ChatType.LOVE) {
-//                PreferencesUtils.putLong(this, Constants.BECOME_COUPLE_TIME_KEY + to_user_id, 0);
-//            }
-            ToastUtils.showCenter(this, "该服务正在紧急维护当中，请稍后再试", 0);
-            updataMessage(message.getMsgID(), Message.ChatStatus.FAIL.ordinal());
-        }
-    }
-
-    /**
-     * 图片返回处理
-     *
-     * @param uri
-     * @param filePath
-     * @param isOrigin 是否原图发送
-     */
-    public void onImageReturn(Uri uri, String filePath, boolean isOrigin) {
-//        String filePath = autoCameraUtils.getPath(this, uri);
-        String fileName = filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length());
-        final Message imgMsg = Message.createImageMessage(Message.Type.CHAT, me_user_id, to_user_id, fileName, "", filePath);
-        imgMsg.setStatus(Message.ChatStatus.SENDING);
-        isOrigin = true;
-        if (isOrigin) {
-            sendImage(filePath);
-//            judeBlackList(imgMsg);
-        } else {
-            Observable.create(new ObservableOnSubscribe<Message>() {
-                @Override
-                public void subscribe(final ObservableEmitter<Message> emitter) throws Exception {
-                    final FileMessageBody imgMessageBody = (FileMessageBody) imgMsg.getBody();
-                    final String outPath = Constants.LOCAL_IMG_PATH + imgMessageBody.getFileName();
-                    ImageUtils.compressImageInPath(imgMessageBody.getFilePath(), Constants.LOCAL_IMG_PATH, new IImageCompressor.OnImageCompressListener() {
+            top.zibin.luban.Luban.with(this)
+                    .load(photos)
+                    .ignoreBy(100)
+                    .setTargetDir(Constants.LOCAL_IMG_PATH) //缓存路径
+                    .filter(new CompressionPredicate() {
                         @Override
-                        public void onCompressStart(String msg) {
-
+                        public boolean apply(String path) {
+                            return !(TextUtils.isEmpty(path) || path.toLowerCase().endsWith(".gif"));
+                        }
+                    })
+                    .setCompressListener(new OnCompressListener() {
+                        @Override
+                        public void onStart() {
                         }
 
                         @Override
-                        public void onCompressComplete(List<String> destFilePaths) {
-                            if (destFilePaths != null && destFilePaths.size() > 0) {
-                                imgMessageBody.setFilePath(outPath);
-                                emitter.onNext(imgMsg);
-                                emitter.onComplete();
-                            }
-                        }
-
-                        @Override
-                        public void onCompressError(String msg) {
-
-                        }
-                    });
-                }
-            }).subscribeOn(Schedulers.io())
-                    .observeOn(Schedulers.io())
-                    .subscribe(new Observer<Message>() {
-                        @Override
-                        public void onSubscribe(Disposable d) {
-
-                        }
-
-                        @Override
-                        public void onNext(Message message) {
-
+                        public void onSuccess(File file) {
+                            sendImage(file.getAbsolutePath());
                         }
 
                         @Override
                         public void onError(Throwable e) {
-
                         }
-
-                        @Override
-                        public void onComplete() {
-
-                        }
-                    });
+                    }).launch();
         }
     }
 
@@ -656,56 +486,6 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     @Override
     protected void onPause() {
         super.onPause();
-        try {
-            if (chatMessageAdapter.getItemCount() > 0) {
-                Message msg = chatMessageAdapter.getItemMsg(chatMessageAdapter.getItemCount() - 1);
-                msg = DBDao.getDbDao(this).queryLastMessage(me_user_id, to_user_id, msg.getMsgID());
-                ChatUser chatUser = new ChatUser();
-                chatUser.setNickName(nickName);
-                chatUser.setUserID(to_user_id);
-                chatUser.setHeadImgUrl(headImgUrl);
-                chatUser.setChatTime(DataUtils.getDateTime(msg.getMsgTime() != 0 ? msg.getMsgTime() : System.currentTimeMillis()));
-                chatUser.setLastMsgId(msg.getMsgID());
-                chatUser.setUnreadCount(0);
-                chatUser.setLastMsgChatType(msg.getChatType());
-                switch (msg.getChatType()) {
-                    case TXT:
-                        TxtMessageBody txtMessageBody = (TxtMessageBody) msg.getBody();
-                        chatUser.setLastMsgContent(txtMessageBody.getMsg());
-                        break;
-                    case IMAGE:
-                        chatUser.setLastMsgContent("[图片]");
-                        break;
-                    case VOICE:
-                        chatUser.setLastMsgContent("[语音]");
-                        break;
-                    case LOVE:
-                        chatUser.setLastMsgContent("[情侣邀请]");
-                        break;
-                    case SUPERLIKE:
-                        chatUser.setLastMsgContent("[超喜欢]");
-                        break;
-                    case GIFT:
-                        chatUser.setLastMsgContent("[礼物]");
-                        break;
-                    case IMAGE_DESC:
-                        chatUser.setLastMsgContent("[图片]");
-                        break;
-                    case VOICE_DESC:
-                        chatUser.setLastMsgContent("[语音]");
-                        break;
-                    default:
-                        chatUser.setLastMsgContent("");
-                        break;
-                }
-                DBDao.getDbDao(this).insertChatUser(me_user_id, chatUser);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (null != chatPresenter) {
-            chatPresenter.onPause();
-        }
     }
 
     @Override
@@ -730,15 +510,21 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
             if (requestCode == Constants.REQUEST_CODE_CAMERA) {
                 final String path = data.getStringExtra("path");
                 LogUtils.i("huang", "path=" + path);
-                onImageReturn(null, path, true);
+                ArrayList<String> photos = new ArrayList<>();
+                photos.add(path);
+                compressImg(photos,false);
             }
             if (requestCode == Constants.REQUEST_CODE_PICKER) {
                 select = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
                 Boolean isOrigin = data.getBooleanExtra(PickerConfig.IS_ORIGIN, false);
+                ArrayList<String> photos = new ArrayList<>();
                 for (final Media media : select) {
                     LogUtils.i("media", media.toString());
-                    onImageReturn(null, media.path, isOrigin);
+                    if (new File(media.path).exists()){
+                        photos.add(media.path);
+                    }
                 }
+                compressImg(photos,isOrigin);
             }
 
             if (requestCode == Constants.REQUEST_CODE_CHAT_MEMBER) {
@@ -1108,6 +894,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     @Override
     public void onExitGroup(BaseBean baseBean) {
         if (baseBean.Status == 200) {
+            exitChatRoom();
             finish();
         } else {
             toast("退出组局失败!");
@@ -1294,6 +1081,12 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 
             @Override
             public void onFail(ErrorResult error) {
+                //已经加入聊天室
+                if(error.getCode() == 4097) {
+                    mImEngine.subscribeToTopic(chatId);
+                } else {
+                    ToastUtils.showLong(GroupChatActivity.this,error.toString());
+                }
                 LogUtils.i("ShopChatTestActivity", "加入聊天室失败=" + error.toString());
             }
         });
@@ -1456,7 +1249,6 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 
     @Override
     public void onAddMessagerCallBack(IMMessage message) {
-
         LogUtils.i("huang", "onAddMessagerCallBack2=" + message.toString());
         message.refresh();
         mMessagerLoader.addMessager(message);
