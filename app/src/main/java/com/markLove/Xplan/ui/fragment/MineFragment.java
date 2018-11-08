@@ -32,6 +32,7 @@ import com.markLove.Xplan.ui.activity.PublishActivity;
 import com.markLove.Xplan.ui.widget.MyWebView;
 import com.markLove.Xplan.utils.GsonUtils;
 import com.markLove.Xplan.utils.LogUtils;
+import com.markLove.Xplan.utils.PreferencesUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -269,6 +270,7 @@ public class MineFragment extends BaseFragment<FilePresenter> implements FileCon
         goPhotoFilesBean.setImgName(file.getName());
         goPhotoFilesBean.setImgPath(file.getAbsolutePath());
         goPhotoFilesBean.setUploadData(netUrl);
+        PreferencesUtils.putString(getActivity(),Constants.ME_HEAD_IMG_URL,netUrl);
         String url = "javascript:"+callBackName+"(" + GsonUtils.obj2Json(goPhotoFilesBean) + ")";
         LogUtils.i("url="+url);
         mWebView.loadUrl("javascript:"+callBackName+"(" + GsonUtils.obj2Json(goPhotoFilesBean) + ")");

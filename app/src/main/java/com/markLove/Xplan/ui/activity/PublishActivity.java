@@ -46,6 +46,7 @@ import com.markLove.Xplan.utils.FileUtils;
 import com.markLove.Xplan.utils.ImageLoaderUtils;
 import com.markLove.Xplan.utils.ImageUtils;
 import com.markLove.Xplan.utils.LogUtils;
+import com.markLove.Xplan.utils.PreferencesUtils;
 import com.markLove.Xplan.utils.StatusBarUtil;
 import com.markLove.Xplan.utils.ToastUtils;
 
@@ -125,9 +126,7 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
         filePresenter = new FilePresenter();
         filePresenter.attachView(this);
 
-        UserBean userBean = App.getInstance().getUserBean();
-        String urlHead = userBean.getUserInfo().getHeadImageUrl();
-        ImageLoaderUtils.displayCircle(this, urlHead, mIvHead);
+        ImageLoaderUtils.displayCircle(this, PreferencesUtils.getString(this, Constants.ME_HEAD_IMG_URL), mIvHead);
     }
 
     private void setListener() {

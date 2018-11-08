@@ -119,6 +119,14 @@ public interface RetrofitApiService {
     Observable<BaseBean<Object>> joinGroup(@QueryMap Map<String, String> map);
 
     /**
+     * 退出组局
+     * @param map
+     * @return
+     */
+    @POST("user/group/exitGroup")
+    Observable<BaseBean<Object>> exitGroup(@QueryMap Map<String, String> map);
+
+    /**
      * 组局详情
      * @param map
      * @return

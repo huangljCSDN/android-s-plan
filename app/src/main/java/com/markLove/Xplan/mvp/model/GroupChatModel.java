@@ -20,6 +20,11 @@ public class GroupChatModel extends GroupChatContract.Model {
     }
 
     @Override
+    public void exitGroup(Map<String, String> map, RequestCallBack requestCallBack) {
+        requestData(retrofitApiService.exitGroup(map),requestCallBack);
+    }
+
+    @Override
     public void participateGroup(Map<String, String> map, RequestCallBack requestCallBack) {
         requestData(retrofitApiService.participateGroup(map),requestCallBack);
     }

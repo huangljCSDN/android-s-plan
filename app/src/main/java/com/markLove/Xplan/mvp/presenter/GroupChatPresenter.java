@@ -45,6 +45,28 @@ public class GroupChatPresenter extends GroupChatContract.Presenter {
     }
 
     @Override
+    public void exitGroup(Map<String, String> map) {
+        if (!isAttach()) return;
+        getView().showLoading();
+
+        mModel.exitGroup(map, new RequestCallBack<BaseBean<Object>>() {
+            @Override
+            public void onSuccess(BaseBean<Object> baseBean) {
+                LogUtils.i("GroupChatPresenter",baseBean.toString());
+                getView().hideLoading();
+                getView().onExitGroup(baseBean);
+            }
+
+            @Override
+            public void onFail(String result) {
+                LogUtils.i("GroupChatPresenter",result);
+                getView().hideLoading();
+                getView().showError("退出组局失败!");
+            }
+        });
+    }
+
+    @Override
     public void participateGroup(Map<String, String> map) {
         if (!isAttach()) return;
         getView().showLoading();
@@ -76,7 +98,7 @@ public class GroupChatPresenter extends GroupChatContract.Presenter {
             public void onSuccess(BaseBean baseBean) {
                 LogUtils.i("GroupChatPresenter",baseBean.toString());
                 getView().hideLoading();
-//                getView().onParticipateGroup(baseBean);
+                getView().onApplyGroup(baseBean);
             }
 
             @Override
@@ -99,7 +121,6 @@ public class GroupChatPresenter extends GroupChatContract.Presenter {
                 LogUtils.i("GroupChatPresenter",baseBean.toString());
                 getView().hideLoading();
                 getView().onGroupDetail(baseBean.Data);
-//                getView().onParticipateGroup(baseBean);
             }
 
             @Override

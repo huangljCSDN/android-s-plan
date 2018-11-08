@@ -20,10 +20,12 @@ public interface GroupChatContract {
         void onGroupDetail(GroupDetailBean detailBean);
         void onParticipateGroup(BaseBean baseBean);
         void onApplyGroup(BaseBean baseBean);
+        void onExitGroup(BaseBean baseBean);
     }
 
     abstract class Model extends BaseModel {
         public abstract void joinGroup(@QueryMap Map<String, String> map, RequestCallBack requestCallBack);
+        public abstract void exitGroup(@QueryMap Map<String, String> map, RequestCallBack requestCallBack);
         public abstract void participateGroup(@QueryMap Map<String, String> map, RequestCallBack requestCallBack);
         public abstract void applyGroup(@QueryMap Map<String, String> map, RequestCallBack requestCallBack);
         public abstract void groupDetails(@QueryMap Map<String, String> map, RequestCallBack requestCallBack);
@@ -31,6 +33,7 @@ public interface GroupChatContract {
 
     abstract class Presenter extends BasePresenter<View> {
         public abstract void joinGroup(@QueryMap Map<String, String> map);
+        public abstract void exitGroup(@QueryMap Map<String, String> map);
         public abstract void participateGroup(@QueryMap Map<String, String> map);
         public abstract void applyGroup(@QueryMap Map<String, String> map);
         public abstract void groupDetails(@QueryMap Map<String, String> map);

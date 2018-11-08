@@ -185,6 +185,22 @@ public class BaseJsInterface {
         startWebViewActivity(goViewBeaan.getUrlPort());
     }
 
+    @JavascriptInterface
+    public void openInPutText() {
+        LogUtils.i("openInPutText=");
+        if(onJsInterfaceCallBack != null){
+            onJsInterfaceCallBack.openInPutText();
+        }
+    }
+
+    @JavascriptInterface
+    public void openInPutText(String json) {
+        LogUtils.i("openInPutText=");
+        if(onJsInterfaceCallBack != null){
+            onJsInterfaceCallBack.openInPutText();
+        }
+    }
+
     /**
      * 改变状态栏颜色
      *
@@ -192,6 +208,20 @@ public class BaseJsInterface {
      */
     @JavascriptInterface
     public void updateTintColor(String color) {
+    }
+
+    public interface OnJsInterfaceCallBack{
+        void openInPutText();
+    }
+
+    public OnJsInterfaceCallBack onJsInterfaceCallBack;
+
+    public OnJsInterfaceCallBack getOnJsInterfaceCallBack() {
+        return onJsInterfaceCallBack;
+    }
+
+    public void setOnJsInterfaceCallBack(OnJsInterfaceCallBack onJsInterfaceCallBack) {
+        this.onJsInterfaceCallBack = onJsInterfaceCallBack;
     }
 
     private void startGroupChatActivity(ChatBean chatBean) {

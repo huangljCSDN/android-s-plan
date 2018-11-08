@@ -175,6 +175,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         findViewById(R.id.iv_remove).setOnClickListener(this);
         findViewById(R.id.btn_enter).setOnClickListener(this);
         findViewById(R.id.fl_back).setOnClickListener(this);
+        findViewById(R.id.tv_invitation).setOnClickListener(this);
         mRlHeads.setOnClickListener(this);
 
         chatView = findViewById(R.id.chatView);
@@ -188,9 +189,9 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         chatView.setOnSendMessageListener(new com.markLove.Xplan.ui.widget.ChatView.OnSendMessageListener() {
             @Override
             public void onSendMessage(Message message) {
-                if (message.getChatType() == Message.ChatType.TXT){
+                if (message.getChatType() == Message.ChatType.TXT) {
                     TxtMessageBody txtMessageBody = (TxtMessageBody) message.getBody();
-                    mImChatControl.sendMessage(IMMessage.CONTENT_TYPE_TXT,txtMessageBody.getMsg());
+                    mImChatControl.sendMessage(IMMessage.CONTENT_TYPE_TXT, txtMessageBody.getMsg());
                 } else {
                     FileMessageBody fileMessageBody = (FileMessageBody) message.getBody();
                     sendVoice(fileMessageBody.getFilePath());
@@ -219,9 +220,9 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         });
         chatMessageAdapter.setOnOnAdapterCallBack(new GroupChatMessageAdapter.OnAdapterCallBack() {
             @Override
-            public void onAgree(int userId,int msgId) {
+            public void onAgree(int userId, int msgId) {
                 agreeMsgId = msgId;
-                participateGroup(userId,dataId);
+                participateGroup(userId, dataId);
             }
         });
     }
@@ -251,7 +252,11 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
                 startGroupMembersActivity();
                 break;
             case R.id.tv_invitation:
-                startInvitingFriendsActivity();
+                if (groupBean.getCurrentNum() == groupBean.getMaxNum()) {
+                    ToastUtils.showLong(this, "该组局已满员");
+                } else {
+                    startInvitingFriendsActivity();
+                }
                 break;
             case R.id.fl_back:
                 finish();
@@ -324,6 +329,17 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         Map<String, String> map = new HashMap<>();
         map.put("groupId", String.valueOf(dataId));
         mPresenter.joinGroup(map);
+    }
+
+    /**
+     * 退出组局
+     *
+     * @param dataId
+     */
+    private void exitGroup() {
+        Map<String, String> map = new HashMap<>();
+        map.put("groupId", String.valueOf(dataId));
+        mPresenter.exitGroup(map);
     }
 
     /**
@@ -547,7 +563,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     public void onImageReturn(Uri uri, String filePath, boolean isOrigin) {
 //        String filePath = autoCameraUtils.getPath(this, uri);
         String fileName = filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length());
-        final Message imgMsg = Message.createImageMessage(Message.Type.CHAT, me_user_id, to_user_id, fileName,"",filePath);
+        final Message imgMsg = Message.createImageMessage(Message.Type.CHAT, me_user_id, to_user_id, fileName, "", filePath);
         imgMsg.setStatus(Message.ChatStatus.SENDING);
         isOrigin = true;
         if (isOrigin) {
@@ -831,14 +847,14 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 
     private void showExitTipDialog() {
         ExitRoomDialog exitRoomDialog = new ExitRoomDialog(this);
-        exitRoomDialog.setTipContent(getString(R.string.exit_group_chat_room));
         exitRoomDialog.setOnDialogCallBack(new ExitRoomDialog.OnDialogCallBack() {
             @Override
             public void onCallBack(String content) {
-                finish();
+                exitGroup();
             }
         });
         exitRoomDialog.show();
+        exitRoomDialog.setTipContent(getString(R.string.exit_group_chat_room));
     }
 
     /**
@@ -991,7 +1007,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
         //未开始
         if (groupBean.getStatus() == 0) {
             //组局创建人
-            if (me_user_id == groupBean.getId()) {
+            if (me_user_id == groupBean.getCreateBy()) {
                 mTvInvitation.setVisibility(View.VISIBLE);
                 mBtnJoin.setVisibility(View.GONE);
             } else {
@@ -1067,11 +1083,13 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 
     @Override
     public void onParticipateGroup(BaseBean baseBean) {
-        if (baseBean.Status == 200){
-           IMMessage imMessage = DbManager.getInstance(this).loadIMMessageByLocalId(agreeMsgId);
-           imMessage.setIsAgree(true);
-           imMessage.update();
-           chatMessageAdapter.refreshAgreeMessageStatus(agreeMsgId);
+        if (baseBean.Status == 200) {
+            IMMessage imMessage = DbManager.getInstance(this).loadIMMessageByLocalId(agreeMsgId);
+            imMessage.setIsAgree(true);
+            imMessage.update();
+            chatMessageAdapter.refreshAgreeMessageStatus(agreeMsgId);
+        } else {
+            toast("同意报名失败!");
         }
     }
 
@@ -1082,13 +1100,24 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
             mBtnJoin.setTextColor(getColor(R.color.color_333333));
             mBtnJoin.setBackgroundResource(R.drawable.bg_joined);
             mBtnJoin.setClickable(false);
+        } else {
+            toast("申请加入组局失败!，请重新申请。");
+        }
+    }
+
+    @Override
+    public void onExitGroup(BaseBean baseBean) {
+        if (baseBean.Status == 200) {
+            finish();
+        } else {
+            toast("退出组局失败!");
         }
     }
 
     /**
      * 报名成功
      */
-    public void showJoinSuccess(){
+    public void showJoinSuccess() {
         mBtnJoin.setText(getString(R.string.joined_success));
         mBtnJoin.setTextColor(getColor(R.color.white));
         mBtnJoin.setBackgroundResource(R.drawable.bg_enter);
@@ -1386,14 +1415,14 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     @Override
     public void onFileTransferSuccess(long localId) {
         LogUtils.i("huang", "onFileTransferSuccess=");
-        chatMessageAdapter.refreshMessageStatus(localId,IMMessage.STATUS_SUCCESS,IMMessage.STATUS_SUCCESS);
+        chatMessageAdapter.refreshMessageStatus(localId, IMMessage.STATUS_SUCCESS, IMMessage.STATUS_SUCCESS);
     }
 
     @Override
     public void onFileTransferFailed(long localId) {
         LogUtils.i("huang", "onFileTransferFailed=");
-        chatMessageAdapter.refreshMessageStatus(localId,IMMessage.STATUS_FAIL,IMMessage.STATUS_FAIL);
-        ToastUtils.showLong(this,R.string.send_fail);
+        chatMessageAdapter.refreshMessageStatus(localId, IMMessage.STATUS_FAIL, IMMessage.STATUS_FAIL);
+        ToastUtils.showLong(this, R.string.send_fail);
     }
 
     @Override
@@ -1409,14 +1438,14 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
     @Override
     public void onSendMessageSuccessCallBack(long localId) {
         LogUtils.i("huang", "onSendMessageSuccessCallBack=");
-        chatMessageAdapter.refreshMessageStatus(localId,IMMessage.STATUS_SUCCESS,IMMessage.STATUS_SUCCESS);
+        chatMessageAdapter.refreshMessageStatus(localId, IMMessage.STATUS_SUCCESS, IMMessage.STATUS_SUCCESS);
     }
 
     @Override
     public void onSendMessageFaileCallBack(long localId) {
         LogUtils.i("huang", "onSendMessageFaileCallBack=");
-        chatMessageAdapter.refreshMessageStatus(localId,IMMessage.STATUS_FAIL,IMMessage.STATUS_DEFAULT);
-        ToastUtils.showLong(this,R.string.send_fail);
+        chatMessageAdapter.refreshMessageStatus(localId, IMMessage.STATUS_FAIL, IMMessage.STATUS_DEFAULT);
+        ToastUtils.showLong(this, R.string.send_fail);
     }
 
     @Override

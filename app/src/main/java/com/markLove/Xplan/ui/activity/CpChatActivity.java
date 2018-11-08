@@ -53,6 +53,7 @@ import com.markLove.Xplan.utils.DensityUtils;
 import com.markLove.Xplan.utils.ImageUtils;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
+import com.markLove.Xplan.utils.StatusBarUtil;
 import com.markLove.Xplan.utils.ToastUtils;
 import com.networkengine.controller.callback.RouterCallback;
 import com.networkengine.database.table.Member;
@@ -62,11 +63,11 @@ import com.xsimple.im.control.IMChatLogic;
 import com.xsimple.im.control.MessagerLoader;
 import com.xsimple.im.control.iable.IIMChatLogic;
 import com.xsimple.im.control.listener.IMChatCallBack;
+import com.xsimple.im.db.DbManager;
 import com.xsimple.im.db.datatable.IMChat;
 import com.xsimple.im.db.datatable.IMGroupRemark;
 import com.xsimple.im.db.datatable.IMMessage;
 import com.xsimple.im.engine.IMEngine;
-import com.xsimple.im.engine.protocol.IMCommand;
 import com.xsimple.im.event.ExitGroupEvent;
 
 import org.greenrobot.eventbus.EventBus;
@@ -130,7 +131,7 @@ public class CpChatActivity extends BaseActivity<UserOperationPresenter> impleme
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        fullScreen(this);
+        StatusBarUtil.setStatusBarColor(this,R.color.color_12032C);
         rlChatMsgList = findViewById(R.id.chat_msg_list);
         mRlTitleBar = findViewById(R.id.rl_title_bar);
         mRlCancel = findViewById(R.id.rl_cancel);
@@ -195,8 +196,15 @@ public class CpChatActivity extends BaseActivity<UserOperationPresenter> impleme
             mTvCare.setBackground(getDrawable(R.drawable.bg_care_gray));
             mTvCare.setClickable(false);
         } else {
-            finish();
+            finishActivity();
         }
+    }
+
+    private void finishActivity(){
+        if (mImChat != null){
+            DbManager.getInstance(this).deleteIMChat(mImChat.getId());
+        }
+        finish();
     }
 
     @Override
@@ -229,7 +237,7 @@ public class CpChatActivity extends BaseActivity<UserOperationPresenter> impleme
                         if(!isCared){
                             showCareDialog();
                         } else {
-                            finish();
+                            finishActivity();
                         }
                     }
                     break;
@@ -829,7 +837,7 @@ public class CpChatActivity extends BaseActivity<UserOperationPresenter> impleme
                     isFinish = true;
                     requestFocus();
                 } else {
-                    finish();
+                    finishActivity();
                 }
             }
         });
@@ -845,7 +853,7 @@ public class CpChatActivity extends BaseActivity<UserOperationPresenter> impleme
         exitRoomDialog.setOnDialogCallBack(new ExitRoomDialog.OnDialogCallBack() {
             @Override
             public void onCallBack(String content) {
-                finish();
+                finishActivity();
             }
         });
         exitRoomDialog.show();
@@ -859,7 +867,7 @@ public class CpChatActivity extends BaseActivity<UserOperationPresenter> impleme
         otherExitRoomDialog.setOnDialogCallBack(new OtherExitRoomDialog.OnDialogCallBack() {
             @Override
             public void onCallBack(String content) {
-                finish();
+                finishActivity();
             }
         });
         otherExitRoomDialog.setCanceledOnTouchOutside(false);
@@ -1052,12 +1060,12 @@ public class CpChatActivity extends BaseActivity<UserOperationPresenter> impleme
         if (mImChatControl == null) {
             Toast.makeText(this, "启动聊天页面失败", Toast.LENGTH_SHORT).show();
             LogUtils.e("聊天器控制器 is null");
-            finish();
+            finishActivity();
             return;
         }
         if (mImChatControl.getMyUid() == null) {
             LogUtils.e("启动聊天页面失败>>>>用户为空----> 自己");
-            finish();
+            finishActivity();
             return;
         }
 
@@ -1285,7 +1293,7 @@ public class CpChatActivity extends BaseActivity<UserOperationPresenter> impleme
         if (imChat != null) {
             imChat.delete();
         }
-        finish();
+        finishActivity();
     }
 
     public void onRefresfItemAddList(List<IMMessage> list) {

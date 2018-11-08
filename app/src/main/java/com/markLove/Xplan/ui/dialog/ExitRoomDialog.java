@@ -23,7 +23,7 @@ public class ExitRoomDialog extends AlertDialog implements View.OnClickListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_exit_room);
-        tvTip = findViewById(R.id.tv_tip_content);
+        tvTip = findViewById(R.id.tv_tip_content1);
         findViewById(R.id.tv_sure).setOnClickListener(this);
         findViewById(R.id.tv_cancel).setOnClickListener(this);
     }

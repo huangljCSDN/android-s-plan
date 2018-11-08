@@ -11,6 +11,7 @@ import com.amap.api.location.AMapLocation;
 import com.cjt2325.cameralibrary.util.LogUtil;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.App;
+import com.markLove.Xplan.base.BaseJsInterface;
 import com.markLove.Xplan.base.ui.BaseFragment;
 import com.markLove.Xplan.bean.MerchantBean;
 import com.markLove.Xplan.bean.NearUserBean;
@@ -20,11 +21,11 @@ import com.markLove.Xplan.module.CircleRecyclerView.CircularViewMode;
 import com.markLove.Xplan.module.CircleRecyclerView.ItemViewMode;
 import com.markLove.Xplan.mvp.contract.SearchContract;
 import com.markLove.Xplan.mvp.presenter.SearchPresenter;
-import com.markLove.Xplan.ui.activity.GoodPlayActivity;
 import com.markLove.Xplan.ui.activity.LoverActivity;
 import com.markLove.Xplan.ui.activity.MerchantInfoActivity;
 import com.markLove.Xplan.ui.activity.PlayersActivity;
 import com.markLove.Xplan.ui.activity.UserInfoActivity;
+import com.markLove.Xplan.ui.activity.WebViewActivity;
 import com.markLove.Xplan.ui.adapter.MerchantListAdapter;
 import com.markLove.Xplan.ui.adapter.UserListAdapter;
 import com.markLove.Xplan.utils.GsonUtils;
@@ -337,7 +338,10 @@ public class SearchFragment extends BaseFragment<SearchPresenter> implements Vie
     }
 
     private void startPlayActivity() {
-        Intent intent = new Intent(getContext(), GoodPlayActivity.class);
+//        Intent intent = new Intent(getContext(), GoodPlayActivity.class);
+        Intent intent = new Intent(getContext(), WebViewActivity.class);
+        intent.putExtra("url", BaseJsInterface.PLAY_INFO_URL);
+        intent.putExtra("isAll",true);
         startActivity(intent);
     }
 
