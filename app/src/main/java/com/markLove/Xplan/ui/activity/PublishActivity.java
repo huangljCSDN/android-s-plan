@@ -32,7 +32,6 @@ import com.markLove.Xplan.bean.msg.Message;
 import com.markLove.Xplan.bean.msg.body.FileMessageBody;
 import com.markLove.Xplan.config.Constants;
 import com.markLove.Xplan.module.emoji.EmojiUtils;
-import com.markLove.Xplan.module.image.IImageCompressor;
 import com.markLove.Xplan.mvp.contract.FileContract;
 import com.markLove.Xplan.mvp.contract.PublishContract;
 import com.markLove.Xplan.mvp.presenter.FilePresenter;
@@ -44,7 +43,6 @@ import com.markLove.Xplan.ui.widget.ChatViewForPublish;
 import com.markLove.Xplan.utils.AudioUtils;
 import com.markLove.Xplan.utils.FileUtils;
 import com.markLove.Xplan.utils.ImageLoaderUtils;
-import com.markLove.Xplan.utils.ImageUtils;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
 import com.markLove.Xplan.utils.StatusBarUtil;
@@ -56,14 +54,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * 发布动态
@@ -470,61 +460,61 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
             mediaList.add(media);
             gridAdapter.setData(mediaList);
         } else {
-            Observable.create(new ObservableOnSubscribe<Message>() {
-                @Override
-                public void subscribe(final ObservableEmitter<Message> emitter) throws Exception {
-                    final FileMessageBody imgMessageBody = (FileMessageBody) imgMsg.getBody();
-                    final String outPath = Constants.LOCAL_IMG_PATH + imgMessageBody.getFileName();
-                    LogUtils.i("huang", "outPath=" + outPath);
-                    ImageUtils.compressImageInPath(imgMessageBody.getFilePath(), Constants.LOCAL_IMG_PATH, new IImageCompressor.OnImageCompressListener() {
-                        @Override
-                        public void onCompressStart(String msg) {
-
-                        }
-
-                        @Override
-                        public void onCompressComplete(List<String> destFilePaths) {
-                            if (destFilePaths != null && destFilePaths.size() > 0) {
-                                LogUtils.i("huang", "destFilePaths=" + destFilePaths.get(0));
-                                imgMessageBody.setFilePath(outPath);
-                                emitter.onNext(imgMsg);
-                                emitter.onComplete();
-                            }
-                        }
-
-                        @Override
-                        public void onCompressError(String msg) {
-
-                        }
-                    });
-                }
-            }).subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Observer<Message>() {
-                        @Override
-                        public void onSubscribe(Disposable d) {
-
-                        }
-
-                        @Override
-                        public void onNext(Message message) {
-                            FileMessageBody imgMessageBody = (FileMessageBody) imgMsg.getBody();
-//                            String outPath = Constants.LOCAL_IMG_PATH + imgMessageBody.getFileName();
-                            Media media = new Media(imgMessageBody.getFilePath(), "", 0, 1, 999, 9999, "");
-                            mediaList.add(media);
-                            gridAdapter.setData(mediaList);
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-
-                        }
-
-                        @Override
-                        public void onComplete() {
-
-                        }
-                    });
+//            Observable.create(new ObservableOnSubscribe<Message>() {
+//                @Override
+//                public void subscribe(final ObservableEmitter<Message> emitter) throws Exception {
+//                    final FileMessageBody imgMessageBody = (FileMessageBody) imgMsg.getBody();
+//                    final String outPath = Constants.LOCAL_IMG_PATH + imgMessageBody.getFileName();
+//                    LogUtils.i("huang", "outPath=" + outPath);
+//                    ImageUtils.compressImageInPath(imgMessageBody.getFilePath(), Constants.LOCAL_IMG_PATH, new IImageCompressor.OnImageCompressListener() {
+//                        @Override
+//                        public void onCompressStart(String msg) {
+//
+//                        }
+//
+//                        @Override
+//                        public void onCompressComplete(List<String> destFilePaths) {
+//                            if (destFilePaths != null && destFilePaths.size() > 0) {
+//                                LogUtils.i("huang", "destFilePaths=" + destFilePaths.get(0));
+//                                imgMessageBody.setFilePath(outPath);
+//                                emitter.onNext(imgMsg);
+//                                emitter.onComplete();
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onCompressError(String msg) {
+//
+//                        }
+//                    });
+//                }
+//            }).subscribeOn(Schedulers.io())
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .subscribe(new Observer<Message>() {
+//                        @Override
+//                        public void onSubscribe(Disposable d) {
+//
+//                        }
+//
+//                        @Override
+//                        public void onNext(Message message) {
+//                            FileMessageBody imgMessageBody = (FileMessageBody) imgMsg.getBody();
+////                            String outPath = Constants.LOCAL_IMG_PATH + imgMessageBody.getFileName();
+//                            Media media = new Media(imgMessageBody.getFilePath(), "", 0, 1, 999, 9999, "");
+//                            mediaList.add(media);
+//                            gridAdapter.setData(mediaList);
+//                        }
+//
+//                        @Override
+//                        public void onError(Throwable e) {
+//
+//                        }
+//
+//                        @Override
+//                        public void onComplete() {
+//
+//                        }
+//                    });
         }
     }
 

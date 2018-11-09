@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import top.zibin.luban.CompressionPredicate;
+import top.zibin.luban.Luban;
 import top.zibin.luban.OnCompressListener;
 
 public class MineFragment extends BaseFragment<FilePresenter> implements FileContract.View{
@@ -207,7 +208,7 @@ public class MineFragment extends BaseFragment<FilePresenter> implements FileCon
         final int size = photos.size();
 
         if (photos.size() == 0) return;
-            top.zibin.luban.Luban.with(getContext())
+            Luban.with(getContext())
                     .load(photos)
                     .ignoreBy(100)
                     .setTargetDir(Constants.LOCAL_IMG_PATH) //缓存路径
@@ -236,6 +237,8 @@ public class MineFragment extends BaseFragment<FilePresenter> implements FileCon
 
                         @Override
                         public void onError(Throwable e) {
+                            LogUtils.e("huang",e.toString());
+//                            e.printStackTrace();
                         }
 
                     }).launch();

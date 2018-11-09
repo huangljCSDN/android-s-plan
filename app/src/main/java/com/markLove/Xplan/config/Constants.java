@@ -1,8 +1,6 @@
 package com.markLove.Xplan.config;
 
-import android.os.Environment;
-
-import java.io.File;
+import com.networkengine.util.FilePathUtils;
 
 /**
  * Created by Administrator on 2017/10/26.
@@ -10,15 +8,21 @@ import java.io.File;
 
 public class Constants {
 
-    public static final String LOCAL_IMG_PATH = Environment.getExternalStorageDirectory().getAbsolutePath()
-            + File.separator + "com.marklove.xplan"
-            + File.separator + "img"
-            + File.separator;
+//    public static final String LOCAL_IMG_PATH = Environment.getExternalStorageDirectory().getAbsolutePath()
+//            + File.separator + "com.markLove.Xplan"
+//            + File.separator + "img"
+//            + File.separator;
 
-    public static final String LOCAL_VOICE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath()
-            + File.separator + "com.marklove.xplan"
-            + File.separator + "voice"
-            + File.separator;
+//    public static final String LOCAL_VOICE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath()
+//            + File.separator + "com.markLove.Xplan"
+//            + File.separator + "voice"
+//            + File.separator;
+
+    public static final String LOCAL_IMG_PATH =  FilePathUtils.getSDIntance().mkdirsSubFile(FilePathUtils.IMAGE_PATH_NAME);
+
+    public static final String LOCAL_VOICE_PATH =  FilePathUtils.getSDIntance().mkdirsSubFile(FilePathUtils.RECORD_PATH_NAME);
+
+    public static final String LOCAL_VIDEO_PATH =  FilePathUtils.getSDIntance().mkdirsSubFile(FilePathUtils.VIDEO_PATH_NAME);
 
     public static final String BASE_NET_URL = "http://webapi.markmylove.com";
 //    public static final String BASE_NET_URL = "http://apps.markmylove.com";

@@ -6,10 +6,6 @@ import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.util.Base64;
 
-import com.markLove.Xplan.base.App;
-import com.markLove.Xplan.module.image.IImageCompressor;
-import com.markLove.Xplan.module.image.ImageCompressorFactory;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -29,11 +25,11 @@ public class ImageUtils {
      * @param outDirPath
      * @return
      */
-    public static void compressImageInPath(String inPath, String outDirPath, IImageCompressor.OnImageCompressListener listener) {
-        ImageCompressorFactory.getCompressor().
-                init(App.getInstance(), outDirPath, inPath)
-                .setOnImageCompressListener(listener).startCompress();
-    }
+//    public static void compressImageInPath(String inPath, String outDirPath, IImageCompressor.OnImageCompressListener listener) {
+//        ImageCompressorFactory.getCompressor().
+//                init(App.getInstance(), outDirPath, inPath)
+//                .setOnImageCompressListener(listener).startCompress();
+//    }
 
     /**
      * 获取图片文件的信息，是否旋转了90度，如果是则反转

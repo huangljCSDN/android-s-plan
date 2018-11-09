@@ -5,7 +5,6 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -20,8 +19,7 @@ import com.cjt2325.cameralibrary.util.FileUtil;
 import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.mvp.BasePresenter;
 import com.markLove.Xplan.base.ui.BaseActivity;
-
-import java.io.File;
+import com.markLove.Xplan.config.Constants;
 
 public class CameraActivity extends BaseActivity {
     private JCameraView jCameraView;
@@ -33,7 +31,8 @@ public class CameraActivity extends BaseActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         jCameraView = (JCameraView) findViewById(R.id.jcameraview);
         //设置视频保存路径
-        jCameraView.setSaveVideoPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "xplan" + File.separator + "camera");
+//        jCameraView.setSaveVideoPath(Environment.getExternalStorageDirectory().getPath() + File.separator + "xplan" + File.separator + "camera");
+        jCameraView.setSaveVideoPath(Constants.LOCAL_VIDEO_PATH);
         int type = getIntent().getIntExtra("type",JCameraView.BUTTON_STATE_BOTH);
         jCameraView.setFeatures(type);
         if (type == JCameraView.BUTTON_STATE_BOTH){
