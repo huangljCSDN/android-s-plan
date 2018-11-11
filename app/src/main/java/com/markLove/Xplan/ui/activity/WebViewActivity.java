@@ -26,6 +26,7 @@ import com.markLove.Xplan.R;
 import com.markLove.Xplan.base.App;
 import com.markLove.Xplan.base.BaseJsInterface;
 import com.markLove.Xplan.base.ui.BaseActivity;
+import com.markLove.Xplan.bean.ChatBean;
 import com.markLove.Xplan.bean.GoImgLibraryBean;
 import com.markLove.Xplan.bean.GoPhotoBean;
 import com.markLove.Xplan.bean.GoPhotoFilesBean;
@@ -39,6 +40,9 @@ import com.markLove.Xplan.utils.KeyboardUtils;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
 import com.markLove.Xplan.utils.StatusBarUtil;
+import com.xsimple.im.db.DbManager;
+import com.xsimple.im.db.datatable.IMBoxMessage;
+import com.xsimple.im.db.datatable.IMOfficialMessage;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -48,7 +52,8 @@ import java.util.List;
 import top.zibin.luban.CompressionPredicate;
 import top.zibin.luban.OnCompressListener;
 
-public class WebViewActivity extends BaseActivity<FilePresenter>  implements FileContract.View {
+public class WebViewActivity extends BaseActivity<FilePresenter> implements FileContract.View {
+    private static final String TAG = "WebViewActivity";
     private MyWebView mWebView;
     private String url;
     GoPhotoBean goPhotoBean;
@@ -77,14 +82,14 @@ public class WebViewActivity extends BaseActivity<FilePresenter>  implements Fil
         LinearLayout mll = findViewById(R.id.rootView);
         mll.addView(mWebView);
 
-        isAll = getIntent().getBooleanExtra("isAll",false);
+        isAll = getIntent().getBooleanExtra("isAll", false);
         url = getIntent().getStringExtra("url");
         jsInterface = new JSInterface(this);
         mWebView.addJavascriptInterface(jsInterface, "xplanfunc");
-        if (isAll){
+        if (isAll) {
             mWebView.loadUrl(url);
         } else {
-            mWebView.loadUrl("file:///android_asset/"+url);
+            mWebView.loadUrl("file:///android_asset/" + url);
         }
 
         editText = findViewById(R.id.et_input_msg2);
@@ -120,18 +125,19 @@ public class WebViewActivity extends BaseActivity<FilePresenter>  implements Fil
         initSoftKeyboard();
     }
 
-    private void sendCommend(){
+    private void sendCommend() {
         String content = editText.getText().toString().trim();
-        HashMap<String,String> map = new HashMap<>();
-        map.put("text",content);
+        HashMap<String, String> map = new HashMap<>();
+        map.put("text", content);
         String json = GsonUtils.obj2Json(map);
-        mWebView.loadUrl("javascript:openInPutTextFinish("+json+")");
+        mWebView.loadUrl("javascript:openInPutTextFinish(" + json + ")");
         editText.setText("");
         llEdit.setVisibility(View.GONE);
     }
 
     //设置软键盘弹起和关闭的监听
     int usableHeightPrevious = 0;
+
     private void initSoftKeyboard() {
         getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -176,7 +182,7 @@ public class WebViewActivity extends BaseActivity<FilePresenter>  implements Fil
         public void goPhoto(String json) {
             goPhotoBean = GsonUtils.json2Bean(json, GoPhotoBean.class);
             type = 1;
-            PreferencesUtils.putString(WebViewActivity.this, Constants.TOKEN_KEY,goPhotoBean.getToken());
+            PreferencesUtils.putString(WebViewActivity.this, Constants.TOKEN_KEY, goPhotoBean.getToken());
             startCameraActivity();
         }
 
@@ -185,8 +191,40 @@ public class WebViewActivity extends BaseActivity<FilePresenter>  implements Fil
         public void fromImgLibrary(String json) {
             type = 2;
             goImgLibraryBean = GsonUtils.json2Bean(json, GoImgLibraryBean.class);
-            PreferencesUtils.putString(WebViewActivity.this,Constants.TOKEN_KEY,goImgLibraryBean.getToken());
+            PreferencesUtils.putString(WebViewActivity.this, Constants.TOKEN_KEY, goImgLibraryBean.getToken());
             startSinglePickerActivity();
+        }
+
+        /**
+         * 获取所有的盒子消息
+         */
+        @JavascriptInterface
+        public void getBoxMessageList(String json) {
+            LogUtils.i(TAG, "getBoxMessageList=" + json.toString());
+            final ChatBean chatBean = GsonUtils.json2Bean(json, ChatBean.class);
+            final List<IMBoxMessage> imBoxMessageList = DbManager.getInstance(WebViewActivity.this).loadBoxIMMessage(chatBean.getId());
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mWebView.loadUrl("javascript:" + chatBean.getsCallback() + "(" + GsonUtils.obj2Json(imBoxMessageList) + ")");
+                }
+            });
+        }
+
+        /**
+         * 获取所有的官方消息方法
+         */
+        @JavascriptInterface
+        public void getOfficialMessageList(String json) {
+            LogUtils.i(TAG, "getOfficialMessageList=" + json.toString());
+            final ChatBean chatBean = GsonUtils.json2Bean(json, ChatBean.class);
+            final List<IMOfficialMessage> imOfficialMessageList = DbManager.getInstance(WebViewActivity.this).loadOfficialIMMessage(chatBean.getId());
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mWebView.loadUrl("javascript:" + chatBean.getsCallback() + "(" + GsonUtils.obj2Json(imOfficialMessageList) + ")");
+                }
+            });
         }
     }
 
@@ -211,7 +249,7 @@ public class WebViewActivity extends BaseActivity<FilePresenter>  implements Fil
         }
     }
 
-    private void startCameraActivity2(){
+    private void startCameraActivity2() {
         Intent intent = new Intent(WebViewActivity.this, CameraActivity.class);
         intent.putExtra("type", JCameraView.BUTTON_STATE_ONLY_CAPTURE);
         startActivityForResult(intent, Constants.REQUEST_CODE_CAMERA);
@@ -225,9 +263,10 @@ public class WebViewActivity extends BaseActivity<FilePresenter>  implements Fil
 
     /**
      * 压缩图片
+     *
      * @param photos
      */
-    private void compressImg(List<String> photos){
+    private void compressImg(List<String> photos) {
         final List<File> files = new ArrayList<>();
         final int size = photos.size();
 
@@ -244,6 +283,7 @@ public class WebViewActivity extends BaseActivity<FilePresenter>  implements Fil
                 })
                 .setCompressListener(new OnCompressListener() {
                     int count = 0;
+
                     @Override
                     public void onStart() {
 
@@ -251,11 +291,11 @@ public class WebViewActivity extends BaseActivity<FilePresenter>  implements Fil
 
                     @Override
                     public void onSuccess(File file) {
-                        count ++;
+                        count++;
                         files.add(file);
-                        if (count == size){
+                        if (count == size) {
                             mPresenter.upload(files);
-                            count =0;
+                            count = 0;
                         }
                     }
 
@@ -283,7 +323,7 @@ public class WebViewActivity extends BaseActivity<FilePresenter>  implements Fil
                 ArrayList<String> photos = new ArrayList<>();
                 for (final Media media : select) {
                     LogUtils.i("media", media.toString());
-                    if (new File(media.path).exists()){
+                    if (new File(media.path).exists()) {
                         photos.add(media.path);
                         localFilePath = media.path;
                     }
@@ -297,38 +337,38 @@ public class WebViewActivity extends BaseActivity<FilePresenter>  implements Fil
     public void uploadSuccess(UploadFileBean bean) {
         hideLoading();
         ArrayList<String> paths = new ArrayList<>();
-        if (bean.getList() != null && !bean.getList().isEmpty()){
+        if (bean.getList() != null && !bean.getList().isEmpty()) {
             for (UploadFileBean.FileBean fileBean : bean.getList()) {
                 paths.add(fileBean.getPath());
             }
         }
 
-        LogUtils.i("huang","localFilePath="+localFilePath);
-        if (type == 1 && goPhotoBean != null){
+        LogUtils.i("huang", "localFilePath=" + localFilePath);
+        if (type == 1 && goPhotoBean != null) {
             File file = new File(localFilePath);
             String netUrl = paths.get(0);
-            if (!file.exists()){
+            if (!file.exists()) {
                 try {
                     file.createNewFile();
-                    fileToJs(file,netUrl,goPhotoBean.getsCallback());
-                } catch (Exception e){
+                    fileToJs(file, netUrl, goPhotoBean.getsCallback());
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             } else {
-                fileToJs(file,netUrl,goPhotoBean.getsCallback());
+                fileToJs(file, netUrl, goPhotoBean.getsCallback());
             }
-        } else if (type == 2 && goImgLibraryBean != null){
+        } else if (type == 2 && goImgLibraryBean != null) {
             File file = new File(localFilePath);
             String netUrl = paths.get(0);
-            if (!file.exists()){
+            if (!file.exists()) {
                 try {
                     file.createNewFile();
-                    fileToJs(file,netUrl,goImgLibraryBean.getsCallback());
-                } catch (Exception e){
+                    fileToJs(file, netUrl, goImgLibraryBean.getsCallback());
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             } else {
-                fileToJs(file,netUrl,goImgLibraryBean.getsCallback());
+                fileToJs(file, netUrl, goImgLibraryBean.getsCallback());
             }
         }
     }
@@ -338,25 +378,25 @@ public class WebViewActivity extends BaseActivity<FilePresenter>  implements Fil
 
     }
 
-    private void fileToJs(File file,String netUrl,String callBackName){
+    private void fileToJs(File file, String netUrl, String callBackName) {
         GoPhotoFilesBean goPhotoFilesBean = new GoPhotoFilesBean();
         goPhotoFilesBean.setImgName(file.getName());
         goPhotoFilesBean.setImgPath(file.getAbsolutePath());
         goPhotoFilesBean.setUploadData(netUrl);
-        PreferencesUtils.putString(this,Constants.ME_HEAD_IMG_URL,netUrl);
-        String url = "javascript:"+callBackName+"(" + GsonUtils.obj2Json(goPhotoFilesBean) + ")";
-        LogUtils.i("url="+url);
-        mWebView.loadUrl("javascript:"+callBackName+"(" + GsonUtils.obj2Json(goPhotoFilesBean) + ")");
+        PreferencesUtils.putString(this, Constants.ME_HEAD_IMG_URL, netUrl);
+        String url = "javascript:" + callBackName + "(" + GsonUtils.obj2Json(goPhotoFilesBean) + ")";
+        LogUtils.i("url=" + url);
+        mWebView.loadUrl("javascript:" + callBackName + "(" + GsonUtils.obj2Json(goPhotoFilesBean) + ")");
     }
 
 
-    private void finishActivity(){
+    private void finishActivity() {
 
     }
 
     @Override
     public void onBackPressed() {
-        if (mWebView.canGoBack()){
+        if (mWebView.canGoBack()) {
             mWebView.goBack();
         } else {
             super.onBackPressed();

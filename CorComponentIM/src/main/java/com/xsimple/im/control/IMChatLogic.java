@@ -317,7 +317,7 @@ public class IMChatLogic implements IIMChatLogic, IMObserver, Handler.Callback {
         if (mChat == null) {
             mChat = mImEngine.getDbManager().getChat(myUserId, mTargetMem.getUserId(), mTargetMem.getType());
             if (null == mChat) {
-                mChat = mImEngine.getDbManager().createChat(myUserId, mTargetMem.getUserId(), mTargetMem.getUserName(), mTargetMem.getType());
+                mChat = mImEngine.getDbManager().createChat(myUserId, mTargetMem.getUserId(), mTargetMem.getDataId(),mTargetMem.getUserName(), mTargetMem.getType());
             }
         }
         return mChat;
@@ -383,7 +383,6 @@ public class IMChatLogic implements IIMChatLogic, IMObserver, Handler.Callback {
      */
     @Override
     public void sendMessage(String msgType, String content) {
-
         IMMsgRequest localMsg = buildeTxtIMMsgRequest(msgType,content);
         mIMChatCallBack.onAddMessagerCallBack(localMsg.getIMessage());
         mImEngine.senIMTextMessage(localMsg, mIMChatCallBack);

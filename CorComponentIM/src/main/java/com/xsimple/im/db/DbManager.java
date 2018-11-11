@@ -370,7 +370,7 @@ public class DbManager {
         builder = mImBoxMessageDao.queryBuilder();
 
         builder.where(IMBoxMessageDao.Properties.CId.eq(chat_id))
-                .orderAsc(IMMessageDao.Properties.Time);
+                .orderDesc(IMBoxMessageDao.Properties.SendTimer);
         return builder.build().list();
     }
 
@@ -386,7 +386,7 @@ public class DbManager {
         builder = mImOfficialMessageDao.queryBuilder();
 
         builder.where(IMOfficialMessageDao.Properties.CId.eq(chat_id))
-                .orderAsc(IMMessageDao.Properties.Time);
+                .orderDesc(IMOfficialMessageDao.Properties.SendTimer);
         return builder.build().list();
     }
 
@@ -513,7 +513,7 @@ public class DbManager {
                     continue;
                 }
                 //自己跟自己聊天，文件助手
-                if (TextUtils.equals(chat.getSenderOrTarget1(), chat.getSenderOrTarget2()) && chat.getType() == sessionType) {
+                if (TextUtils.equals(chat.getSenderOrTarget1(), chat.getChatId()) && chat.getType() == sessionType) {
                     return chat;
                 }
             }
@@ -525,7 +525,7 @@ public class DbManager {
                 }
 
             /*在我的所有会话中，是否存在和target的会话*/
-                if ((chat.getSenderOrTarget1().equals(targetId) || chat.getSenderOrTarget2().equals(targetId)) && chat.getType() == sessionType) {
+                if ((chat.getSenderOrTarget1().equals(targetId) || chat.getChatId().equals(targetId)) && chat.getType() == sessionType) {
                     return chat;
                 }
             }
@@ -541,8 +541,8 @@ public class DbManager {
      * @param targetId 会话对方用户id
      * @param type     会话类型
      */
-    public IMChat createChat(String myId, String targetId, String targetName, @IMChat.SessionType int type) {
-        IMChat chat = new IMChat(myId, myId, type, targetName, 0, System.currentTimeMillis(), targetId, "", "");
+    public IMChat createChat(String myId, String targetId,String chatId, String targetName, @IMChat.SessionType int type) {
+        IMChat chat = new IMChat(myId, myId, type, targetName, 0, System.currentTimeMillis(), targetId,chatId, "", "");
         chat.setId(mChatDao.insert(chat));
         return chat;
     }
@@ -571,9 +571,9 @@ public class DbManager {
                 ＊ 会话中记录的发送者标签等于新消息中的接收者Id并且接收者标签等于新消息里的发送者Id 视为已经存在该会话了
                  * */
                 if ((chat.getSenderOrTarget1().equals(iMMessage.getSenderId())
-                        && chat.getSenderOrTarget2().equals(iMMessage.getTagertId())
+                        && chat.getChatId().equals(iMMessage.getTagertId())
                         || chat.getSenderOrTarget1().equals(iMMessage.getTagertId())
-                        && chat.getSenderOrTarget2().equals(iMMessage.getSenderId()))
+                        && chat.getChatId().equals(iMMessage.getSenderId()))
                         && chat.getType() == iMMessage.getType()) {
                     return chat;
                 }
@@ -591,7 +591,7 @@ public class DbManager {
                 }
 
                 /*群组消息是订阅后才能收到，如果能收到,一定和当前用户相关属于当前用户的会话，只用判断Target是否相等就能确定是不是同一个会话*/
-                if (chat.getSenderOrTarget2().equals(iMMessage.getTagertId())) {
+                if (chat.getChatId().equals(iMMessage.getTagertId())) {
                     return chat;
                 }
             }
@@ -699,7 +699,7 @@ public class DbManager {
                 chatName = IMEngine.getInstance(mContext).getIMGroup(iMMessage.getTagertId()).getName();
             }
 
-            IMChat newIMChat = new IMChat(uId, iMMessage.getSenderId(), iMMessage.getType(), chatName, 0, iMMessage.getTime(), iMMessage.getTagertId(), iMMessage.getReceiverName(), "");
+            IMChat newIMChat = new IMChat(uId, iMMessage.getSenderId(), iMMessage.getType(), chatName, 0, iMMessage.getTime(), iMMessage.getTagertId(),"", iMMessage.getReceiverName(), "");
             //设置消息的未阅读数量  消息为接收的消息
 //            if (iMMessage.getSendOrReceive() == IMMessage.ON_RECEIVE_IMMESSAGE) {
 //                newIMChat.setUnReadCount(1);
@@ -790,7 +790,7 @@ public class DbManager {
          /*是否为新会话要加入本地数据库*/
         if (chat == null) {
             String chatName = "系统消息";
-            IMChat newIMChat = new IMChat(imSysMessage.getCurrUserId(), "", IMChat.SESSION_SYSTEM_MSG, chatName, 1, imSysMessage.getReceivedTimer(), "", "", "");
+            IMChat newIMChat = new IMChat(imSysMessage.getCurrUserId(), "", IMChat.SESSION_SYSTEM_MSG, chatName, 1, imSysMessage.getReceivedTimer(), "", "","", "");
             Long chatId = mChatDao.insert(newIMChat);
             imSysMessage.setCId(chatId);
         } else {
@@ -831,7 +831,7 @@ public class DbManager {
         /*是否为新会话要加入本地数据库*/
         if (chat == null) {
             String chatName = "盒子小助手";
-            IMChat newIMChat = new IMChat(imBoxMessage.getUserId(), "", IMChat.SESSION_BOX_MSG, chatName, 1, imBoxMessage.getSendTimer(), "", "", "");
+            IMChat newIMChat = new IMChat(imBoxMessage.getUserId(), "", IMChat.SESSION_BOX_MSG, chatName, 1, imBoxMessage.getSendTimer(), "", "", "", "");
             Long chatId = mChatDao.insert(newIMChat);
             imBoxMessage.setCId(chatId);
         } else {
@@ -871,7 +871,7 @@ public class DbManager {
         /*是否为新会话要加入本地数据库*/
         if (chat == null) {
             String chatName = "官方消息";
-            IMChat newIMChat = new IMChat(imOfficialMessage.getUserId(), "", IMChat.SESSION_OFFICIAL_MSG, chatName, 1, imOfficialMessage.getSendTimer(), "", "", "");
+            IMChat newIMChat = new IMChat(imOfficialMessage.getUserId(), "", IMChat.SESSION_OFFICIAL_MSG, chatName, 1, imOfficialMessage.getSendTimer(), "", "", "", "");
             Long chatId = mChatDao.insert(newIMChat);
             imOfficialMessage.setCId(chatId);
         } else {
@@ -921,7 +921,7 @@ public class DbManager {
 
             String chatName = isSingleChatMessage(iMMessage) ? iMMessage.getSenderName() : iMMessage.getGroupName();
 
-            IMChat newIMChat = new IMChat(uId, iMMessage.getSenderId(), iMMessage.getType(), chatName, 0, iMMessage.getTime(), iMMessage.getTagertId(), iMMessage.getReceiverName(), "");
+            IMChat newIMChat = new IMChat(uId, iMMessage.getSenderId(), iMMessage.getType(), chatName, 0, iMMessage.getTime(), iMMessage.getTagertId(), "",iMMessage.getReceiverName(), "");
 
             newIMChat.setTime(iMMessage.getTime());
             Long chatId = mChatDao.insert(newIMChat);
@@ -1014,7 +1014,7 @@ public class DbManager {
         List<String> orderDesc = new ArrayList<>();
         if (list != null) {
             for (IMChat imChat : list) {
-                orderDesc.add(imChat.getSenderOrTarget2());
+                orderDesc.add(imChat.getChatId());
             }
         }
         return orderDesc;
@@ -1120,8 +1120,8 @@ public class DbManager {
     public void deleteIMChat(String sendId, String targetId) {
         QueryBuilder<IMChat> chatQueryBuilder = mChatDao.queryBuilder();
 
-        WhereCondition whereCondition1 = chatQueryBuilder.and(IMChatDao.Properties.SenderOrTarget1.eq(sendId), IMChatDao.Properties.SenderOrTarget2.eq(targetId));
-        WhereCondition whereCondition2 = chatQueryBuilder.and(IMChatDao.Properties.SenderOrTarget2.eq(sendId), IMChatDao.Properties.SenderOrTarget1.eq(targetId));
+        WhereCondition whereCondition1 = chatQueryBuilder.and(IMChatDao.Properties.SenderOrTarget1.eq(sendId), IMChatDao.Properties.ChatId.eq(targetId));
+        WhereCondition whereCondition2 = chatQueryBuilder.and(IMChatDao.Properties.ChatId.eq(sendId), IMChatDao.Properties.SenderOrTarget1.eq(targetId));
         List<IMChat> IMChats = mChatDao.queryBuilder().whereOr(whereCondition1, whereCondition2).list();
         mChatDao.deleteInTx(IMChats);
     }
@@ -1133,7 +1133,7 @@ public class DbManager {
     public void deleteIMChatByGroup(String muid, String groupid) {
         QueryBuilder<IMChat> chatQueryBuilder = mChatDao.queryBuilder();
 
-        WhereCondition whereCondition = chatQueryBuilder.and(IMChatDao.Properties.UId.eq(muid), IMChatDao.Properties.SenderOrTarget2.eq(groupid));
+        WhereCondition whereCondition = chatQueryBuilder.and(IMChatDao.Properties.UId.eq(muid), IMChatDao.Properties.ChatId.eq(groupid));
         List<IMChat> IMChats = mChatDao.queryBuilder().where(whereCondition).list();
         mChatDao.deleteInTx(IMChats);
     }
@@ -1355,7 +1355,7 @@ public class DbManager {
         imOfficialMessage.setUserId(msgEntity.getMsgContent().getUserId());
         imOfficialMessage.setSendTimer(Long.parseLong(msgEntity.getParam().getSendTime()));
         imOfficialMessage.setType(msgEntity.getMsgContent().getType());
-        imOfficialMessage.setTitle(msgEntity.getMsgContent().getGroupName());
+        imOfficialMessage.setTitle(msgEntity.getMsgContent().getTitle());
         imOfficialMessage.setContent(msgEntity.getMsgContent().getContent());
         imOfficialMessage.setImgUrl(msgEntity.getMsgContent().getImgUrl());
         imOfficialMessage.setNetUrl(msgEntity.getMsgContent().getNetUrl());
@@ -1375,7 +1375,7 @@ public class DbManager {
         imBoxMessage.setUserId(msgEntity.getMsgContent().getUserId());
         imBoxMessage.setSendTimer(Long.parseLong(msgEntity.getParam().getSendTime()));
         imBoxMessage.setType(msgEntity.getMsgContent().getType());
-        imBoxMessage.setTitle(msgEntity.getMsgContent().getGroupName());
+        imBoxMessage.setTitle(msgEntity.getMsgContent().getTitle());
         imBoxMessage.setContent(msgEntity.getMsgContent().getContent());
 
         if (mDbManager.addOrUpdateBoxMsgToChat(imBoxMessage)){

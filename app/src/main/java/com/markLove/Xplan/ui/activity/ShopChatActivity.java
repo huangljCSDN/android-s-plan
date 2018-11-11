@@ -713,15 +713,14 @@ public class ShopChatActivity extends BaseActivity<ShopChatPresenter> implements
     private void initIm(MerchantInfoBean merchantInfoBean){
         EventBus.getDefault().register(this);
         initMember();
-//        chatId = String.valueOf(getIntent().getIntExtra("chatId", 1));
-        chatId = "1";
+        chatId = String.valueOf(getIntent().getIntExtra("chatId", 1));
         mImEngine = IMEngine.getInstance(this);
         //聊天对象
 //        IMGroup group = mIMEngine.getIMGroup(id);
 //        IMChatActivity.startMe(getContext(), new MemEntity(group.getId(), group.getName(), group.getType()), null, null);
 
 //        final MemEntity memEntity = (MemEntity) getIntent().getSerializableExtra(EXTRA_TARGET);
-        final MemEntity memEntity = new MemEntity(chatId,merchantInfoBean.getGroupName(),1);
+        final MemEntity memEntity = new MemEntity(chatId, String.valueOf(dataId),merchantInfoBean.getGroupName(),IMChat.SESSION_GROUP_DISCUSSION);
         mImChatControl = new IMChatLogic.Build() {
             @Override
             public MemEntity setTargetMem() {

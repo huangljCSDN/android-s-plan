@@ -25,6 +25,7 @@ import com.markLove.Xplan.ui.activity.WebViewActivity;
 import com.markLove.Xplan.ui.widget.MyWebView;
 import com.markLove.Xplan.utils.GsonUtils;
 import com.markLove.Xplan.utils.LogUtils;
+import com.networkengine.util.LogUtil;
 import com.xsimple.im.db.DbManager;
 import com.xsimple.im.db.datatable.IMBoxMessage;
 import com.xsimple.im.db.datatable.IMChat;
@@ -36,10 +37,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MsgFragment extends BaseFragment {
+    private static final String TAG = "MsgFragment";
     private MyWebView mWebView;
     private DbManager dbManager;
     private long boxChatId;
     private long officialChatId;
+    private ChatBean chatBeanForMsgList;
 
     @Override
     protected int getContentViewLayoutID() {
@@ -69,27 +72,6 @@ public class MsgFragment extends BaseFragment {
             super(mActivity);
         }
 
-        // 被JS调用的方法必须加入@JavascriptInterface注解
-        @JavascriptInterface
-        public void toChatRoom(String json) {
-            LogUtils.i("huang", "toChatRoom=" + json);
-            ChatBean chatBean = GsonUtils.json2Bean(json, ChatBean.class);
-            switch (chatBean.getChatType()) {
-                case 1:
-                    startGroupChatActivity(chatBean.getChatId());
-                    break;
-                case 2:
-                    startShopChatActivity(chatBean.getChatId());
-                    break;
-                case 3:
-                    startCpChatActivity(chatBean.getChatId());
-                    break;
-                case 4:
-                    startSingleChatActivity(chatBean.getChatId());
-                    break;
-            }
-        }
-
         @JavascriptInterface
         public void goView(String json) {
             LogUtils.i("json=" + json);
@@ -99,44 +81,31 @@ public class MsgFragment extends BaseFragment {
         }
 
         /**
-         * 获取所有的盒子消息
-         */
-        @JavascriptInterface
-        private String getBoxMessageList() {
-            List<IMBoxMessage> imBoxMessageList = dbManager.loadBoxIMMessage(boxChatId);
-            return GsonUtils.obj2Json(imBoxMessageList);
-        }
-
-        /**
-         * 获取所有的官方消息方法
-         */
-        @JavascriptInterface
-        private String getOfficialMessageList() {
-            List<IMOfficialMessage> imOfficialMessageList = dbManager.loadOfficialIMMessage(officialChatId);
-            return GsonUtils.obj2Json(imOfficialMessageList);
-        }
-
-        /**
          * 获取消息列表
+         *
          * @return
          */
         @JavascriptInterface
-        private String getMessageInfo() {
-            return initMsgData();
+        public void getMessageInfo(String json) {
+            LogUtils.i(TAG, "getMessageInfo=" + json.toString());
+            chatBeanForMsgList = GsonUtils.json2Bean(json, ChatBean.class);
+            refreshMsgListData();
         }
 
         /**
          * 删除会话
+         *
          * @return
          */
         @JavascriptInterface
-        private void deleteChat(String json) {
-            MsgBean msgBean = GsonUtils.json2Bean(json,MsgBean.class);
-            if (msgBean.type == IMChat.SESSION_GROUP_CLUSTER || msgBean.type == IMChat.SESSION_PERSON){
+        public void deleteChat(String json) {
+            MsgBean msgBean = GsonUtils.json2Bean(json, MsgBean.class);
+            if (msgBean.type == IMChat.SESSION_GROUP_CLUSTER || msgBean.type == IMChat.SESSION_GROUP_DISCUSSION
+                    || msgBean.type == IMChat.SESSION_PERSON) {
                 dbManager.deleteIMChat(msgBean.getId());
-            } else if (msgBean.type == IMChat.SESSION_BOX_MSG){
+            } else if (msgBean.type == IMChat.SESSION_BOX_MSG) {
                 dbManager.deleteBoxMessage(msgBean.getId());
-            } else if (msgBean.type == IMChat.SESSION_OFFICIAL_MSG){
+            } else if (msgBean.type == IMChat.SESSION_OFFICIAL_MSG) {
                 dbManager.deleteOfficialMessage(msgBean.getId());
             }
         }
@@ -145,7 +114,21 @@ public class MsgFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        mWebView.loadUrl("javascript:setMessageInfo(" + initMsgData() + ")");
+        refreshMsgListData();
+    }
+
+    /**
+     * 刷新消息列表数据
+     */
+    private void refreshMsgListData() {
+        if (chatBeanForMsgList != null) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mWebView.loadUrl("javascript:" + chatBeanForMsgList.getsCallback() + "(" + getMsgData() + ")");
+                }
+            });
+        }
     }
 
     /**
@@ -153,9 +136,11 @@ public class MsgFragment extends BaseFragment {
      *
      * @return
      */
-    private String initMsgData() {
+    private String getMsgData() {
         IMEngine mImEngine = IMEngine.getInstance(getContext());
         List<IMChat> chats = mImEngine.getChats(App.getInstance().getUserId());
+        if (chats == null || chats.size() <= 0) return "";
+
         //将盒子消息移到第一位
         for (int i = 0; i < chats.size(); i++) {
             IMChat chat = chats.get(i);
@@ -177,7 +162,8 @@ public class MsgFragment extends BaseFragment {
 
         //获取会话最后一条消息
         for (IMChat chat : chats) {
-            if (chat.getType() == IMChat.SESSION_GROUP_CLUSTER || chat.getType() == IMChat.SESSION_PERSON) {
+            if (chat.getType() == IMChat.SESSION_GROUP_CLUSTER || chat.getType() == IMChat.SESSION_GROUP_DISCUSSION
+                    || chat.getType() == IMChat.SESSION_PERSON) {
                 List<IMMessage> list = dbManager.loadLastMessage(chat.getId());
                 chat.setIMMessages(list);
             } else if (chat.getType() == IMChat.SESSION_BOX_MSG) {
@@ -190,14 +176,15 @@ public class MsgFragment extends BaseFragment {
                 chat.setIMOfficialMessage(list);
             }
         }
+        LogUtils.i(TAG, "chats=" + GsonUtils.obj2Json(chats));
         return GsonUtils.obj2Json(chats);
     }
 
     private void test() {
         IMBoxMessage imBoxMessage = new IMBoxMessage(Long.parseLong("0"), Long.parseLong("0"), "366930", (long) 213123, false, false, "box", "", "你被提出组局了");
-        LogUtils.i("huang", GsonUtils.obj2Json(imBoxMessage));
+        LogUtils.i(TAG, GsonUtils.obj2Json(imBoxMessage));
         IMOfficialMessage imOfficialMessage = new IMOfficialMessage((long) 0, (long) 0, "356665", "das15564789.png", "http://www.baidu.com", (long) 1515588845, false, false, "official", "这是标题", "给你送了大礼包了");
-        LogUtils.i("huang", GsonUtils.obj2Json(imOfficialMessage));
+        LogUtils.i(TAG, GsonUtils.obj2Json(imOfficialMessage));
         IMEngine mImEngine = IMEngine.getInstance(getContext());
         List<IMChat> chats = mImEngine.getChats(App.getInstance().getUserId());
         for (IMChat chat : chats) {
@@ -218,7 +205,7 @@ public class MsgFragment extends BaseFragment {
         imBoxMessages.add(imBoxMessage);
         chats.get(1).setIMOfficialMessage(officialMessages);
         chats.get(0).setIMBoxMessage(imBoxMessages);
-        LogUtils.i("huang", "chats=" + GsonUtils.obj2Json(chats));
+        LogUtils.i(TAG, "chats=" + GsonUtils.obj2Json(chats));
     }
 
     private void startWebViewActivity(String url) {
@@ -226,39 +213,6 @@ public class MsgFragment extends BaseFragment {
         intent.putExtra("url", url);
         startActivityForResult(intent, 200);
     }
-
-    private void startShopChatActivity(int id) {
-        Intent intent = new Intent(getContext(), ShopChatActivity.class);
-        intent.putExtra("chatId", id);
-        startActivity(intent);
-    }
-
-    private void startGroupChatActivity(int id) {
-        Intent intent = new Intent(getContext(), GroupChatActivity.class);
-        intent.putExtra("chatId", id);
-        startActivity(intent);
-    }
-
-    private void startSingleChatActivity(int id) {
-        Intent intent = new Intent(getContext(), SingleChatActivity.class);
-        intent.putExtra("chatId", id);
-        startActivity(intent);
-    }
-
-    private void startCpChatActivity(int id) {
-        Intent intent = new Intent(getContext(), CpChatActivity.class);
-        intent.putExtra("chatId", id);
-        startActivity(intent);
-    }
-
-//    @Override
-//    public void onBackPressed() {
-//        if (mWebView.canGoBack()){
-//            mWebView.goBack();
-//        } else {
-//            super.onBackPressed();
-//        }
-//    }
 
     @Override
     public void onDestroy() {

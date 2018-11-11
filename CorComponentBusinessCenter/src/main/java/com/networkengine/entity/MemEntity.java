@@ -9,11 +9,13 @@ import java.io.Serializable;
  */
 
 public class MemEntity implements Serializable {
-    //id
+    //id (个人id，店铺聊天室id，组局聊天室id)
     private String userId;
+    //组局/店铺id
+    private String dataId;
     //名字
     private String userName;
-    //类型，个人0 群组1 讨论组2
+    //类型，个人0,组局聊天室1 店铺聊天室2
     private int type;
     //头像地址
     private String imgUrl = "";
@@ -38,6 +40,13 @@ public class MemEntity implements Serializable {
         this.type = type;
     }
 
+    public MemEntity(String userId,String dataId, String userName, int type) {
+        this.userId = userId;
+        this.userName = userName;
+        this.type = type;
+        this.dataId = dataId;
+    }
+
     public MemEntity(String userId, String userName, int type, String imgUrl) {
         this.userId = userId;
         this.userName = userName;
@@ -56,6 +65,13 @@ public class MemEntity implements Serializable {
         this.organization = organization;
     }
 
+    public String getDataId() {
+        return dataId;
+    }
+
+    public void setDataId(String dataId) {
+        this.dataId = dataId;
+    }
 
     public String getUserId() {
         return userId;

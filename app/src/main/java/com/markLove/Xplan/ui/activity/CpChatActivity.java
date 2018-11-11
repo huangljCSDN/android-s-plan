@@ -728,7 +728,7 @@ public class CpChatActivity extends BaseActivity<UserOperationPresenter> impleme
 //        chatId = "369105";
         mImEngine = IMEngine.getInstance(this);
 
-        final MemEntity memEntity = new MemEntity(chatId,"",0);
+        final MemEntity memEntity = new MemEntity(chatId,"","",IMChat.SESSION_PERSON);
         mImChatControl = new IMChatLogic.Build() {
             @Override
             public MemEntity setTargetMem() {

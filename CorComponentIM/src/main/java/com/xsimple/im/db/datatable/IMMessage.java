@@ -64,15 +64,15 @@ public class IMMessage {
     /**
      * 消息类型
      */
-    public static final int TYPE_CHAT = 0;
+    public static final int TYPE_CHAT = 4;
 
     /**
-     * 群组
+     * 组局聊天室
      */
     public static final int TYPE_GROUP = 1;
 
     /**
-     * 讨论组
+     * 店铺聊天室
      */
     public static final int TYPE_DISCUSS = 2;
 

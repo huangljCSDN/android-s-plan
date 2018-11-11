@@ -31,16 +31,17 @@ import java.util.List;
 @Entity(nameInDb = "im_chat_new")
 public class IMChat {
 
-    public static final int SESSION_PERSON = 0;// 个人
-    public static final int SESSION_GROUP_CLUSTER = 1;// 群组
-    public static final int SESSION_GROUP_DISCUSSION = 2;// 讨论组
+    public static final int SESSION_GROUP_CLUSTER = 1;// 组局聊天室
+    public static final int SESSION_GROUP_DISCUSSION = 2;// 店铺聊天室
     public static final int SESSION_SYSTEM_MSG = 3;// 系统消息
-    public static final int SESSION_LIGHT_MSG = 4;// 轻应用消息
+    public static final int SESSION_PERSON = 4;// 个人
 
     public static final int SESSION_BOX_MSG = 5;// 消息盒子
     public static final int SESSION_OFFICIAL_MSG = 6;// 官方消息
 
-    @IntDef({SESSION_PERSON, SESSION_GROUP_CLUSTER, SESSION_GROUP_DISCUSSION, SESSION_SYSTEM_MSG, SESSION_LIGHT_MSG})
+
+
+    @IntDef({SESSION_PERSON, SESSION_GROUP_CLUSTER, SESSION_GROUP_DISCUSSION, SESSION_SYSTEM_MSG})
     @Retention(RetentionPolicy.SOURCE)
     @Target({ElementType.PARAMETER, ElementType.FIELD})
     public @interface SessionType {
@@ -61,10 +62,17 @@ public class IMChat {
 
     private String receiverName;
 
-    /**
-     * 发送或接收id2  对于群组，senderOrTarget2 为群组 id
-     */
     private String senderOrTarget2;
+
+    /**
+     * 发送或接收id2  对于群组，chatId 为群组 id
+     */
+    private String chatId;
+
+    /**
+     * 组局/店铺id
+     */
+    private String dataId;
 
     /**
      * 会话类型
@@ -155,14 +163,16 @@ public class IMChat {
 
     @Keep
     public IMChat(String uId, String senderOrTarget1, int type, String name,
-                  int UnReadCount, Long time, String senderOrTarget2, String receiverName,String funKey) {
+                  int UnReadCount, Long time, String chatId,String dataId, String receiverName,String funKey) {
         this.uId = uId;
         this.senderOrTarget1 = senderOrTarget1;
         this.type = type;
         this.name = name;
         this.UnReadCount = UnReadCount;
         this.time = time;
-        this.senderOrTarget2 = senderOrTarget2;
+//        this.senderOrTarget2 = senderOrTarget2;
+        this.chatId = chatId;
+        this.dataId = dataId;
         this.receiverName = receiverName;
         this.funKey = funKey;
     }
@@ -173,15 +183,17 @@ public class IMChat {
     }
 
 
-    @Generated(hash = 830058073)
-    public IMChat(Long id, String uId, String senderOrTarget1, String receiverName, String senderOrTarget2, int type,
-            String name, int UnReadCount, Long time, boolean isStick, boolean isNotDisturb, String drafts, long refreshTime,
-            String funKey) {
+    @Generated(hash = 1441368836)
+    public IMChat(Long id, String uId, String senderOrTarget1, String receiverName, String senderOrTarget2, String chatId,
+            String dataId, int type, String name, int UnReadCount, Long time, boolean isStick, boolean isNotDisturb,
+            String drafts, long refreshTime, String funKey) {
         this.id = id;
         this.uId = uId;
         this.senderOrTarget1 = senderOrTarget1;
         this.receiverName = receiverName;
         this.senderOrTarget2 = senderOrTarget2;
+        this.chatId = chatId;
+        this.dataId = dataId;
         this.type = type;
         this.name = name;
         this.UnReadCount = UnReadCount;
@@ -192,6 +204,7 @@ public class IMChat {
         this.refreshTime = refreshTime;
         this.funKey = funKey;
     }
+
 
 
     public void setuId(String uId) {
@@ -467,6 +480,8 @@ public class IMChat {
         return "IMChat{" +
                 "id=" + id +
                 ", uId='" + uId + '\'' +
+                ", dataId='" + dataId + '\'' +
+                ", chatId='" + chatId + '\'' +
                 ", senderOrTarget1='" + senderOrTarget1 + '\'' +
                 ", receiverName='" + receiverName + '\'' +
                 ", senderOrTarget2='" + senderOrTarget2 + '\'' +
@@ -544,5 +559,25 @@ public class IMChat {
     @Generated(hash = 1174372829)
     public synchronized void resetIMOfficialMessage() {
         IMOfficialMessage = null;
+    }
+
+
+    public String getChatId() {
+        return this.chatId;
+    }
+
+
+    public void setChatId(String chatId) {
+        this.chatId = chatId;
+    }
+
+
+    public String getDataId() {
+        return this.dataId;
+    }
+
+
+    public void setDataId(String dataId) {
+        this.dataId = dataId;
     }
 }

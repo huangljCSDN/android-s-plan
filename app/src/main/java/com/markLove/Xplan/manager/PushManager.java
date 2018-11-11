@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.NotificationManagerCompat;
 
+import com.markLove.Xplan.base.App;
 import com.markLove.Xplan.utils.GsonUtils;
 import com.markLove.Xplan.utils.LogUtils;
 import com.networkengine.engine.LogicEngine;
@@ -73,8 +74,10 @@ public class PushManager {
         String type = msgContent.getType();
         //盒子小助手消息
         if (MessageContent.MSG_TYPE_BOX.equals(type)) {
+            messageEntity.getMsgContent().setUserId(App.getInstance().getUserId());
             dbManager.processBoxMessage(messageEntity);
         } else if (MessageContent.MSG_TYPE_OFFICIAL.equals(type)) { //官方消息
+            messageEntity.getMsgContent().setUserId(App.getInstance().getUserId());
             dbManager.processOfficialMessage(messageEntity);
         }
     }
@@ -108,31 +111,31 @@ public class PushManager {
             try {
                 MchlApiService mchlApiService = LogicEngine.getInstance().getMchlClient();
                 RequestGetMsgsParam requestGetMsgsParam = new RequestGetMsgsParam(10, params[0]);
-                Response<Object> execute = mchlApiService.getNewMsgs(requestGetMsgsParam).execute();
+                Response<GetMsgsResult> execute = mchlApiService.getNewMsgs(requestGetMsgsParam).execute();
                 if (execute == null) {
                     return null;
                 }
-                LogUtils.i("Response11111111="+GsonUtils.obj2Json(execute.body()));
-//                if (execute.isSuccessful()) {
-//
-//                    GetMsgsResult body = execute.body();
-//
-//                    List<GetMsgsEntity> data = null;
-//                    if (body != null && body.getData() != null) {
-//                        data = body.getData().getData();
-//                    }
-//                    if (data != null && !data.isEmpty()) {
-//                        long clientMaxMsgId = 0;
-//                        try {
-//                            clientMaxMsgId = Long.parseLong(body.getData().getClientMaxMsgId());
-//                        } catch (Exception e) {
-//
-//                        }
-//                        doPullMessage(clientMaxMsgId, DEF_TRY_COUNT);
-//                        return data;
-//                    }
-//
-//                }
+                LogUtils.i("PushManager="+GsonUtils.obj2Json(execute.body()));
+                if (execute.isSuccessful()) {
+
+                    GetMsgsResult body = execute.body();
+
+                    List<GetMsgsEntity> data = null;
+                    if (body != null && body.getData() != null) {
+                        data = body.getData().getData();
+                    }
+                    if (data != null && !data.isEmpty()) {
+                        long clientMaxMsgId = 0;
+                        try {
+                            clientMaxMsgId = Long.parseLong(body.getData().getClientMaxMsgId());
+                        } catch (Exception e) {
+
+                        }
+                        doPullMessage(clientMaxMsgId, DEF_TRY_COUNT);
+                        return data;
+                    }
+
+                }
             } catch (IOException e) {
                 doPullMessage(params[0], --tryCount);
             }

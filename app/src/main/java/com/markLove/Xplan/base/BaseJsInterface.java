@@ -21,6 +21,11 @@ import com.markLove.Xplan.utils.AppManager;
 import com.markLove.Xplan.utils.GsonUtils;
 import com.markLove.Xplan.utils.LogUtils;
 import com.markLove.Xplan.utils.PreferencesUtils;
+import com.xsimple.im.db.DbManager;
+import com.xsimple.im.db.datatable.IMBoxMessage;
+import com.xsimple.im.db.datatable.IMOfficialMessage;
+
+import java.util.List;
 
 public class BaseJsInterface {
 

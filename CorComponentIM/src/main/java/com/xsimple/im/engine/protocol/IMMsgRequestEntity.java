@@ -15,6 +15,7 @@ import com.networkengine.entity.RequestMessageParams;
 import com.networkengine.util.AtUtil;
 import com.networkengine.util.CoracleSdk;
 import com.xsimple.im.R;
+import com.xsimple.im.db.datatable.IMChat;
 import com.xsimple.im.db.datatable.IMChatRecordInfo;
 import com.xsimple.im.db.datatable.IMFileInfo;
 import com.xsimple.im.db.datatable.IMLocationInfo;
@@ -87,7 +88,7 @@ public class IMMsgRequestEntity extends MsgRequestEntity implements IProcessorPa
 
         RequestMessageParams params = new RequestMessageParams();
 
-        if (0 == type) {//单聊
+        if (IMChat.SESSION_PERSON == type) {//单聊
             List<String> receivers = new ArrayList<>();
             receivers.add(tagertId);
             //设置单聊id
@@ -95,14 +96,14 @@ public class IMMsgRequestEntity extends MsgRequestEntity implements IProcessorPa
             params.setChatType(com.networkengine.PubConstant.ConversationType.PERSONAL);
             requestMessageEntity.setTarget_name(singleTargetName);
             requestMessageEntity.setChatType(com.networkengine.PubConstant.ConversationType.PERSONAL);
-        } else if (1 == type) {//群聊
+        } else if (IMChat.SESSION_GROUP_CLUSTER == type) {//组局聊天室
             //设置群聊id
             params.setGroupId(tagertId);
             params.setGroupName(groupName);
             requestMessageEntity.setGroupName(groupName);
             params.setChatType(PubConstant.ConversationType.CHATROOM);
             requestMessageEntity.setChatType(com.networkengine.PubConstant.ConversationType.CHATROOM);
-        } else if (2 == type) {//讨论组
+        } else if (IMChat.SESSION_GROUP_DISCUSSION == type) {//店铺聊天室
             //设置群聊id
             params.setGroupId(tagertId);
             params.setGroupName(groupName);

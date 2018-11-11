@@ -961,7 +961,7 @@ public class GroupChatActivity extends BaseActivity<GroupChatPresenter> implemen
 //        IMChatActivity.startMe(getContext(), new MemEntity(group.getId(), group.getName(), group.getType()), null, null);
 
 //        final MemEntity memEntity = (MemEntity) getIntent().getSerializableExtra(EXTRA_TARGET);
-        final MemEntity memEntity = new MemEntity(chatId, detailBean.getGroup().getTitle(), 1);
+        final MemEntity memEntity = new MemEntity(chatId, String.valueOf(dataId),detailBean.getGroup().getTitle(), IMChat.SESSION_GROUP_CLUSTER);
         mImChatControl = new IMChatLogic.Build() {
             @Override
             public MemEntity setTargetMem() {

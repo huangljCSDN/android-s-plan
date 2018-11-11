@@ -1550,7 +1550,7 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
             message.setImMessage(imMessage);
             message.setStatus(changeStatus(imMessage.getStatus()));
         } else if (IMMessage.GROUP_OFFICE_AGREE.equals(imMessage.getContentType())) {
-            TxtMessageBody txtMessageBody = new TxtMessageBody(Message.Type.CHAT, Message.ChatType.TXT, imMessage.getContent());
+            TxtMessageBody txtMessageBody = new TxtMessageBody(Message.Type.CHAT, Message.ChatType.NOTIFICATION, imMessage.getContent());
             message = new Message(IMMessage.SYSTEM_ID, Integer.parseInt(imMessage.getApplyId()),String.valueOf(imMessage.getLocalId()),Message.Type.CHAT, Message.ChatType.NOTIFICATION,txtMessageBody);
             message.setImMessage(imMessage);
             message.setStatus(changeStatus(imMessage.getStatus()));
@@ -1561,7 +1561,7 @@ public class GroupChatMessageAdapter extends RecyclerView.Adapter<ChatBaseViewHo
                 }
             }
         } else if (IMMessage.GROUP_OFFICE_APPLY.equals(imMessage.getContentType())) {
-            TxtMessageBody txtMessageBody = new TxtMessageBody(Message.Type.CHAT, Message.ChatType.TXT, imMessage.getContent());
+            TxtMessageBody txtMessageBody = new TxtMessageBody(Message.Type.CHAT, Message.ChatType.REQUEST_JOIN, imMessage.getContent());
             message = new Message(IMMessage.SYSTEM_ID, Integer.parseInt(imMessage.getApplyId()),String.valueOf(imMessage.getLocalId()),Message.Type.CHAT, Message.ChatType.REQUEST_JOIN,txtMessageBody);
             message.setImMessage(imMessage);
             message.setAgree(imMessage.getIsAgree());

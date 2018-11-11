@@ -33,4 +33,13 @@ public class IMSendResult {
     public void setData(IMSendResultDetail data) {
         this.data = data;
     }
+
+    @Override
+    public String toString() {
+        return "IMSendResult{" +
+                "code='" + code + '\'' +
+                ", msg='" + msg + '\'' +
+                ", data=" + data +
+                '}';
+    }
 }

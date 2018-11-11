@@ -12,6 +12,7 @@ import com.networkengine.entity.RequestMessageEntity;
 import com.networkengine.util.LogUtil;
 import com.xsimple.im.db.DbManager;
 import com.xsimple.im.db.datatable.IMCallInfo;
+import com.xsimple.im.db.datatable.IMChat;
 import com.xsimple.im.db.datatable.IMChatRecordInfo;
 import com.xsimple.im.db.datatable.IMFileInfo;
 import com.xsimple.im.db.datatable.IMLocationInfo;
@@ -128,7 +129,7 @@ public class MsgParameterProcessor extends Processor<IMMsgRequestEntity, IMMessa
         message.setContent(UnicodeUtils.unicode2String(msgContent.getContent()));
         //聊天类型
         if (PubConstant.ConversationType.PERSONAL.equals(imMsgRequestEntity.getParam().getChatType())) {
-            message.setType(0);
+            message.setType(4);
         } else if (PubConstant.ConversationType.FIXEDGROUP.equals(imMsgRequestEntity.getParam().getChatType())) {
             message.setType(1);
         } else if (PubConstant.ConversationType.DISCUSSIONGROUP.equals(imMsgRequestEntity.getParam().getChatType())) {

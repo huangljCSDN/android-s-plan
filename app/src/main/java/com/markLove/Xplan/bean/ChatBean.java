@@ -17,6 +17,51 @@ public class ChatBean {
     private String dataName;
     private String headImageUrl;
 
+    private String sCallback;
+    private int page;
+    private int rows;
+    private long id; //官方会话/盒子会话id
+
+    public int getPage() {
+        return page;
+    }
+
+    public void setPage(int page) {
+        this.page = page;
+    }
+
+    public int getRows() {
+        return rows;
+    }
+
+    public void setRows(int rows) {
+        this.rows = rows;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getHeadImageUrl() {
+        return headImageUrl;
+    }
+
+    public void setHeadImageUrl(String headImageUrl) {
+        this.headImageUrl = headImageUrl;
+    }
+
+    public String getsCallback() {
+        return sCallback;
+    }
+
+    public void setsCallback(String sCallback) {
+        this.sCallback = sCallback;
+    }
+
     public String getDataName() {
         return dataName;
     }

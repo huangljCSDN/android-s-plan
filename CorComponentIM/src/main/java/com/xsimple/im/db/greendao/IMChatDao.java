@@ -32,15 +32,17 @@ public class IMChatDao extends AbstractDao<IMChat, Long> {
         public final static Property SenderOrTarget1 = new Property(2, String.class, "senderOrTarget1", false, "SENDER_OR_TARGET1");
         public final static Property ReceiverName = new Property(3, String.class, "receiverName", false, "RECEIVER_NAME");
         public final static Property SenderOrTarget2 = new Property(4, String.class, "senderOrTarget2", false, "SENDER_OR_TARGET2");
-        public final static Property Type = new Property(5, int.class, "type", false, "TYPE");
-        public final static Property Name = new Property(6, String.class, "name", false, "NAME");
-        public final static Property UnReadCount = new Property(7, int.class, "UnReadCount", false, "UN_READ_COUNT");
-        public final static Property Time = new Property(8, Long.class, "time", false, "TIME");
-        public final static Property IsStick = new Property(9, boolean.class, "isStick", false, "IS_STICK");
-        public final static Property IsNotDisturb = new Property(10, boolean.class, "isNotDisturb", false, "IS_NOT_DISTURB");
-        public final static Property Drafts = new Property(11, String.class, "drafts", false, "DRAFTS");
-        public final static Property RefreshTime = new Property(12, long.class, "refreshTime", false, "REFRESH_TIME");
-        public final static Property FunKey = new Property(13, String.class, "funKey", false, "FUN_KEY");
+        public final static Property ChatId = new Property(5, String.class, "chatId", false, "CHAT_ID");
+        public final static Property DataId = new Property(6, String.class, "dataId", false, "DATA_ID");
+        public final static Property Type = new Property(7, int.class, "type", false, "TYPE");
+        public final static Property Name = new Property(8, String.class, "name", false, "NAME");
+        public final static Property UnReadCount = new Property(9, int.class, "UnReadCount", false, "UN_READ_COUNT");
+        public final static Property Time = new Property(10, Long.class, "time", false, "TIME");
+        public final static Property IsStick = new Property(11, boolean.class, "isStick", false, "IS_STICK");
+        public final static Property IsNotDisturb = new Property(12, boolean.class, "isNotDisturb", false, "IS_NOT_DISTURB");
+        public final static Property Drafts = new Property(13, String.class, "drafts", false, "DRAFTS");
+        public final static Property RefreshTime = new Property(14, long.class, "refreshTime", false, "REFRESH_TIME");
+        public final static Property FunKey = new Property(15, String.class, "funKey", false, "FUN_KEY");
     }
 
     private DaoSession daoSession;
@@ -65,15 +67,17 @@ public class IMChatDao extends AbstractDao<IMChat, Long> {
                 "\"SENDER_OR_TARGET1\" TEXT," + // 2: senderOrTarget1
                 "\"RECEIVER_NAME\" TEXT," + // 3: receiverName
                 "\"SENDER_OR_TARGET2\" TEXT," + // 4: senderOrTarget2
-                "\"TYPE\" INTEGER NOT NULL ," + // 5: type
-                "\"NAME\" TEXT," + // 6: name
-                "\"UN_READ_COUNT\" INTEGER NOT NULL ," + // 7: UnReadCount
-                "\"TIME\" INTEGER," + // 8: time
-                "\"IS_STICK\" INTEGER NOT NULL ," + // 9: isStick
-                "\"IS_NOT_DISTURB\" INTEGER NOT NULL ," + // 10: isNotDisturb
-                "\"DRAFTS\" TEXT," + // 11: drafts
-                "\"REFRESH_TIME\" INTEGER NOT NULL ," + // 12: refreshTime
-                "\"FUN_KEY\" TEXT);"); // 13: funKey
+                "\"CHAT_ID\" TEXT," + // 5: chatId
+                "\"DATA_ID\" TEXT," + // 6: dataId
+                "\"TYPE\" INTEGER NOT NULL ," + // 7: type
+                "\"NAME\" TEXT," + // 8: name
+                "\"UN_READ_COUNT\" INTEGER NOT NULL ," + // 9: UnReadCount
+                "\"TIME\" INTEGER," + // 10: time
+                "\"IS_STICK\" INTEGER NOT NULL ," + // 11: isStick
+                "\"IS_NOT_DISTURB\" INTEGER NOT NULL ," + // 12: isNotDisturb
+                "\"DRAFTS\" TEXT," + // 13: drafts
+                "\"REFRESH_TIME\" INTEGER NOT NULL ," + // 14: refreshTime
+                "\"FUN_KEY\" TEXT);"); // 15: funKey
     }
 
     /** Drops the underlying database table. */
@@ -110,30 +114,40 @@ public class IMChatDao extends AbstractDao<IMChat, Long> {
         if (senderOrTarget2 != null) {
             stmt.bindString(5, senderOrTarget2);
         }
-        stmt.bindLong(6, entity.getType());
+ 
+        String chatId = entity.getChatId();
+        if (chatId != null) {
+            stmt.bindString(6, chatId);
+        }
+ 
+        String dataId = entity.getDataId();
+        if (dataId != null) {
+            stmt.bindString(7, dataId);
+        }
+        stmt.bindLong(8, entity.getType());
  
         String name = entity.getName();
         if (name != null) {
-            stmt.bindString(7, name);
+            stmt.bindString(9, name);
         }
-        stmt.bindLong(8, entity.getUnReadCount());
+        stmt.bindLong(10, entity.getUnReadCount());
  
         Long time = entity.getTime();
         if (time != null) {
-            stmt.bindLong(9, time);
+            stmt.bindLong(11, time);
         }
-        stmt.bindLong(10, entity.getIsStick() ? 1L: 0L);
-        stmt.bindLong(11, entity.getIsNotDisturb() ? 1L: 0L);
+        stmt.bindLong(12, entity.getIsStick() ? 1L: 0L);
+        stmt.bindLong(13, entity.getIsNotDisturb() ? 1L: 0L);
  
         String drafts = entity.getDrafts();
         if (drafts != null) {
-            stmt.bindString(12, drafts);
+            stmt.bindString(14, drafts);
         }
-        stmt.bindLong(13, entity.getRefreshTime());
+        stmt.bindLong(15, entity.getRefreshTime());
  
         String funKey = entity.getFunKey();
         if (funKey != null) {
-            stmt.bindString(14, funKey);
+            stmt.bindString(16, funKey);
         }
     }
 
@@ -165,30 +179,40 @@ public class IMChatDao extends AbstractDao<IMChat, Long> {
         if (senderOrTarget2 != null) {
             stmt.bindString(5, senderOrTarget2);
         }
-        stmt.bindLong(6, entity.getType());
+ 
+        String chatId = entity.getChatId();
+        if (chatId != null) {
+            stmt.bindString(6, chatId);
+        }
+ 
+        String dataId = entity.getDataId();
+        if (dataId != null) {
+            stmt.bindString(7, dataId);
+        }
+        stmt.bindLong(8, entity.getType());
  
         String name = entity.getName();
         if (name != null) {
-            stmt.bindString(7, name);
+            stmt.bindString(9, name);
         }
-        stmt.bindLong(8, entity.getUnReadCount());
+        stmt.bindLong(10, entity.getUnReadCount());
  
         Long time = entity.getTime();
         if (time != null) {
-            stmt.bindLong(9, time);
+            stmt.bindLong(11, time);
         }
-        stmt.bindLong(10, entity.getIsStick() ? 1L: 0L);
-        stmt.bindLong(11, entity.getIsNotDisturb() ? 1L: 0L);
+        stmt.bindLong(12, entity.getIsStick() ? 1L: 0L);
+        stmt.bindLong(13, entity.getIsNotDisturb() ? 1L: 0L);
  
         String drafts = entity.getDrafts();
         if (drafts != null) {
-            stmt.bindString(12, drafts);
+            stmt.bindString(14, drafts);
         }
-        stmt.bindLong(13, entity.getRefreshTime());
+        stmt.bindLong(15, entity.getRefreshTime());
  
         String funKey = entity.getFunKey();
         if (funKey != null) {
-            stmt.bindString(14, funKey);
+            stmt.bindString(16, funKey);
         }
     }
 
@@ -211,15 +235,17 @@ public class IMChatDao extends AbstractDao<IMChat, Long> {
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // senderOrTarget1
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // receiverName
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // senderOrTarget2
-            cursor.getInt(offset + 5), // type
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // name
-            cursor.getInt(offset + 7), // UnReadCount
-            cursor.isNull(offset + 8) ? null : cursor.getLong(offset + 8), // time
-            cursor.getShort(offset + 9) != 0, // isStick
-            cursor.getShort(offset + 10) != 0, // isNotDisturb
-            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // drafts
-            cursor.getLong(offset + 12), // refreshTime
-            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13) // funKey
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // chatId
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // dataId
+            cursor.getInt(offset + 7), // type
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // name
+            cursor.getInt(offset + 9), // UnReadCount
+            cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10), // time
+            cursor.getShort(offset + 11) != 0, // isStick
+            cursor.getShort(offset + 12) != 0, // isNotDisturb
+            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // drafts
+            cursor.getLong(offset + 14), // refreshTime
+            cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15) // funKey
         );
         return entity;
     }
@@ -231,15 +257,17 @@ public class IMChatDao extends AbstractDao<IMChat, Long> {
         entity.setSenderOrTarget1(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setReceiverName(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setSenderOrTarget2(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setType(cursor.getInt(offset + 5));
-        entity.setName(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
-        entity.setUnReadCount(cursor.getInt(offset + 7));
-        entity.setTime(cursor.isNull(offset + 8) ? null : cursor.getLong(offset + 8));
-        entity.setIsStick(cursor.getShort(offset + 9) != 0);
-        entity.setIsNotDisturb(cursor.getShort(offset + 10) != 0);
-        entity.setDrafts(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
-        entity.setRefreshTime(cursor.getLong(offset + 12));
-        entity.setFunKey(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
+        entity.setChatId(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setDataId(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setType(cursor.getInt(offset + 7));
+        entity.setName(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setUnReadCount(cursor.getInt(offset + 9));
+        entity.setTime(cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10));
+        entity.setIsStick(cursor.getShort(offset + 11) != 0);
+        entity.setIsNotDisturb(cursor.getShort(offset + 12) != 0);
+        entity.setDrafts(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
+        entity.setRefreshTime(cursor.getLong(offset + 14));
+        entity.setFunKey(cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15));
      }
     
     @Override

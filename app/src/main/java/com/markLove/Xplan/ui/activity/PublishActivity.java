@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.EditText;
@@ -54,6 +55,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import top.zibin.luban.CompressionPredicate;
+import top.zibin.luban.Luban;
+import top.zibin.luban.OnCompressListener;
 
 /**
  * 发布动态
@@ -304,11 +309,11 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (data != null) {
-            LogUtils.i("huang", "requestCode=" + requestCode + "   resultCode=" + resultCode);
+            LogUtils.i("PublishActivity", "requestCode=" + requestCode + "   resultCode=" + resultCode);
             //拍照
             if (requestCode == Constants.REQUEST_CODE_CAMERA) {
                 final String path = data.getStringExtra("path");
-                LogUtils.i("huang", "path=" + path);
+                LogUtils.i("PublishActivity", "path=" + path);
                 if (path.contains("mp4")) {
                     mediaList.clear();
                     Media media = new Media(path, "", 0, 2, 999, 9999, "");
@@ -342,11 +347,12 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
                         }
                     }
                     //是否原图
-//                    Boolean isOrigin = data.getBooleanExtra(PickerConfig.IS_ORIGIN, false);
-                    Boolean isOrigin = true;
+                    Boolean isOrigin = data.getBooleanExtra(PickerConfig.IS_ORIGIN, false);
+                    List<String> paths = new ArrayList<>();
                     for (final Media media : select) {
-                        onImageReturn(null, media.path, isOrigin);
+                        paths.add(media.path);
                     }
+                    compressImg(paths, isOrigin);
                     type = 1;
                     mTvPublish.setTextColor(getColor(R.color.color_30efec));
                     mRecycleView.setVisibility(View.VISIBLE);
@@ -442,79 +448,60 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
     }
 
     /**
-     * 图片返回处理
+     * 压缩图片
      *
-     * @param uri
-     * @param filePath
-     * @param isOrigin 是否原图发送
+     * @param photos
      */
-    public void onImageReturn(Uri uri, String filePath, boolean isOrigin) {
-//        String filePath = autoCameraUtils.getPath(this, uri);
-        String fileName = filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length());
-        final Message imgMsg = Message.createImageMessage(Message.Type.CHAT, 0, 0,"", fileName, filePath);
-        imgMsg.setStatus(Message.ChatStatus.SENDING);
-        isOrigin = true;
-        LogUtils.i("huang","filePath="+filePath);
+    private void compressImg(List<String> photos, boolean isOrigin) {
+        final List<File> files = new ArrayList<>();
+        final int size = photos.size();
+
+        if (photos.size() == 0) return;
+
         if (isOrigin) {
-            Media media = new Media(filePath, "", 0, 1, 999, 9999, "");
-            mediaList.add(media);
+            for (String path : photos) {
+                Media media = new Media(path, "", 0, 1, 999, 9999, "");
+                mediaList.add(media);
+            }
             gridAdapter.setData(mediaList);
         } else {
-//            Observable.create(new ObservableOnSubscribe<Message>() {
-//                @Override
-//                public void subscribe(final ObservableEmitter<Message> emitter) throws Exception {
-//                    final FileMessageBody imgMessageBody = (FileMessageBody) imgMsg.getBody();
-//                    final String outPath = Constants.LOCAL_IMG_PATH + imgMessageBody.getFileName();
-//                    LogUtils.i("huang", "outPath=" + outPath);
-//                    ImageUtils.compressImageInPath(imgMessageBody.getFilePath(), Constants.LOCAL_IMG_PATH, new IImageCompressor.OnImageCompressListener() {
-//                        @Override
-//                        public void onCompressStart(String msg) {
-//
-//                        }
-//
-//                        @Override
-//                        public void onCompressComplete(List<String> destFilePaths) {
-//                            if (destFilePaths != null && destFilePaths.size() > 0) {
-//                                LogUtils.i("huang", "destFilePaths=" + destFilePaths.get(0));
-//                                imgMessageBody.setFilePath(outPath);
-//                                emitter.onNext(imgMsg);
-//                                emitter.onComplete();
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onCompressError(String msg) {
-//
-//                        }
-//                    });
-//                }
-//            }).subscribeOn(Schedulers.io())
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribe(new Observer<Message>() {
-//                        @Override
-//                        public void onSubscribe(Disposable d) {
-//
-//                        }
-//
-//                        @Override
-//                        public void onNext(Message message) {
-//                            FileMessageBody imgMessageBody = (FileMessageBody) imgMsg.getBody();
-////                            String outPath = Constants.LOCAL_IMG_PATH + imgMessageBody.getFileName();
-//                            Media media = new Media(imgMessageBody.getFilePath(), "", 0, 1, 999, 9999, "");
-//                            mediaList.add(media);
-//                            gridAdapter.setData(mediaList);
-//                        }
-//
-//                        @Override
-//                        public void onError(Throwable e) {
-//
-//                        }
-//
-//                        @Override
-//                        public void onComplete() {
-//
-//                        }
-//                    });
+            Luban.with(this)
+                    .load(photos)
+                    .ignoreBy(100)
+                    .setTargetDir(Constants.LOCAL_IMG_PATH) //缓存路径
+                    .filter(new CompressionPredicate() {
+                        @Override
+                        public boolean apply(String path) {
+                            return !(TextUtils.isEmpty(path) || path.toLowerCase().endsWith(".gif"));
+                        }
+                    })
+                    .setCompressListener(new OnCompressListener() {
+                        int count = 0;
+
+                        @Override
+                        public void onStart() {
+
+                        }
+
+                        @Override
+                        public void onSuccess(File file) {
+                            count++;
+                            Media media = new Media(file.getAbsolutePath(), "", 0, 1, 999, 9999, "");
+                            mediaList.add(media);
+                            files.add(file);
+                            if (count == size) {
+                                gridAdapter.setData(mediaList);
+                                count = 0;
+                            }
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            LogUtils.e("huang", e.toString());
+//                            e.printStackTrace();
+                        }
+
+                    }).launch();
         }
     }
 
@@ -579,7 +566,7 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
                     files.add(videoFile);
                     files.add(new File(videoImagPath));
                 }
-                LogUtils.i("huang", files.toString());
+                LogUtils.i("PublishActivity", files.toString());
                 filePresenter.upload(files);
             } else {
                 addLocus(null);
@@ -594,7 +581,7 @@ public class PublishActivity extends BaseActivity<PublishPresenter> implements V
      */
     private void addLocus(ArrayList<UploadFileBean.FileBean> fileBeanArrayList) {
         ArrayList<String> paths = new ArrayList<>();
-        if (fileBeanArrayList != null && !fileBeanArrayList.isEmpty()){
+        if (fileBeanArrayList != null && !fileBeanArrayList.isEmpty()) {
             for (UploadFileBean.FileBean fileBean : fileBeanArrayList) {
                 paths.add(fileBean.getPath());
             }

@@ -29,4 +29,12 @@ public class IMSendResultDetail {
     public void setVirtualMsgId(String virtualMsgId) {
         this.virtualMsgId = virtualMsgId;
     }
+
+    @Override
+    public String toString() {
+        return "IMSendResultDetail{" +
+                "sendTime=" + sendTime +
+                ", virtualMsgId='" + virtualMsgId + '\'' +
+                '}';
+    }
 }

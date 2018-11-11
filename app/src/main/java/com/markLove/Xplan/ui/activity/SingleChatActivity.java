@@ -664,12 +664,10 @@ public class SingleChatActivity extends BaseActivity<UserOperationPresenter> imp
     private void initIm(){
         EventBus.getDefault().register(this);
         initMember();
-//        chatId = String.valueOf(to_user_id);
-        chatId = "369101"; //刘杰的
-//        chatId = "369105";
+        chatId = String.valueOf(to_user_id);
         mImEngine = IMEngine.getInstance(this);
 
-        final MemEntity memEntity = new MemEntity(chatId,"",0);
+        final MemEntity memEntity = new MemEntity(chatId,"","",IMChat.SESSION_PERSON);
         mImChatControl = new IMChatLogic.Build() {
             @Override
             public MemEntity setTargetMem() {
