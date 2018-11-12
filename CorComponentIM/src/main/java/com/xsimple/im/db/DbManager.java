@@ -4,7 +4,6 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.networkengine.entity.GetMsgsEntity;
-import com.networkengine.entity.GroupMember;
 import com.networkengine.util.LogUtil;
 import com.xsimple.im.db.datatable.IMBHelper;
 import com.xsimple.im.db.datatable.IMBoxMessage;
@@ -40,7 +39,6 @@ import com.xsimple.im.db.greendao.IMReplyInfoDao;
 import com.xsimple.im.db.greendao.IMSysMessageDao;
 import com.xsimple.im.db.greendao.IMUserDao;
 import com.xsimple.im.engine.IMEngine;
-import com.xsimple.im.engine.protocol.MsgEntity;
 import com.xsimple.im.event.NewSysMsgEvent;
 
 import org.greenrobot.eventbus.EventBus;
@@ -698,8 +696,13 @@ public class DbManager {
             } else {
                 chatName = IMEngine.getInstance(mContext).getIMGroup(iMMessage.getTagertId()).getName();
             }
+            IMChat newIMChat = null;
+            if (iMMessage.getSendOrReceive() == IMMessage.ON_RECEIVE_IMMESSAGE){
+                newIMChat = new IMChat(uId, iMMessage.getTagertId(), iMMessage.getType(), chatName, 0, iMMessage.getTime(), iMMessage.getSenderId(),"", iMMessage.getReceiverName(), "");
+            } else {
+                newIMChat = new IMChat(uId, iMMessage.getSenderId(), iMMessage.getType(), chatName, 0, iMMessage.getTime(), iMMessage.getTagertId(),"", iMMessage.getReceiverName(), "");
+            }
 
-            IMChat newIMChat = new IMChat(uId, iMMessage.getSenderId(), iMMessage.getType(), chatName, 0, iMMessage.getTime(), iMMessage.getTagertId(),"", iMMessage.getReceiverName(), "");
             //设置消息的未阅读数量  消息为接收的消息
 //            if (iMMessage.getSendOrReceive() == IMMessage.ON_RECEIVE_IMMESSAGE) {
 //                newIMChat.setUnReadCount(1);

@@ -667,7 +667,7 @@ public class SingleChatActivity extends BaseActivity<UserOperationPresenter> imp
         chatId = String.valueOf(to_user_id);
         mImEngine = IMEngine.getInstance(this);
 
-        final MemEntity memEntity = new MemEntity(chatId,"","",IMChat.SESSION_PERSON);
+        final MemEntity memEntity = new MemEntity(chatId,"",nickName,IMChat.SESSION_PERSON);
         mImChatControl = new IMChatLogic.Build() {
             @Override
             public MemEntity setTargetMem() {

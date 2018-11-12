@@ -3,10 +3,7 @@ package com.markLove.Xplan.ui.fragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
 import android.widget.LinearLayout;
 
 import com.markLove.Xplan.R;
@@ -17,15 +14,10 @@ import com.markLove.Xplan.base.ui.BaseFragment;
 import com.markLove.Xplan.bean.ChatBean;
 import com.markLove.Xplan.bean.GoViewBeaan;
 import com.markLove.Xplan.bean.MsgBean;
-import com.markLove.Xplan.ui.activity.CpChatActivity;
-import com.markLove.Xplan.ui.activity.GroupChatActivity;
-import com.markLove.Xplan.ui.activity.ShopChatActivity;
-import com.markLove.Xplan.ui.activity.SingleChatActivity;
 import com.markLove.Xplan.ui.activity.WebViewActivity;
 import com.markLove.Xplan.ui.widget.MyWebView;
 import com.markLove.Xplan.utils.GsonUtils;
 import com.markLove.Xplan.utils.LogUtils;
-import com.networkengine.util.LogUtil;
 import com.xsimple.im.db.DbManager;
 import com.xsimple.im.db.datatable.IMBoxMessage;
 import com.xsimple.im.db.datatable.IMChat;
@@ -89,7 +81,7 @@ public class MsgFragment extends BaseFragment {
         public void getMessageInfo(String json) {
             LogUtils.i(TAG, "getMessageInfo=" + json.toString());
             chatBeanForMsgList = GsonUtils.json2Bean(json, ChatBean.class);
-            refreshMsgListData();
+            refreshMsgListData(chatBeanForMsgList.getsCallback());
         }
 
         /**
@@ -114,18 +106,18 @@ public class MsgFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        refreshMsgListData();
+        refreshMsgListData("setMessageInfo");
     }
 
     /**
      * 刷新消息列表数据
      */
-    private void refreshMsgListData() {
+    private void refreshMsgListData(final String methodName) {
         if (chatBeanForMsgList != null) {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mWebView.loadUrl("javascript:" + chatBeanForMsgList.getsCallback() + "(" + getMsgData() + ")");
+                    mWebView.loadUrl("javascript:" + methodName + "(" + getMsgData() + ")");
                 }
             });
         }

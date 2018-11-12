@@ -638,6 +638,7 @@ public class IMEngine implements Handler.Callback {
      * @return
      */
     private IMMessage saveWhenSendMessage(long msgLocalId, IMSendResult sendResult) {
+        if (sendResult == null) return null;
         LogUtil.i("IMSendResult=="+sendResult.toString());
         ProtocolStack protocolStack = new ProtocolStack(mContext, mDbManager);
         if (sendResult == null) {
