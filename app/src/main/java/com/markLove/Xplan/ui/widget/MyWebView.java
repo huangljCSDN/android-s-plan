@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -62,10 +63,18 @@ public class MyWebView extends WebView {
     }
 
     public void onDestroy(){
-        removeAllViews();
+        //避免内存泄露，先将webView从父布局中移除
+        ViewParent parent = getParent();
+        if (parent != null) {
+            ((ViewGroup) parent).removeView(this);
+        }
+
         stopLoading();
+        // 退出时调用此方法，移除绑定的服务，否则某些特定系统会报错
+        getSettings().setJavaScriptEnabled(false);
         clearHistory();
         clearCache(true);
+        removeAllViews();
         destroy();
     }
 }
